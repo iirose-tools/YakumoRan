@@ -1,0 +1,15 @@
+{
+  "name": "dice",
+  "id": "dice",
+  "main": "index",
+  "author": {
+    "name": "涂山苏苏",
+    "github": "TheresaQWQ",
+    "iirose": "涂山苏苏"
+  },
+  "intro": [],
+  "commands": [{
+    "cmd": "骰子 次数d面数",
+    "helper": "扔一个跑团骰子"
+  }]
+}

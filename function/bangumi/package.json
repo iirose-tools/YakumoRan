@@ -1,0 +1,15 @@
+{
+  "name": "bangumi",
+  "id": "bangumi",
+  "main": "index",
+  "author": {
+    "name": "涂山苏苏",
+    "github": "TheresaQWQ",
+    "iirose": "涂山苏苏"
+  },
+  "intro": [],
+  "commands": [{
+    "cmd": "<username>在看啥",
+    "helper": "让我来康康这个人在看什么番"
+  }]
+}

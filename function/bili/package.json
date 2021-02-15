@@ -1,0 +1,20 @@
+{
+  "name": "bilibili",
+  "id": "bili",
+  "main": "index",
+  "author": {
+    "name": "涂山苏苏",
+    "github": "TheresaQWQ",
+    "iirose": "涂山苏苏"
+  },
+  "intro": [
+    "提供哔哩哔哩相关功能"
+  ],
+  "commands": [{
+    "cmd": ".wb set <message>",
+    "helper": "设置欢迎词"
+  }, {
+    "cmd": ".wb rm",
+    "helper": "删除欢迎词"
+  }]
+}

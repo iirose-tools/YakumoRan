@@ -1,0 +1,20 @@
+{
+  "name": "welcome",
+  "id": "welcome",
+  "main": "index",
+  "author": {
+    "name": "涂山苏苏",
+    "github": "TheresaQWQ",
+    "iirose": "涂山苏苏"
+  },
+  "intro": [
+    "进入房间自动欢迎"
+  ],
+  "commands": [{
+    "cmd": ".wb set <message>",
+    "helper": "设置欢迎词"
+  }, {
+    "cmd": ".wb rm",
+    "helper": "删除欢迎词"
+  }]
+}

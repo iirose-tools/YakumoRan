@@ -1,0 +1,20 @@
+{
+  "name": "arknights",
+  "id": "arknights",
+  "main": "index",
+  "author": {
+    "name": "涂山苏苏",
+    "github": "TheresaQWQ",
+    "iirose": "涂山苏苏"
+  },
+  "intro": [
+    "查询明日方舟游戏数据"
+  ],
+  "commands": [{
+    "cmd": "查物品<keyword>",
+    "helper": "查询明日方舟物品信息"
+  }, {
+    "cmd": "查掉落<keyword>",
+    "helper": "查询明日方舟物品掉率"
+  }]
+}
