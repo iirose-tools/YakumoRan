@@ -15,6 +15,9 @@ export default {
     master: "主人用户名",
     color: "消息颜色"
   },
+  chat: {
+    disable: false      // 关闭聊天功能
+  },
   account: {
     username: "机器人用户名",
     password: "机器人密码md5",

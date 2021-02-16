@@ -1,0 +1,17 @@
+{
+  "name": "vtbmusic",
+  "id": "vtbmusic",
+  "main": "index",
+  "author": {
+    "name": "涂山苏苏",
+    "github": "TheresaQWQ",
+    "iirose": "涂山苏苏"
+  },
+  "intro": [
+    "所有歌曲均来自 https://vtbmusic.com"
+  ],
+  "commands": [{
+    "cmd": "vtb点歌 <keywrod>",
+    "helper": "点歌"
+  }]
+}

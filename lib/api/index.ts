@@ -10,6 +10,8 @@ import { send } from '../websocket'
 import { PublicMessage as type_PublicMessage } from '../decoder/PublicMessage';
 import { mkdirSync } from 'fs';
 import config from '../../config';
+import media_card from '../encoder/media_card';
+import media_data from '../encoder/media_data';
 
 export const Event =  Bot;
 
@@ -19,6 +21,8 @@ export const command = (regexp: RegExp, callback: (m: RegExpExecArray, e: type_P
 
     regexp.lastIndex = 0;
     if(regexp.test(e.message)) {
+      logger('Command').info(`${e.username} 触发了 ${regexp} 命令: ${e.message}`);
+
       const reply = (msg: string, color: string) => {
         return method.sendPublicMessage(msg, color);
       }
@@ -55,6 +59,15 @@ export const method = {
     logger('Bot').debug(`向 ${uid} 转账 ${money} 蔷薇币, 留言: ${message}`);
     const data = payment(uid, money, message);
     return send(data);
+  },
+  sendMedia: (type: "music" | "video", title: string, signer: string, cover: string, link: string, url: string, duration: number, BitRate: number, color: string) => {
+    const cardData = media_card(type, title, signer, cover, BitRate, color);
+    const mediaData = media_data(type, title, signer, cover, link, url, duration);
+
+    return [
+      send(cardData),
+      send(mediaData)
+    ];
   }
 }
 
