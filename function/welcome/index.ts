@@ -3,6 +3,10 @@ import fs from 'fs';
 import * as api from '../../lib/api';
 import config from '../../config';
 
+try {
+  fs.mkdirSync(path.join(api.Data, 'welcome'));
+} catch (error) {}
+
 const random = (n: number, m: number): number => { return Math.floor(Math.random() * (m - n + 1) + n); };
 
 const GetWelcomeBack = (uid: string): (string | null) => {
