@@ -9,11 +9,11 @@ const functionPath = path.join(__dirname, '../../function');
 const func: any = {};
 
 fs.readdirSync(functionPath).forEach(e => {
-  logger('Function').info(`正在加载 ${e} ...`);
+  logger('Plugin').info(`正在加载 ${e} ...`);
 
   const itemPath = path.join(functionPath, e);
   const packageData = JSON.parse(fs.readFileSync(path.join(itemPath, 'package.json')).toString());
-  require(path.join(itemPath, packageData.main));
+  if(e !== 'core') require(path.join(itemPath, packageData.main));
 
   func[packageData.id] = {};
   func[packageData.id].helper = Object.values(packageData.commands);
@@ -21,7 +21,7 @@ fs.readdirSync(functionPath).forEach(e => {
   func[packageData.id].intro = packageData.intro;
   func[packageData.id].name = packageData.name;
 
-  logger('Function').info(`${e} 加载完成`);
+  logger('Plugin').info(`${e} 加载完成`);
 })
 
 Event.on('PublicMessage', (msg) => {
@@ -85,7 +85,7 @@ Event.on('PublicMessage', (msg) => {
 
       return tmp.join('\n');
     } else {
-      return `[YakumoRan] Function 未找到`;
+      return `[YakumoRan] 插件未找到`;
     }
   }
 

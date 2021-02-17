@@ -11,3 +11,13 @@ api.command(/^vtb点歌 (.*)$/, (m, e, reply) => {
     }
   })
 });
+
+api.command(/^vtb点歌$/, (m, e, reply) => {
+  vtbmusic.hotMusic().then(e => {
+    if(e){
+      api.method.sendMedia('music', e.title, e.signer, e.cover, `https://vtbmusic.com/song?id=${e.id}`, e.music, e.duration, e.bitrate, config.app.color);
+    } else {
+      reply('[vtbmusic] 点歌失败', config.app.color);
+    }
+  })
+});

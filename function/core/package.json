@@ -1,0 +1,18 @@
+{
+  "name": "core",
+  "id": "core",
+  "main": "",
+  "author": {
+    "name": "涂山苏苏",
+    "github": "TheresaQWQ",
+    "iirose": "涂山苏苏"
+  },
+  "intro": [],
+  "commands": [{
+    "cmd": ".help",
+    "helper": "查看机器人帮助信息"
+  }, {
+    "cmd": ".help <id>",
+    "helper": "查看插件帮助信息"
+  }]
+}
