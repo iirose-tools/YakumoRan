@@ -1,0 +1,15 @@
+{
+  "name": "tools",
+  "id": "tools",
+  "main": "index",
+  "author": {
+    "name": "涂山苏苏",
+    "github": "TheresaQWQ",
+    "iirose": "涂山苏苏"
+  },
+  "intro": [],
+  "commands": [{
+    "cmd": "赞我",
+    "helper": "让机器人给你点个赞"
+  }]
+}
