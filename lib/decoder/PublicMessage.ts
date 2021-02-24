@@ -11,7 +11,6 @@ export interface PublicMessage {
 
 export default (message: string) => {
   if(message.indexOf('<') !== -1) {
-    let isPubMsg = true;
     const msg: PublicMessage[] = [];
     const tmp1 = message.split('<');
     tmp1.forEach(e => {
@@ -28,17 +27,11 @@ export default (message: string) => {
             title: tmp[9] === "'108" ? "花瓣" : tmp[9],
             messageId: Number(tmp[10])
           });
-        } else {
-          isPubMsg = false;
         }
-      } else {
-        isPubMsg = false;
       }
     })
 
-    if(isPubMsg) {
-      return msg;
-    }
+    return msg;
   } else {
     const tmp = message.split('>')
     if(tmp.length === 11) {
