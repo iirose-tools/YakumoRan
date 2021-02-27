@@ -116,14 +116,17 @@ api.Event.on('JoinRoom', (msg) => {
 
   users[msg.uid] = true;
 
+  if(msg.uid.substr(0, 1) === 'X') {
+    api.method.sendPublicMessage(sp.first[random(0, sp.first.length - 1)], config.app.color);
+    setTimeout(() => {
+      delete users[msg.uid];
+    }, 6e4);
+    return;
+  }
+
   setTimeout(() => {
     delete users[msg.uid];
   }, 1e4);
-
-  if(msg.uid.substr(0, 1) === 'X') {
-    api.method.sendPublicMessage(sp.first[random(0, sp.first.length - 1)], config.app.color);
-    return;
-  }
 
   let isSp = false;
 

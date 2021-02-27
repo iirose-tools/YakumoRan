@@ -1,0 +1,18 @@
+{
+  "name": "game",
+  "id": "game",
+  "main": "index",
+  "author": {
+    "name": "涂山苏苏",
+    "github": "TheresaQWQ",
+    "iirose": "涂山苏苏"
+  },
+  "intro": [
+    "一些游戏",
+    "目前只有一个灯谜"
+  ],
+  "commands": [{
+    "cmd": "灯谜",
+    "helper": "猜灯谜"
+  }]
+}
