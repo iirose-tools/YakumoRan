@@ -1,3 +1,5 @@
+import { Bot } from "../event";
+
 export interface UserList {
   avatar: string;
   username: string;
@@ -8,8 +10,6 @@ export interface UserList {
 
 export default (message: string) => {
   if (message.substr(0, 3) === '%*"') {
-    let isUserList = true;
-
     const list: UserList[] = [];
     message.substr(3).split('<').forEach((e, i) => {
       const tmp = e.split('>');
@@ -21,14 +21,10 @@ export default (message: string) => {
           room: tmp[4],
           uid: tmp[8]
         });
-      } else {
-        isUserList = false;
       }
     });
 
-    if(isUserList) return list;
-    return null;
-  } else {
-    return null;
+    Bot.emit("UserList", list);
+    return true;
   }
 }

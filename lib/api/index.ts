@@ -12,6 +12,7 @@ import { mkdirSync } from 'fs';
 import config from '../../config';
 import media_card from '../encoder/media_card';
 import media_data from '../encoder/media_data';
+import status from '../core/status';
 
 export const Event =  Bot;
 
@@ -21,6 +22,7 @@ export const command = (regexp: RegExp, callback: (m: RegExpExecArray, e: type_P
 
     regexp.lastIndex = 0;
     if(regexp.test(e.message)) {
+      status("command");
       logger('Command').info(`${e.username} 触发了 ${regexp} 命令: ${e.message}`);
 
       const reply = (msg: string, color: string) => {
@@ -36,6 +38,7 @@ export const command = (regexp: RegExp, callback: (m: RegExpExecArray, e: type_P
 
 export const method = {
   sendPublicMessage: (message: string, color: string) => {
+    status("sendMsg");
     logger('Bot').debug(`发送了群聊消息: ${message}`);
     const data = PublicMessage(message, color);
     return send(data);

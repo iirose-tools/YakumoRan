@@ -1,3 +1,5 @@
+import { Bot } from "../event";
+
 export interface Like {
   username: string,
   avatar: string,
@@ -20,9 +22,8 @@ export default (message: string) => {
         color: tmp[6]
       }
 
-      return msg;
+      Bot.emit("like", msg);
+      return true;
     }
   }
-
-  return null;
 }

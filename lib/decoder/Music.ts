@@ -1,3 +1,5 @@
+import { Bot } from "../event";
+
 export interface Music {
   url: string,
   link: string,
@@ -15,16 +17,15 @@ export default (message: string) => {
       const msg = {
         url: `http${tmp[0].split(' ')[0]}`,
         link: `http${tmp[0].split(' ')[1]}`,
-        duration: tmp[1],
+        duration: Number(tmp[1]),
         title: tmp[2],
         singer: tmp[3].substr(2),
         owner: tmp[4],
         pic: `http${tmp[6]}`
       }
 
-      return msg;
+      Bot.emit("music", msg);
+      return true;
     }
-  } else {
-    return null;
   }
 }

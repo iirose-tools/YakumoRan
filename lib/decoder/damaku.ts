@@ -1,3 +1,5 @@
+import { Bot } from '../event';
+
 export interface Damaku {
   username: string,
   avatar: string,
@@ -16,9 +18,8 @@ export default (message: string) => {
         color: tmp[2],
       }
 
-      return msg;
+      Bot.emit("damaku", msg);
+      return true;
     }
   }
-
-  return null;
 }

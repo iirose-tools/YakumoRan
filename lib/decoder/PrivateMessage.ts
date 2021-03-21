@@ -1,3 +1,5 @@
+import { Bot } from "../event";
+
 export interface PrivateMessage {
   timestamp: Number,
   uid: string,
@@ -23,10 +25,9 @@ export default (message: string) => {
           messageId: Number(tmp[10])
         }
   
-        return msg;
+        Bot.emit("PrivateMessage", msg);
+        return true;
       }
     }
   }
-
-  return null;
 }

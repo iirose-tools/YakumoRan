@@ -1,3 +1,5 @@
+import { Bot } from "../event";
+
 export interface SystemMessage {
   timestamp: number,
   avatar: string,
@@ -14,7 +16,7 @@ export default (message: string) => {
     if(/\d+/.test(tmp[0])) {
       if(tmp[3] === "'1") {
         const msg = {
-          timestamp: tmp[0],
+          timestamp: Number(tmp[0]),
           avatar: tmp[1],
           username: tmp[2],
           color: tmp[5],
@@ -23,10 +25,9 @@ export default (message: string) => {
           room: tmp[10]
         }
   
-        return msg;
+        Bot.emit('JoinRoom', msg);
+        return true;
       }
     }
   }
-
-  return null;
 }
