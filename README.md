@@ -15,7 +15,7 @@ export default {
     color: "消息颜色"
   },
   chat: {
-    disable: false      // 关闭聊天功能
+    disable: false      // true为关闭聊天功能，false为开启聊天功能
   },
   account: {
     username: "机器人用户名",
@@ -28,4 +28,6 @@ export default {
 }
 ```
 
-## 原版聊天功能春风不推荐使用...请尽可能在[食用方法]第二步之前前往function文件夹的chat文件夹删除掉
+## 原版的聊天功能
+- 春风不推荐使用...请在配置文件时修改是否启动聊天功能
+- 春风编写的插件可以代替它聊天(虽然并不是每个问题都能回答....
