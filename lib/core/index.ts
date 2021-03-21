@@ -10,9 +10,7 @@ Bot.on("PublicMessage", msg => {
 })
 
 WebSocket.on('message', (msg) => {
-  if(!decoder(msg)) {
-    logger("Decoder").warn("收到了无法解析的消息: ", (msg.length > 50) ? `${msg.substr(0, 50)}...` : msg);
-  }
+  decoder(msg)
 })
 
 WebSocket.once('connect', () => {

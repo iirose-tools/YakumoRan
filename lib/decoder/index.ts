@@ -10,20 +10,14 @@ import PublicMessage from './PublicMessage';
 import userlist from './userlist';
 
 export default (msg: string): boolean => {
-  const stats = {
-    p: false,
-  }
-  
-  stats.p = (userlist(msg) && !stats.p) ? true : false;
-  stats.p = (PublicMessage(msg) && !stats.p) ? true : false;
-  stats.p = (LeaveRoom(msg) && !stats.p) ? true : false;
-  stats.p = (JoinRoom(msg) && !stats.p) ? true : false;
-  stats.p = (PrivateMessage(msg) && !stats.p) ? true : false;
-  stats.p = (damaku(msg) && !stats.p) ? true : false;
-  stats.p = (like(msg) && !stats.p) ? true : false;
-  stats.p = (MoveToRoom(msg) && !stats.p) ? true : false;
-  stats.p = (Music(msg) && !stats.p) ? true : false;
-  stats.p = (paymentCallback(msg) && !stats.p) ? true : false;
-  
-  return stats.p;
+  userlist(msg);
+  PublicMessage(msg);
+  LeaveRoom(msg);
+  JoinRoom(msg);
+  PrivateMessage(msg);
+  damaku(msg);
+  like(msg);
+  MoveToRoom(msg);
+  Music(msg);
+  paymentCallback(msg);
 }
