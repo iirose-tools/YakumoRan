@@ -9,7 +9,7 @@ import PrivateMessage from './PrivateMessage';
 import PublicMessage from './PublicMessage';
 import userlist from './userlist';
 
-export default (msg: string): boolean => {
+export default (msg: string) => {
   userlist(msg);
   PublicMessage(msg);
   LeaveRoom(msg);
