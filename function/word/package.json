@@ -1,0 +1,26 @@
+{
+  "name": "word",
+  "id": "word",
+  "main": "index",
+  "author": {
+    "name": "春风~",
+    "github": "BSTluo",
+    "iirose": "春风萧落"
+  },
+  "intro": [
+    "自定义词库"
+  ],
+  "commands": [{
+    "cmd": ".问<message1>答<message2>",
+    "helper": "设置对话词库"
+  }, {
+    "cmd": ".删全问<message1>",
+    "helper": "删除一个触发词的所有结果"
+  },{
+    "cmd": ".删问<message1>序号<词库序号>",
+    "helper": "删除一个触发词的某个结果"
+  },{
+    "cmd": ".问表<message1>",
+    "helper": "查看一个触发词的结果(可看序号)"
+  }]
+}
