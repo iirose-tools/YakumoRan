@@ -1,6 +1,6 @@
 import status from './status';
 import decoder from '../decoder';
-import login from '../encoder/login';
+import login from '../encoder/system/login';
 import { WebSocket, Bot } from '../event';
 import logger from '../logger';
 import init, { send } from '../websocket';
@@ -10,7 +10,9 @@ Bot.on("PublicMessage", msg => {
 })
 
 WebSocket.on('message', (msg) => {
-  decoder(msg)
+  if(!decoder(msg)) {
+    logger("Decoder").warn("收到了无法解析的消息: ", (msg.length > 50) ? `${msg.substr(0, 50)}...` : msg);
+  }
 })
 
 WebSocket.once('connect', () => {
