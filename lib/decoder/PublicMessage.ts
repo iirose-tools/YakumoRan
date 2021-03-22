@@ -1,5 +1,11 @@
 import { Bot } from "../event";
 
+export interface replyMessage {
+  message: string,
+  username: string,
+  time: number
+}
+
 export interface PublicMessage {
   timestamp: number,
   avatar: string,
@@ -8,7 +14,38 @@ export interface PublicMessage {
   color: string,
   uid: string,
   title: string,
-  messageId: number
+  messageId: number,
+  replyMessage: replyMessage[] | null
+}
+
+const replyMsg = (msg: string): replyMessage[] | null => {
+  if(msg.includes(" (_hr) ")) {
+    const replies: replyMessage[] = [];
+
+    msg.split(" (hr_) ").forEach(e => {
+      if(e.includes(" (_hr) ")) {
+        const tmp = e.split(" (_hr) ");
+        const user = tmp[1].split("_");
+
+        replies.unshift({
+          message: tmp[0],
+          username: user[0],
+          time: Number(user[1])
+        })
+
+        replies.sort((a, b) => {
+          return (a.time - b.time)
+        })
+      } else {
+        //@ts-ignore
+        replies.unshift(e);
+      }
+    })
+
+    return replies;
+  }
+
+  return null;
 }
 
 export default (message: string) => {
@@ -21,15 +58,17 @@ export default (message: string) => {
       if(/^\d+$/.test(tmp[0])) {
         if(tmp.length === 11) {
           parser = true;
+          const reply = replyMsg(tmp[3]);
           Bot.emit("PublicMessage", {
             timestamp: Number(tmp[0]),
             avatar: tmp[1],
             username: tmp[2],
-            message: tmp[3],
+            message: reply ? String(reply.shift()) : tmp[3],
             color: tmp[5],
             uid: tmp[8],
             title: tmp[9] === "'108" ? "花瓣" : tmp[9],
-            messageId: Number(tmp[10])
+            messageId: Number(tmp[10]),
+            replyMessage: reply
           });
         } else if (tmp.length === 12) {
           if(tmp[3] === "'1") {
@@ -82,15 +121,19 @@ export default (message: string) => {
     const tmp = message.split('>')
     if(tmp.length === 11) {
       if(/^\d+$/.test(tmp[0])) {
+        const reply = replyMsg(tmp[3]);
+        const message = reply ? String(reply.shift()) : tmp[3];
+        
         const msg = {
           timestamp: Number(tmp[0]),
           avatar: tmp[1],
           username: tmp[2],
-          message: tmp[3],
+          message: message,
           color: tmp[5],
           uid: tmp[8],
           title: tmp[9] === "'108" ? "花瓣" : tmp[9],
-          messageId: Number(tmp[10])
+          messageId: Number(tmp[10]),
+          replyMessage: reply
         }
 
         Bot.emit("PublicMessage", msg);

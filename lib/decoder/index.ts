@@ -10,14 +10,21 @@ import PublicMessage from './PublicMessage';
 import userlist from './userlist';
 
 export default (msg: string) => {
-  userlist(msg);
-  PublicMessage(msg);
-  LeaveRoom(msg);
-  JoinRoom(msg);
-  PrivateMessage(msg);
-  damaku(msg);
-  like(msg);
-  MoveToRoom(msg);
-  Music(msg);
-  paymentCallback(msg);
+  const status = [];
+  
+  status.push(userlist(msg));
+  status.push(PublicMessage(msg));
+  status.push(LeaveRoom(msg));
+  status.push(JoinRoom(msg));
+  status.push(PrivateMessage(msg));
+  status.push(damaku(msg));
+  status.push(like(msg));
+  status.push(MoveToRoom(msg));
+  status.push(Music(msg));
+  status.push(paymentCallback(msg));
+  
+  status.filter(e => e);
+
+  if(status.length > 0) return true;
+  return false;
 }
