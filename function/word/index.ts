@@ -10,7 +10,7 @@ const random = (n: number, m: number): number => { return Math.floor(Math.random
 
 //更新json文件
 function xie(file:any){
-	let jsonstr:string = JSON.stringify(file,null,"\n");//转换为字符串
+	let jsonstr:string = JSON.stringify(file,null,3);//转换为字符串
 	let err: any;
 	fs.writeFile(path.join(__dirname, "../../json/word.json"), jsonstr, function(err) {
 	if (err) {
