@@ -89,37 +89,12 @@ function isError(element:any, index:any, array:any) {
 
 //关键词回复
 api.command(/^(.*)$/,async (m, e, reply) => {
-	let wd1:string = m[1];//发送的信息内容
-	let SRzhenze = /\[(.*)\]/g;
-	let SRjieguo:any;
-	let shuchu:any;
-	SRjieguo=SRzhenze.exec(wd1);//过滤艾特等其他的信息
-	if(SRjieguo){//过滤成功
-		let wda = wd1.replace(SRjieguo[1],"艾特");
-		if(word[wda]){
-			let ran1:number=word[wda].length;
-			let rd1:number=random(0, ran1 - 1);
-				if(word[wda][rd1].replace("艾特",SRjieguo[1])){
-					reply(word[wda][rd1].replace("艾特",SRjieguo[1]),config.app.color);
-				}else{
-					reply(word[wda][rd1],config.app.color);
-				}
-		}else{
-			wd1=lue(wd1);
-			let ran2:number=word[wd1].length;
-			let rd2:number=random(0, ran2 - 1);
-				if(word[wd1]){
-					reply(word[wd1][rd2],config.app.color);
-				}
-		}
-		
-	}else{
-		wd1=lue(wd1);
-		if(word[wd1]){
-			let ran3:number=word[wd1].length;
-			let rd3:number=random(0, ran3 - 1);
-			reply(word[wd1][rd3],config.app.color);
-		}
+let wd1:string = m[1];//发送的信息内容
+	wd1=lue(wd1);
+	if (word[wd1]!=null) {
+		let ran:number=word[wd1].length;
+		let rd:number=random(0, ran - 1);
+		reply(word[wd1][rd], config.app.color);
 	}
 
 });
