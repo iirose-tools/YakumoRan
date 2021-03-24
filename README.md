@@ -13,6 +13,7 @@ export default {
   app: {
     nickname: "机器人昵称",
     master: "主人用户名",
+    master_uid: '主人uid',
     color: "消息颜色"
   },
   chat: {
