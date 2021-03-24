@@ -1,0 +1,31 @@
+{
+  "name": "SCP-079",
+  "id": "scp079",
+  "main": "index",
+  "author": {
+    "name": "涂山苏苏",
+    "github": "TheresaQWQ",
+    "iirose": "涂山苏苏"
+  },
+  "intro": [
+    "提供了一些管理功能",
+    "已经实现的功能",
+    "- 涩图检测",
+    "- 快捷管理",
+    "计划实现的功能",
+    "- 检测 广告/骂人 消息"
+  ],
+  "commands": [{
+    "cmd": "/mute <type> <message>",
+    "helper": "禁言一个人30分钟"
+  }, {
+    "cmd": "/kick",
+    "helper": "把一个人踢出房间"
+  }, {
+    "cmd": "/ban <message>",
+    "helper": "封禁一个人一天"
+  }, {
+    "cmd": "/call <message>",
+    "helper": "发送一条房间公告"
+  }]
+}
