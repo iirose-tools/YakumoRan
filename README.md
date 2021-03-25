@@ -1,9 +1,15 @@
-# YakumoRan
-> 一个普通的花园机器人
+# youmei
+> 基于苏苏花园的ai的衍生ai
+> 词库文件存放在/dist/json/内
+## 原版的聊天功能
+- 春风不推荐使用...有一些词条可能会比较奇怪(?....在配置文件时可以决定是否启动聊天功能
+- 春风编写的插件可以代替它聊天(虽然并不是每个问题都能回答....
+
 
 ## 食用方法
-- 新建 config.ts 文件
-- 参考 [配置文件](#配置文件) 修改配置文件
+- 安装Nodejs
+- 打开cmd npm install -g typescript
+- 参考 [配置文件](#配置文件) 修改config.ts配置文件
 - 运行 `npm run build`
 - 运行 `npm start` 启动项目
 
@@ -14,10 +20,10 @@ export default {
     nickname: "机器人昵称",
     master: "主人用户名",
     master_uid: '主人uid',
-    color: "消息颜色"
+    color: "消息颜色"    //不用#哦...示例：66ccff
   },
   chat: {
-    disable: false      // 关闭聊天功能
+    disable: false      // true为关闭聊天功能，false为开启聊天功能
   },
   account: {
     username: "机器人用户名",
@@ -28,9 +34,3 @@ export default {
     level: "INFO"
   }
 }
-```
-
-## 未来的一些计划
-- [ ] 支持资料卡等协议
-- [ ] 支持炒股协议
-- [ ] 增加QQ/花园联动功能(消息转发)
