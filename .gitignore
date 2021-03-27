@@ -2,4 +2,4 @@ logs/
 dist/
 node_modules/
 data/
-config.ts
+config.json

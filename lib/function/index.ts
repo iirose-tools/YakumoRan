@@ -21,6 +21,10 @@ fs.readdirSync(functionPath).forEach(e => {
   func[packageData.id].intro = packageData.intro;
   func[packageData.id].name = packageData.name;
 
+  try {
+    fs.mkdirSync(`./data/${packageData.id}`)
+  } catch (error) {}
+
   logger('Plugin').info(`${e} 加载完成`);
 })
 
