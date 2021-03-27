@@ -1,5 +1,6 @@
 import got from 'got'
 import logger from './lib/logger'
+import config from './config'
 import pack from './package.json'
 
 const update = () => {
@@ -17,8 +18,6 @@ const update = () => {
 
 const init = async () => {
   logger('Core').info('正在启动...')
-
-  const config: any = await import('./config')
   update()
 
   await import('./lib/core')

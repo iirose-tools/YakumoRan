@@ -93,10 +93,14 @@ api.command(/^\.删全问(.*)$/, async (m, e, reply) => {
 })
 
 // 关键词回复
-api.command(/^(.*)$/, async (m, e, reply) => {
+api.Event.on('PublicMessage', msg => {
   const word = getWord()
-  let wd1: string = m[1]// 发送的信息内容
+  let wd1: string = msg.message.trim()
+
+  const reply = api.method.sendPublicMessage
+
   wd1 = fitter(wd1)
+
   if (word[wd1] != null) {
     const ran: number = word[wd1].length
     const rd: number = random(0, ran - 1)
