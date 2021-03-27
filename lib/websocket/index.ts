@@ -33,7 +33,7 @@ const init = () => {
     logger('WebSocket').error('WebSocket出现错误', err)
   })
 
-  socket.onmessage = (event: { data: Iterable<number> }) => {
+  socket.onmessage = (event: any) => {
     // @ts-ignore
     const array = new Uint8Array(event.data)
 
@@ -61,7 +61,7 @@ export const send = (data: string): Promise<Error | null> => {
       const deflatedArray = new Uint8Array(deflatedData.length + 1)
       deflatedArray[0] = 1
       deflatedArray.set(deflatedData, 1)
-      socket.send(deflatedArray, (err: Error | PromiseLike<Error | null> | null) => {
+      socket.send(deflatedArray, (err: any) => {
         if (err) return resolve(err)
         resolve(null)
       })

@@ -1,0 +1,20 @@
+on:
+  push:
+  pull_request:
+
+jobs:
+  ci:
+    name: ci
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: install node v14
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14
+    - name: npm install
+      run: npm install
+    - name: lint
+      run: npm run lint
+    - name: tsc
+      run: npm run build

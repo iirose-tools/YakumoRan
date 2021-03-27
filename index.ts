@@ -18,13 +18,13 @@ const update = () => {
 const init = async () => {
   logger('Core').info('正在启动...')
 
-  await import('./config')
+  const config: any = await import('./config')
   update()
 
   await import('./lib/core')
   await import('./lib/function')
 
-  logger('Core').info('启动完成 欢迎使用')
+  logger('Core').info(`启动完成 欢迎使用: ${config.account.username}`)
 }
 
 init()
