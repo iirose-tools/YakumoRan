@@ -3,5 +3,5 @@ export default (message: string, color: string) => {
     m: message,
     mc: color,
     i: Math.random().toString().substr(2, 12)
-  });
+  })
 }

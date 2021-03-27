@@ -1,13 +1,13 @@
-import { EventEmitter } from 'events';
-import { SystemMessage } from './decoder/LeaveRoom';
-import { PublicMessage } from './decoder/PublicMessage';
-import { PrivateMessage } from './decoder/PrivateMessage';
-import { UserList } from './decoder/userlist';
-import { Damaku } from './decoder/damaku';
-import { Like } from './decoder/like';
-import { SwitchRoom } from './decoder/SwitchRoom';
-import { Music } from './decoder/Music';
-import { paymentCallback } from './decoder/paymentCallback';
+import { EventEmitter } from 'events'
+import { SystemMessage } from './decoder/LeaveRoom'
+import { PublicMessage } from './decoder/PublicMessage'
+import { PrivateMessage } from './decoder/PrivateMessage'
+import { UserList } from './decoder/userlist'
+import { Damaku } from './decoder/damaku'
+import { Like } from './decoder/like'
+import { SwitchRoom } from './decoder/SwitchRoom'
+import { Music } from './decoder/Music'
+import { paymentCallback } from './decoder/paymentCallback'
 
 interface WebSocketEvent {
   on(event: 'send', listener: (msg: string) => void): void;
@@ -24,7 +24,7 @@ interface WebSocketEvent {
   emit(event: 'message', msg: string): void;
   emit(event: 'connect'): void;
   emit(event: 'disconnect'): void;
-  
+
   removeAllListeners(event: 'send'): void
   removeAllListeners(event: 'message'): void
   removeAllListeners(event: 'connect'): void
@@ -67,7 +67,7 @@ interface BotEvent {
   emit(event: 'SwitchRoom', msg: SwitchRoom): void;
   emit(event: 'music', msg: Music): void;
   emit(event: 'paymentCallback', msg: paymentCallback): void;
-  
+
   removeAllListeners(event: 'login'): void
   removeAllListeners(event: 'UserList'): void
   removeAllListeners(event: 'PublicMessage'): void
@@ -81,8 +81,8 @@ interface BotEvent {
   removeAllListeners(event: 'paymentCallback'): void
 }
 
-export const WebSocket: WebSocketEvent = new EventEmitter();
-export const Bot: BotEvent = new EventEmitter();
+export const WebSocket: WebSocketEvent = new EventEmitter()
+export const Bot: BotEvent = new EventEmitter()
 
-//@ts-ignore
+// @ts-ignore
 Bot.setMaxListeners(Number.MAX_SAFE_INTEGER)

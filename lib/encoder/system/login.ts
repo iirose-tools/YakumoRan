@@ -1,4 +1,4 @@
-import config from "../../../config";
+import config from '../../../config'
 
 export default () => {
   const data = {
@@ -9,7 +9,7 @@ export default () => {
     mo: '',
     mb: '',
     mu: '01'
-  };
+  }
 
-  return `*${JSON.stringify(data)}`;
+  return `*${JSON.stringify(data)}`
 }

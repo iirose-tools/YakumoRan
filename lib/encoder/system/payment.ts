@@ -3,6 +3,6 @@ export default (uid: string, money: number, message: string = '') => {
     g: uid,
     c: money,
     m: message
-  });
+  })
   return `+$${data}`
 }

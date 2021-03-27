@@ -1,7 +1,7 @@
-export default (type: "music" | "video", title: string, signer: string, cover: string, link: string, url: string, duration: number) => {
+export default (type: 'music' | 'video', title: string, signer: string, cover: string, link: string, url: string, duration: number) => {
   const typeMap = {
-    'music': 0,
-    'video': 1
+    music: 0,
+    video: 1
   }
 
   const data = JSON.stringify({

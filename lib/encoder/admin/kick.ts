@@ -1,3 +1,3 @@
 export default (username: string) => {
-  return `!#["${username}"]`;
+  return `!#["${username}"]`
 }

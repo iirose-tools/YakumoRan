@@ -1,1 +1,1 @@
-export default () => { return "!13"; };
+export default () => { return '!13' }

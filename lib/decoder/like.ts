@@ -1,4 +1,4 @@
-import { Bot } from "../event";
+import { Bot } from '../event'
 
 export interface Like {
   username: string,
@@ -10,9 +10,9 @@ export interface Like {
 }
 
 export default (message: string) => {
-  if(message.substr(0, 2) === '@*') {
+  if (message.substr(0, 2) === '@*') {
     const tmp = message.substr(2).split('>')
-    if(tmp.length === 7) {
+    if (tmp.length === 7) {
       const msg = {
         username: tmp[0],
         avatar: tmp[1],
@@ -22,8 +22,8 @@ export default (message: string) => {
         color: tmp[6]
       }
 
-      Bot.emit("like", msg);
-      return true;
+      Bot.emit('like', msg)
+      return true
     }
   }
 }

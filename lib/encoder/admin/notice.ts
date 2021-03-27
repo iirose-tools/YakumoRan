@@ -1,3 +1,3 @@
 export default (msg: string) => {
-  return `!!["${msg}"]`;
+  return `!!["${msg}"]`
 }

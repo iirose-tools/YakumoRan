@@ -1,5 +1,5 @@
-import log4js from 'log4js';
-import config from "../config";
+import log4js from 'log4js'
+import config from '../config'
 
 log4js.configure({
   appenders: {
@@ -19,6 +19,6 @@ log4js.configure({
       level: config.logger.level
     }
   }
-});
+})
 
-export default log4js.getLogger;
+export default log4js.getLogger

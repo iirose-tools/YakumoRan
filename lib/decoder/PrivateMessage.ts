@@ -1,4 +1,4 @@
-import { Bot } from "../event";
+import { Bot } from '../event'
 
 export interface PrivateMessage {
   timestamp: Number,
@@ -11,10 +11,10 @@ export interface PrivateMessage {
 }
 
 export default (message: string) => {
-  if(message.substr(0, 1) === '"') {
+  if (message.substr(0, 1) === '"') {
     const tmp = message.substr(1).split('>')
-    if(tmp.length === 11) {
-      if(/^\d+$/.test(tmp[0])) {
+    if (tmp.length === 11) {
+      if (/^\d+$/.test(tmp[0])) {
         const msg = {
           timestamp: Number(tmp[0]),
           uid: tmp[1],
@@ -24,9 +24,9 @@ export default (message: string) => {
           color: tmp[5],
           messageId: Number(tmp[10])
         }
-  
-        Bot.emit("PrivateMessage", msg);
-        return true;
+
+        Bot.emit('PrivateMessage', msg)
+        return true
       }
     }
   }

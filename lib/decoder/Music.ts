@@ -1,4 +1,4 @@
-import { Bot } from "../event";
+import { Bot } from '../event'
 
 export interface Music {
   url: string,
@@ -12,8 +12,8 @@ export interface Music {
 
 export default (message: string) => {
   if (message.substr(0, 2) === '&1') {
-    const tmp = message.substr(2).split('>');
-    if(tmp.length === 7) {
+    const tmp = message.substr(2).split('>')
+    if (tmp.length === 7) {
       const msg = {
         url: `http${tmp[0].split(' ')[0]}`,
         link: `http${tmp[0].split(' ')[1]}`,
@@ -24,8 +24,8 @@ export default (message: string) => {
         pic: `http${tmp[6]}`
       }
 
-      Bot.emit("music", msg);
-      return true;
+      Bot.emit('music', msg)
+      return true
     }
   }
 }
