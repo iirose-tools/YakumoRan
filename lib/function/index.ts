@@ -13,6 +13,11 @@ fs.readdirSync(functionPath).forEach(e => {
 
   const itemPath = path.join(functionPath, e)
   const packageData = JSON.parse(fs.readFileSync(path.join(itemPath, 'package.json')).toString())
+
+  try {
+    fs.mkdirSync(path.join(__dirname, `../../data/${packageData.id}`))
+  } catch (error) {}
+
   if (e !== 'core') require(path.join(itemPath, packageData.main))
 
   func[packageData.id] = {}
@@ -20,10 +25,6 @@ fs.readdirSync(functionPath).forEach(e => {
   func[packageData.id].author = packageData.author
   func[packageData.id].intro = packageData.intro
   func[packageData.id].name = packageData.name
-
-  try {
-    fs.mkdirSync(`./data/${packageData.id}`)
-  } catch (error) {}
 
   logger('Plugin').info(`${e} 加载完成`)
 })

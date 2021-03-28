@@ -17,6 +17,8 @@ const getWord = () => {
 // 苏苏的随机数生成姬
 const random = (n: number, m: number): number => { return Math.floor(Math.random() * (m - n + 1) + n) }
 
+getWord()
+
 // 更新json文件
 const update = (file: any) => {
   try {
