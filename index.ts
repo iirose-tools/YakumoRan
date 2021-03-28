@@ -1,6 +1,5 @@
 import got from 'got'
 import logger from './lib/logger'
-import config from './config'
 import pack from './package.json'
 
 const update = () => {

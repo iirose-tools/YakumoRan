@@ -6,6 +6,7 @@ import { getImg, getRealUrl, isPorn } from './utils'
 Ran.Event.on('PublicMessage', async msg => {
   if (msg.username === config.account.username) return
 
+  // 图片检测
   const imgs = getImg(msg.message)
   if (imgs) {
     logger('SCP-079').info(`${msg.username} 的消息中包含 ${imgs.length} 张图片，检测中...`)
@@ -14,7 +15,7 @@ Ran.Event.on('PublicMessage', async msg => {
       const realUrl = await getRealUrl(url)
       const rate = await isPorn(realUrl)
       logger('SCP-079').info(`第 ${imgs.indexOf(url) + 1}/${imgs.length} 张图片检测完成，rate: ${rate}`)
-      if (rate > 0.8) {
+      if (rate > config.function.scp079.nsfw_rate) {
         // 是涩图
         Ran.method.admin.mute('all', msg.username, '30m', `[YakumoRan|${config.account.username}] 涩图自动封禁`)
         Ran.method.sendPublicMessage('\n'.repeat(50), '000')
@@ -29,6 +30,15 @@ Ran.Event.on('PublicMessage', async msg => {
     }
   }
 
+  // 赌博检测
+  const gamblingRegex = /(压|押)(完|\d+)/gm
+  if (gamblingRegex.test(msg.message) && !config.function.scp079.allowGambling) {
+    logger('SCP-079').info(`检测到 ${msg.username} 赌博，已移除`)
+    Ran.method.sendPrivateMessage(msg.uid, '[YakumoRan] 本房禁止赌博', config.app.color)
+    Ran.method.admin.kick(msg.username)
+  }
+
+  // 管理命令
   if (msg.username === config.app.master) {
     const m = msg.message.trim()
     if (m.substr(0, 1) === '/') {

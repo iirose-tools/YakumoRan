@@ -3,7 +3,7 @@ import got from 'got'
 import config from '../../config'
 import util from 'util'
 
-if (!config.chat.disable) {
+if (!config.function.chat.disable) {
   api.Event.on('PublicMessage', async (msg) => {
     if (msg.username === config.account.username) return // 不响应自己发送的消息
 
