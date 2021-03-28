@@ -24,6 +24,7 @@ import mute from '../encoder/admin/mute'
 import notice from '../encoder/admin/notice'
 import setMaxUser from '../encoder/admin/setMaxUser'
 import whiteList from '../encoder/admin/whiteList'
+import GetUserList from '../encoder/system/GetUserList'
 
 export const Event = Bot
 
@@ -82,6 +83,14 @@ export const method = {
       send(cardData),
       send(mData)
     ]
+  },
+  utils: {
+    getUserList: () => {
+      return new Promise((resolve, reject) => {
+        Bot.once('GetUserListCallback', resolve)
+        send(GetUserList())
+      })
+    }
   },
   admin: {
     blackList: (username: string, time: string, msg?: string) => {
