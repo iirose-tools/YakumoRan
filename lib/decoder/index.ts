@@ -9,6 +9,7 @@ import PrivateMessage from './PrivateMessage'
 import PublicMessage from './PublicMessage'
 import userlist from './userlist'
 import GetUserListCallback from './GetUserListCallback'
+import UserProfileCallback from './UserProfileCallback'
 
 export default (msg: string) => {
   const status = []
@@ -24,6 +25,7 @@ export default (msg: string) => {
   status.push(Music(msg))
   status.push(paymentCallback(msg))
   status.push(GetUserListCallback(msg))
+  status.push(UserProfileCallback(msg))
 
   status.filter(e => e)
 
