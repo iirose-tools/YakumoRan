@@ -95,6 +95,7 @@ const sp = {
 
 const users: { [index: string]: boolean } = {}
 
+
 api.command(/^\.wb set (.*)$/, (m, e, reply) => {
   const file = path.join(api.Data, 'welcome', e.uid)
   try {
@@ -104,6 +105,7 @@ api.command(/^\.wb set (.*)$/, (m, e, reply) => {
     reply('[Welcome] 设置失败', config.app.color)
   }
 })
+
 
 api.command(/^\.wb rm$/, (m, e, reply) => {
   const file = path.join(api.Data, 'welcome', e.uid)
