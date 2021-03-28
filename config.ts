@@ -11,8 +11,14 @@ const defaultConfig = {
     master_uid: '主人uid',
     color: '消息颜色'
   },
-  chat: {
-    disable: true
+  function: {
+    chat: {
+      disable: true
+    },
+    scp079: {
+      nsfw_rate: 0.8,
+      allowGambling: true
+    }
   },
   account: {
     username: '机器人用户名',
@@ -34,7 +40,7 @@ if (!fs.existsSync(configPath)) {
     const newConf = Object.assign(defaultConfig, conf)
     newConf.version = pack.version
     fs.writeFileSync(configPath, JSON.stringify(newConf, undefined, 4))
-    console.log('配置文件版本不匹配，已更新完成，请手动修改后重新启动程序')
+    console.log('配置文件版本不匹配，已更新完成，请参考 README.md 手动修改后重新启动程序')
     process.exit(0)
   }
 }

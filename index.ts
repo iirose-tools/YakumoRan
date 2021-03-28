@@ -1,6 +1,5 @@
 import got from 'got'
 import logger from './lib/logger'
-import config from './config'
 import pack from './package.json'
 
 const update = () => {
@@ -22,8 +21,6 @@ const init = async () => {
 
   await import('./lib/core')
   await import('./lib/function')
-
-  logger('Core').info(`启动完成 欢迎使用: ${config.account.username}`)
 }
 
 init()

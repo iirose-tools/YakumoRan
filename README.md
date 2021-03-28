@@ -18,8 +18,12 @@
 - - `master`: 主人用户名
 - - `master_uid`: 主人uid
 - - `color`: 气泡颜色
-- `chat`: 聊天功能
-- - `disable`: 是否关闭聊天功能
+- `function`: 插件配置
+- - `chat`: 聊天功能
+- - - `disable`: 是否关闭聊天功能
+- - `scp079`: SCP-79
+- - - `nsfw_rate`: 涩图检测阈值，默认0.8
+- - - `allowGambling`: 是否允许赌博，默认 `true`
 - `account`: 账号配置
 - - `username`: 用户名
 - - `password`: 密码MD5

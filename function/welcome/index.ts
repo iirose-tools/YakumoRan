@@ -73,6 +73,9 @@ const sp = {
     // 崩坏三周三和周日概率触发
     week_3or7: '欢迎回来，今晚深渊结算，关底大盾四路泰坦，{at}打不过，你充钱也打不过'
   },
+  ak: {
+    week_7: '{at} 欢迎回来，今日剿灭结算，红锤挡道，祝您代理失误'
+  },
   first: [
     [
       '欢迎来到蔷薇花园，这里是一个多功能聊天室~',
@@ -168,6 +171,12 @@ api.Event.on('JoinRoom', (msg) => {
   // 周三和周日，1%概率触发
   if ((week === 3 || week === 7) && (t >= 14 && t <= 18) && random(1, 100) === 1) {
     welcome = sp.bh3.week_3or7
+    isSp = true
+  }
+
+  // 周日，1%概率触发
+  if (week === 7 && random(1, 100) === 1) {
+    welcome = sp.ak.week_7
     isSp = true
   }
 

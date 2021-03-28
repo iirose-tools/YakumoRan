@@ -8,6 +8,7 @@ import { Like } from './decoder/like'
 import { SwitchRoom } from './decoder/SwitchRoom'
 import { Music } from './decoder/Music'
 import { paymentCallback } from './decoder/paymentCallback'
+import { GetUserListCallback } from './decoder/GetUserListCallback'
 
 interface WebSocketEvent {
   on(event: 'send', listener: (msg: string) => void): void;
@@ -43,6 +44,7 @@ interface BotEvent {
   on(event: 'SwitchRoom', listener: (msg: SwitchRoom) => void): void;
   on(event: 'music', listener: (msg: Music) => void): void;
   on(event: 'paymentCallback', listener: (msg: paymentCallback) => void): void;
+  on(event: 'GetUserListCallback', listener: (msg: GetUserListCallback[]) => void): void;
 
   once(event: 'login', listener: () => void): void;
   once(event: 'UserList', listener: (msg: UserList[]) => void): void;
@@ -55,6 +57,7 @@ interface BotEvent {
   once(event: 'SwitchRoom', listener: (msg: SwitchRoom) => void): void;
   once(event: 'music', listener: (msg: Music) => void): void;
   once(event: 'paymentCallback', listener: (msg: paymentCallback) => void): void;
+  once(event: 'GetUserListCallback', listener: (msg: GetUserListCallback[]) => void): void;
 
   emit(event: 'login'): void;
   emit(event: 'UserList', msg: UserList[]): void;
@@ -67,6 +70,7 @@ interface BotEvent {
   emit(event: 'SwitchRoom', msg: SwitchRoom): void;
   emit(event: 'music', msg: Music): void;
   emit(event: 'paymentCallback', msg: paymentCallback): void;
+  emit(event: 'GetUserListCallback', msg: GetUserListCallback[]): void;
 
   removeAllListeners(event: 'login'): void
   removeAllListeners(event: 'UserList'): void
@@ -79,6 +83,7 @@ interface BotEvent {
   removeAllListeners(event: 'SwitchRoom'): void
   removeAllListeners(event: 'music'): void
   removeAllListeners(event: 'paymentCallback'): void
+  removeAllListeners(event: 'GetUserListCallback'): void
 }
 
 export const WebSocket: WebSocketEvent = new EventEmitter()
