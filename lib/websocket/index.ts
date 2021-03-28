@@ -6,7 +6,7 @@ import logger from '../logger'
 let socket: WS
 
 const init = () => {
-  socket = new WS('wss://m.iirose.com:443')
+  socket = new WS('wss://m2.iirose.com:8778')
 
   socket.binaryType = 'arraybuffer'
 
