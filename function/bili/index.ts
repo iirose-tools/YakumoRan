@@ -61,13 +61,13 @@ api.command(/^B站热搜$/gm, async (m, e, reply) => {
 api.command(/^今日新番$/, async (m, e, reply) => {
   const data: any = await bili.bangumi.today()
   const mapping: any = {
-    1: ' 一',
-    2: ' 二',
-    3: ' 三',
-    4: ' 四',
-    5: ' 五',
-    6: ' 六',
-    7: ' 日'
+    1: '一',
+    2: '二',
+    3: '三',
+    4: '四',
+    5: '五',
+    6: '六',
+    7: '日'
   }
 
   if (data) {
