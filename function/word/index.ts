@@ -23,7 +23,6 @@ const getWord = () => {
   const wordPath = path.join(__dirname, '../../data/word/word.json')
   if (!fs.existsSync(wordPath)) {
     fs.writeFileSync(wordPath, '{}')
-    console.log('测试成功')
   }
 
   return JSON.parse(fs.readFileSync(wordPath).toString())
