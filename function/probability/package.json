@@ -1,0 +1,21 @@
+{
+  "name": "word",
+  "id": "word",
+  "main": "index",
+  "author": {
+    "name": "春风~",
+    "github": "BSTluo",
+    "iirose": "春风萧落"
+  },
+  "intro": [
+    "模拟赌博"
+  ],
+  "commands": [{
+    "cmd": ".雨铭压<message>",
+    "helper": "压钱，这个可以随意金额哦~"
+  }, {
+    "cmd": ".查看钱包<艾特>",
+    "helper": "查看自己或其他人的钱包"
+  }
+]
+}
