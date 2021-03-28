@@ -2,7 +2,7 @@ import config from '../../config'
 import * as api from '../../lib/api'
 import * as arknights from './api'
 
-api.command(/查物品(.*)/, async (m, e, reply) => {
+api.command(/^查物品(.*)$/, async (m, e, reply) => {
   const result = await arknights.getItem(m[1])
   if (result) {
     const msg: string[] = []
@@ -15,7 +15,7 @@ api.command(/查物品(.*)/, async (m, e, reply) => {
   }
 })
 
-api.command(/查掉落(.*)/, async (m, e, reply) => {
+api.command(/^查掉落(.*)$/, async (m, e, reply) => {
   reply('[Arknights] 正在查询...', config.app.color)
   const stats = {
     query: 0,
