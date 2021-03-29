@@ -43,7 +43,7 @@ api.command(/^\.雨铭全压$/, async (m, e, reply) => {
   if (nowMoney[e.username] == null) {
     nowMoney[e.username] = 350
   }
-  let havaMoney: number = nowMoney[e.username]
+  const havaMoney: number = nowMoney[e.username]
   if (random(0, 1) === 0) {
     nowMoney[e.username] = nowMoney[e.username] - nowMoney[e.username]
     update(nowMoney)
