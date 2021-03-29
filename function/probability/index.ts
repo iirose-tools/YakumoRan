@@ -43,14 +43,15 @@ api.command(/^\.雨铭全压$/, async (m, e, reply) => {
   if (nowMoney[e.username] == null) {
     nowMoney[e.username] = 350
   }
+  let havaMoney: number = nowMoney[e.username]
   if (random(0, 1) === 0) {
     nowMoney[e.username] = nowMoney[e.username] - nowMoney[e.username]
     update(nowMoney)
-    reply(` [*${e.username}*]   :  余额 - ${nowMoney[e.username]} 钞   ❌   ,   💰 ${String(nowMoney[e.username])} 钞`, config.app.color)
+    reply(` [*${e.username}*]   :  余额 - ${havaMoney} 钞   ❌   ,   💰 ${String(nowMoney[e.username])} 钞`, config.app.color)
   } else {
     nowMoney[e.username] = nowMoney[e.username] + nowMoney[e.username]
     update(nowMoney)
-    reply(` [*${e.username}*]   :  余额 + ${nowMoney[e.username]} 钞   ✔️   ,   💰 ${String(nowMoney[e.username])} 钞`, config.app.color)
+    reply(` [*${e.username}*]   :  余额 + ${havaMoney} 钞   ✔️   ,   💰 ${String(nowMoney[e.username])} 钞`, config.app.color)
   }
 })
 
