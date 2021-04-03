@@ -27,5 +27,5 @@ export const isPorn = async (url: string) => {
     }
   })
 
-  return JSON.parse(resp.body).result;
+  return JSON.parse(resp.body).result
 }
