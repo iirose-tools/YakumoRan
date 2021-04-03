@@ -21,11 +21,11 @@ export const getRealUrl = async (url: string): Promise<string> => {
 }
 
 export const isPorn = async (url: string) => {
-  const resp = await got.get('https://api.peer.ink/api/v1/isPorn', {
+  const resp = await got.get('https://api.peer.ink/api/v2/nsfw', {
     searchParams: {
       url: url
     }
   })
 
-  return Number(resp.body) / 1e2
+  return JSON.parse(resp.body).result;
 }

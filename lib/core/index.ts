@@ -6,10 +6,6 @@ import logger from '../logger'
 import init, { send } from '../websocket'
 import config from '../../config'
 
-Bot.on('PublicMessage', msg => {
-  logger('Bot').info(`${msg.username} > ${msg.message}`)
-})
-
 WebSocket.on('message', (msg) => {
   if (!decoder(msg)) {
     logger('Decoder').warn('收到了无法解析的消息: ', (msg.length > 50) ? `${msg.substr(0, 50)}...` : msg)
