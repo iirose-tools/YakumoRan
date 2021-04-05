@@ -124,6 +124,11 @@
   resolved "https://registry.npm.taobao.org/@types/pako/download/@types/pako-1.0.1.tgz?cache=0&sync_timestamp=1613379420881&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fpako%2Fdownload%2F%40types%2Fpako-1.0.1.tgz#33b237f3c9aff44d0f82fe63acffa4a365ef4a61"
   integrity sha1-M7I388mv9E0Pgv5jrP+ko2XvSmE=
 
+"@types/random-number-csprng@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.npm.taobao.org/@types/random-number-csprng/download/@types/random-number-csprng-1.0.0.tgz#139d6cd5d063fc34915e81dc7da5a018cdc45534"
+  integrity sha1-E51s1dBj/DSRXoHcfaWgGM3EVTQ=
+
 "@types/readable-stream@^2.3.9":
   version "2.3.9"
   resolved "https://registry.npm.taobao.org/@types/readable-stream/download/@types/readable-stream-2.3.9.tgz?cache=0&sync_timestamp=1613384638930&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freadable-stream%2Fdownload%2F%40types%2Freadable-stream-2.3.9.tgz#40a8349e6ace3afd2dd1b6d8e9b02945de4566a9"
@@ -307,6 +312,11 @@ balanced-match@^1.0.0:
   resolved "https://registry.npm.taobao.org/balanced-match/download/balanced-match-1.0.0.tgz#89b4d199ab2bee49de164ea02b89ce462d71b767"
   integrity sha1-ibTRmasr7kneFk6gK4nORi1xt2c=
 
+bluebird@^3.3.3:
+  version "3.7.2"
+  resolved "https://registry.npm.taobao.org/bluebird/download/bluebird-3.7.2.tgz#9f229c15be272454ffa973ace0dbee79a1b0c36f"
+  integrity sha1-nyKcFb4nJFT/qXOs4NvueaGww28=
+
 brace-expansion@^1.1.7:
   version "1.1.11"
   resolved "https://registry.npm.taobao.org/brace-expansion/download/brace-expansion-1.1.11.tgz#3c7fcbf529d87226f3d2f52b966ff5271eb441dd"
@@ -420,6 +430,11 @@ content-type@^1.0.4:
   version "1.0.4"
   resolved "https://registry.npm.taobao.org/content-type/download/content-type-1.0.4.tgz#e138cc75e040c727b1966fe5e5f8c9aee256fe3b"
   integrity sha1-4TjMdeBAxyexlm/l5fjJruJW/js=
+
+create-error@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.npm.taobao.org/create-error/download/create-error-0.3.1.tgz#69810245a629e654432bf04377360003a5351a23"
+  integrity sha1-aYECRaYp5lRDK/BDdzYAA6U1GiM=
 
 cross-spawn@^7.0.2:
   version "7.0.3"
@@ -1481,6 +1496,14 @@ quick-lru@^5.1.1:
   version "5.1.1"
   resolved "https://registry.npm.taobao.org/quick-lru/download/quick-lru-5.1.1.tgz?cache=0&sync_timestamp=1610610342263&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fquick-lru%2Fdownload%2Fquick-lru-5.1.1.tgz#366493e6b3e42a3a6885e2e99d18f80fb7a8c932"
   integrity sha1-NmST5rPkKjpoheLpnRj4D7eoyTI=
+
+random-number-csprng@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.npm.taobao.org/random-number-csprng/download/random-number-csprng-1.0.2.tgz#fcd120e62dffc2c07674c7c3fe01e16b25f73a26"
+  integrity sha1-/NEg5i3/wsB2dMfD/gHhayX3OiY=
+  dependencies:
+    bluebird "^3.3.3"
+    create-error "^0.3.1"
 
 read-pkg-up@^2.0.0:
   version "2.0.0"

@@ -1,6 +1,6 @@
 {
-  "name": "word",
-  "id": "word",
+  "name": "probability",
+  "id": "probability",
   "main": "index",
   "author": {
     "name": "春风~",
@@ -11,11 +11,10 @@
     "模拟赌博"
   ],
   "commands": [{
-    "cmd": ".雨铭压<message>",
+    "cmd": "{{nickname}}压<金额>",
     "helper": "压钱，这个可以随意金额哦~"
   }, {
     "cmd": ".查看钱包<艾特>",
     "helper": "查看自己或其他人的钱包"
-  }
-]
+  }]
 }
