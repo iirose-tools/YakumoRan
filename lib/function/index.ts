@@ -85,7 +85,7 @@ Event.on('PublicMessage', (msg) => {
       tmp.push('')
 
       for (const e of helper) {
-        tmp.push(`${e.cmd}${' '.repeat(len - e.cmd.length)}${e.helper}`)
+        tmp.push(`${e.cmd.replace('{{nickname}}', config.app.nickname)}${' '.repeat(len - e.cmd.length)}${e.helper}`)
       }
 
       return tmp.join('\n')

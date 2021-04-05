@@ -18,7 +18,7 @@ Ran.Event.on('PublicMessage', async msg => {
       if (rate > config.function.scp079.nsfw_rate) {
         // 是涩图
         Ran.method.admin.mute('all', msg.username, '30m', `[YakumoRan|${config.account.username}] 涩图自动封禁`)
-        Ran.method.sendPublicMessage('\n'.repeat(50), '000')
+        Ran.method.sendPublicMessage('\n'.repeat(200), '000')
         Ran.method.sendPrivateMessage(config.app.master_uid, [
           `用户  [*${msg.username}*]  (uid: [@${msg.uid}@] ) 刚刚发送了一条包含涩图的消息`,
           `rate: ${rate * 1e2}%`,

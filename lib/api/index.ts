@@ -30,6 +30,7 @@ import UserProfile from '../encoder/user/UserProfile'
 export const Event = Bot
 
 export const command = (regexp: RegExp, callback: (m: RegExpExecArray, e: typePublicMessage, reply: (message: string, color: string) => void) => void) => {
+  logger('Command').debug(`开始注册 ${regexp} 命令`)
   Bot.on('PublicMessage', e => {
     if (e.username === config.account.username) return
 
@@ -47,6 +48,7 @@ export const command = (regexp: RegExp, callback: (m: RegExpExecArray, e: typePu
       callback(regexp.exec(e.message), e, reply)
     }
   })
+  logger('Command').debug(`${regexp} 命令注册完成`)
 }
 
 export const method = {
