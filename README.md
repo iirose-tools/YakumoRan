@@ -24,6 +24,9 @@
 - - `scp079`: SCP-79
 - - - `nsfw_rate`: 涩图检测阈值，默认0.8
 - - - `allowGambling`: 是否允许赌博，默认 `true`
+- - `probab`: 模拟赌博功能
+- - - `every`: 赌博间隔(单位是毫秒)
+- - - `huifu`: 钱包恢复时间(单位是毫秒)
 - `account`: 账号配置
 - - `username`: 用户名
 - - `password`: 密码MD5
