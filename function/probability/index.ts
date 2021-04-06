@@ -28,7 +28,6 @@ const getMoney = (uid: string) => {
   if (!fs.existsSync(moneyPath)) {
     fs.writeFileSync(moneyPath, '{"money":100,"probab":50}')
   }
-  console.log(JSON.parse(fs.readFileSync(moneyPath).toString()))
   return JSON.parse(fs.readFileSync(moneyPath).toString())
 }
 
@@ -45,10 +44,7 @@ const update = (uid: string, file:any) => {
 // 核心源码
 // eslint-disable-next-line no-useless-escape
 api.command(new RegExp(`^${config.app.nickname}压(.*)$`), async (m, e, reply) => {
-  if (!getLimit(e.uid, 2000)) {
-    reply('太快啦...会刷屏给人造成麻烦的...休息一下再继续吧~', config.app.color)
-    return null
-  }
+  if (!getLimit(e.uid, config.function.probab.every)) return
 
   const nowMoney = getMoney(e.uid)
   if (nowMoney.probab <= 0 || nowMoney.probab >= 100) {
@@ -64,15 +60,14 @@ api.command(new RegExp(`^${config.app.nickname}压(.*)$`), async (m, e, reply) =
     if (await random(0, 100) >= nowMoney.probab) {
       nowMoney.money = nowMoney.money - m1
       if (nowMoney.money === 0) {
-        if (getLimit(e.uid, 10000)) {
+        if (getLimit(e.uid, config.function.probab.huifu)) {
           nowMoney.probab = nowMoney.probab + 10
           nowMoney.money = 100
           update(e.uid, nowMoney)
-          reply(` [*${e.username}*]   :  已经把您的余额恢复为了 100 钞 , 下次恢复还有10秒！祝您游玩愉快~ `, config.app.color)
+          reply(` [*${e.username}*]   :  已经把您的余额恢复为了 100 钞 , 下次恢复还有20秒！祝您游玩愉快~ `, config.app.color)
         }
-        if (!getLimit(e.uid, 10000)) {
+        if (!getLimit(e.uid, config.function.probab.huifu)) {
           update(e.uid, nowMoney)
-          reply(` [*${e.username}*]   :  余额 - ${m1} 钞   ❌   ,   💰 花钞不足力...，休息一下...等候恢复CD吧~`, config.app.color)
         }
       } else {
         nowMoney.probab = nowMoney.probab + 10
@@ -100,7 +95,6 @@ api.command(/^查看钱包$/, async function (m, e, reply) {
 api.command(/^重启钱包$/, async function (m, e, reply) {
   const nowMoney = getMoney(e.uid)
   if (!getLimit(e.uid, 10000)) {
-    reply(`还在CD哦...~ 请稍等一下叫${config.app.nickname}重启吧~ `, config.app.color)
     return null
   } else {
     nowMoney.money = 100
@@ -123,5 +117,3 @@ api.command(/^设置(.*):(.*)$/, async function (m, e, reply) {
   update(theUid, m1)
   reply(` [*${e.username}*]   :  您的余额为  :  ${String(nowMoney.money)}钞`, config.app.color)
 })
-
-// 概率加减异常
