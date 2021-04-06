@@ -4,7 +4,7 @@ import * as api from '../../lib/api'
 import config from '../../config'
 import logger from '../../lib/logger'
 import random from 'random-number-csprng'
-import { report } from 'process'
+// import { report } from 'process'
 
 try {
   fs.mkdirSync(path.join(__dirname, '../../data/probability'))
