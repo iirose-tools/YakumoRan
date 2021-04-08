@@ -1,0 +1,26 @@
+{
+  "name": "word",
+  "id": "word",
+  "main": "index",
+  "author": {
+    "name": "饼",
+    "github": "Cookie",
+    "iirose": "苏丙"
+  },
+  "intro": [
+    "漂流瓶"
+  ],
+  "commands": [
+    {
+      "cmd": ".biu<标题>:<内容>",
+      "helper": "丢出一个漂流瓶"
+    },
+    {
+      "cmd": ".pick",
+      "helper": "拾取一个漂流瓶"
+    }
+  ],
+  "devDependencies": {
+    "@types/request": "^2.48.5"
+  }
+}
