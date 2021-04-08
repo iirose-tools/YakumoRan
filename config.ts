@@ -18,6 +18,10 @@ const defaultConfig = {
     scp079: {
       nsfw_rate: 0.8,
       allowGambling: true
+    },
+    probab: {
+      every: 2000,
+      huifu: 20000
     }
   },
   account: {
