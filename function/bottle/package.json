@@ -1,10 +1,10 @@
 {
-  "name": "word",
-  "id": "word",
+  "name": "bottle",
+  "id": "bottle",
   "main": "index",
   "author": {
     "name": "饼",
-    "github": "Cookie",
+    "github": "butterdoge",
     "iirose": "苏丙"
   },
   "intro": [
@@ -12,11 +12,11 @@
   ],
   "commands": [
     {
-      "cmd": ".biu<标题>:<内容>",
-      "helper": "丢出一个漂流瓶"
+      "cmd": "以<name>之名,丢出漂流瓶,内容如下:<input>",
+      "helper": "丢出一个漂流瓶，漂流瓶的署名是<name>"
     },
     {
-      "cmd": ".pick",
+      "cmd": "捡瓶瓶。",
       "helper": "拾取一个漂流瓶"
     }
   ],
