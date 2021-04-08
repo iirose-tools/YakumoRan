@@ -77,7 +77,7 @@ const createNewBottle = async (uid:string, content:string, name:string) => {
 }
 
 // 创建瓶子指令
-api.command(/^以(.*)之名，丢出漂流瓶,内容如下:(.*)$/, (m, e, reply) => {
+api.command(/^以(.*)之名,丢出漂流瓶,内容如下:(.*)$/, (m, e, reply) => {
   const id:string = e.uid
   const name:string = m[1]
   const content:string = m[2]
