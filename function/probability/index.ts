@@ -106,12 +106,14 @@ api.command(/^重启钱包$/, async function (m, e, reply) {
 
 // 设置积分
 api.command(/^设置(.*):(.*)$/, async function (m, e, reply) {
+  const m1 = Number(m[2].trim())
+  if (m1 <= Math.max() || m1 >= Math.min()) return reply('请输入一个正常的数字', config.app.color)
   const nowMoney = getMoney(e.uid)
   if (e.username !== config.app.master) {
     reply(` [*${e.username}*]   :  ${config.app.nickname}做不到啦...去叫叫咱的主人来试试..(?`, config.app.color)
     return null
   }
-  const m1 = Number(m[2].trim())
+
   const theUid = m[1].replace(/[@[\] ]/g, '').trim()
   nowMoney.money = m1
   update(theUid, m1)
