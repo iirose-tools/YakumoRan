@@ -26,6 +26,7 @@ import setMaxUser from '../encoder/admin/setMaxUser'
 import whiteList from '../encoder/admin/whiteList'
 import GetUserList from '../encoder/system/GetUserList'
 import UserProfile from '../encoder/user/UserProfile'
+import { moveTo } from '../core'
 
 export const Event = Bot
 
@@ -252,6 +253,11 @@ export const method = {
         const data = mediaOperation(op, time)
         send(data)
       }
+    }
+  },
+  bot: {
+    moveTo: (roomId: string) => {
+      return moveTo(roomId)
     }
   }
 }
