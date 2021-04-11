@@ -42,3 +42,7 @@ Ran.command(/^搜图(.*)$/, async (m, e, reply) => {
     reply('[Pixiv] 没有搜索到任何结果', config.app.color)
   }
 })
+
+Ran.command(/^搜图$/, async (m, e, reply) => {
+  reply('[https://api.peer.ink/api/v1/pixiv/wallpaper/image?a.jpg#e]', config.app.color)
+})
