@@ -10,8 +10,16 @@ try {
 
 // 是否为管理员
 const isAdmin = (name: string) => {
-  const allowed = getOp()
-  if (allowed.op.includes(name)) {
+  const allowed = getAdmin()
+  if (allowed.admin.includes(name)) {
+    return true
+  } else {
+    return false
+  }
+}
+const isOp = (name:string) => {
+  const op = getAdmin()
+  if (op.op.include(name)) {
     return true
   } else {
     return false
@@ -29,15 +37,14 @@ const getWord = () => {
 }
 
 // 获取权限列表
-const getOp = () => {
+const getAdmin = () => {
   const opPath = path.join(__dirname, '../../data/word/op.json')
   if (!fs.existsSync(opPath)) {
-    fs.writeFileSync(opPath, '{"op":[]}')
+    fs.writeFileSync(opPath, '{"admin":[],"op":[]}')
   }
 
   return JSON.parse(fs.readFileSync(opPath).toString())
 }
-
 // 苏苏的随机数生成姬
 const random = (n: number, m: number): number => { return Math.floor(Math.random() * (m - n + 1) + n) }
 
@@ -57,7 +64,7 @@ const fitter = (txt: string, ty: number) => {
     txt = txt.replace(/[\s[\]]/g, '')
   }
   if (ty === 1) {
-    txt = txt.replace(/[\s[\]*]/g, '')
+    txt = txt.replace(/[@[\] ]/g, '')
   }
   return txt
 }
@@ -69,7 +76,7 @@ const isError = (element: any, index: any, array: any) => {
 
 // 添加问答...
 api.command(/^\.问(.*)答(.*)$/, async (m, e, reply) => {
-  if (!isAdmin(e.username) && e.username !== config.app.master) return
+  if (!isAdmin(e.uid) && e.uid !== config.app.master_uid && !isOp(e.uid)) return
   const word = getWord()
   let wd1: string = m[1]// 问后面的内容
   const wd2: string = m[2]// 答后面的内容
@@ -85,7 +92,7 @@ api.command(/^\.问(.*)答(.*)$/, async (m, e, reply) => {
 
 // 删除部分问答
 api.command(/^\.删问(.*)序[号|列](.*)$/, async (m, e, reply) => {
-  if (!isAdmin(e.username) && e.username !== config.app.master) return
+  if (!isAdmin(e.uid) && e.uid !== config.app.master_uid && !isOp(e.uid)) return
   const word = getWord()
   let wd1: string = m[1]// 问后面的内容
   const wd2 = Number(m[2]) - 1
@@ -102,7 +109,7 @@ api.command(/^\.删问(.*)序[号|列](.*)$/, async (m, e, reply) => {
 
 // 查看词库list
 api.command(/^\.问表(.*)$/, async (m, e, reply) => {
-  if (!isAdmin(e.username) && e.username !== config.app.master) return
+  if (!isAdmin(e.uid) && e.uid !== config.app.master_uid && !isOp(e.uid)) return
   const word = getWord()
   let wd1: string = m[1]
   wd1 = fitter(wd1, 0)
@@ -115,7 +122,7 @@ api.command(/^\.问表(.*)$/, async (m, e, reply) => {
 
 // 删除一整个回复
 api.command(/^\.删全问(.*)$/, async (m, e, reply) => {
-  if (!isAdmin(e.username) && e.username !== config.app.master) return
+  if (!isAdmin(e.uid) && e.uid !== config.app.master_uid && !isOp(e.uid)) return
   let wd1: string = m[1]// 问后面的内容
   const word = getWord()
   wd1 = fitter(wd1, 0)
@@ -144,30 +151,55 @@ api.Event.on('PublicMessage', msg => {
 })
 
 // 饼修改的部分：
-api.command(/^.添加权限(.*)$/, async (m, e, reply) => {
-  // 只允许master进行该操作。
-  const allowed = getOp()
-  if (e.username !== config.app.master) return
+api.command(/^.添加权限(.*):(.*)$/, async (m, e, reply) => {
+  // 只允许master和admin进行该操作。
   let added: string = m[1]
   added = fitter(added, 1)
-  allowed.op.push(added)
-  update(allowed, 'op')
-  reply('权限添加成功', config.app.color)
+  const allowed = getAdmin()
+
+  if (m[2] === '高级') {
+    if (e.uid !== config.app.master_uid) return
+    allowed.admin.push(added)
+    update(allowed, 'op')
+    reply('高级权限添加成功', config.app.color)
+  }
+  if (m[2] === '普通') {
+    if (e.uid !== config.app.master_uid && !isAdmin(e.uid)) return
+    allowed.op.push(added)
+    update(allowed, 'op')
+    reply('权限添加成功', config.app.color)
+  }
+
+
 })
 
-api.command(/^移除权限(.*)$/, async (m, e, reply) => {
-  // 只允许master进行该操作。
-  const allowed = getOp()
-  if (e.username !== config.app.master) return
+api.command(/^.移除权限(.*):(.*)$/, async (m, e, reply) => {
+  // 只允许master和admin进行该操作。
   let username: string = m[1]
   username = fitter(username, 1)
+  const allowed = getAdmin()
+
+  if (m[2] === '高级') {
+    if (e.uid !== config.app.master_uid) return
+    allowed.admin.forEach(function (item: any, index: any, arr: any) {
+      if (item === username) {
+        allowed.admin.splice(index, 1)
+      }
+    })
+    update(allowed, 'op')
+    // 将username写到一个json里...然后我研究下怎么写json...哎。
+    reply('权限移除成功', config.app.color)
+  }
+  if (m[2] === '普通') {
+    if (e.uid !== config.app.master_uid && !isAdmin(e.uid)) return
+    allowed.op.forEach(function (item: any, index: any, arr: any) {
+      if (item === username) {
+        allowed.op.splice(index, 1)
+      }
+    })
+    update(allowed, 'op')
+    // 将username写到一个json里...然后我研究下怎么写json...哎。
+    reply('权限移除成功', config.app.color)
+  }
   // 找到并删除。
-  allowed.op.forEach(function (item: any, index: any, arr: any) {
-    if (item === username) {
-      allowed.op.splice(index, 1)
-    }
-  })
-  update(allowed, 'op')
-  // 将username写到一个json里...然后我研究下怎么写json...哎。
-  reply('权限移除成功', config.app.color)
 })
