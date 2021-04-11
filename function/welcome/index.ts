@@ -19,13 +19,6 @@ const GetWelcomeBack = (uid: string): (string | null) => {
   }
 }
 
-api.Event.once('login', () => {
-  setTimeout(() => {
-    logger('MoveTo').info('moving')
-    api.method.bot.moveTo('6056ce66f196a')
-  }, 5e3)
-})
-
 const sentences = [
   [
     // 早上
