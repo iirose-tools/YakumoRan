@@ -2,7 +2,6 @@ import path from 'path'
 import fs from 'fs'
 import * as api from '../../lib/api'
 import config from '../../config'
-import logger from '../../lib/logger'
 
 try {
   fs.mkdirSync(path.join(api.Data, 'welcome'))
