@@ -3,7 +3,7 @@ import decoder from '../decoder'
 import login from '../encoder/system/login'
 import { WebSocket, Bot } from '../event'
 import logger from '../logger'
-import init, { send } from '../websocket'
+import init, { close, send } from '../websocket'
 import config from '../../config'
 
 WebSocket.on('message', (msg) => {
@@ -13,13 +13,13 @@ WebSocket.on('message', (msg) => {
 })
 
 WebSocket.once('connect', () => {
-  status('connected')
   setInterval(() => {
     send('')
   }, 6e4)
 })
 
 WebSocket.on('connect', async () => {
+  status('connected')
   const err = await send(login())
   if (err) {
     status('login_fail')
@@ -49,3 +49,17 @@ status('start')
 setInterval(() => {
   status('heartbeat')
 }, 3e4)
+
+export const moveTo = (roomId: string) => {
+  logger('Core').info('正在切换房间...')
+  try {
+    config.account.room = roomId
+    close()
+    init()
+    logger('Core').info('切换完成')
+    return true
+  } catch (error) {
+    logger('Core').warn('切换失败', error)
+    return false
+  }
+}

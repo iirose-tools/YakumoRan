@@ -4,6 +4,9 @@ import { WebSocket } from '../event'
 import logger from '../logger'
 
 let socket: WS
+const status = {
+  allowClose: false
+}
 
 const init = () => {
   // @ts-ignore
@@ -18,6 +21,7 @@ const init = () => {
   }
 
   socket.onclose = (event: { code: any; reason: any }) => {
+    if (status.allowClose) return
     logger('WebSocket').warn('WebSocket 断开连接, code: ', event.code, ', reason: ', event.reason)
     WebSocket.emit('disconnect')
 
@@ -54,6 +58,12 @@ const init = () => {
 
 export default () => {
   init()
+}
+
+export const close = () => {
+  status.allowClose = true
+  socket.close()
+  return true
 }
 
 export const send = (data: string): Promise<Error | null> => {

@@ -169,8 +169,6 @@ api.command(/^.添加权限(.*):(.*)$/, async (m, e, reply) => {
     update(allowed, 'op')
     reply('权限添加成功', config.app.color)
   }
-
-
 })
 
 api.command(/^.移除权限(.*):(.*)$/, async (m, e, reply) => {

@@ -82,7 +82,6 @@ export const vtbmusic = {
 
       return vtbmusic.parseMusic(music[random(0, music.length - 1)])
     } catch (error) {
-      console.log(error)
       return null
     }
   },
