@@ -10,6 +10,7 @@ import PublicMessage from './PublicMessage'
 import userlist from './userlist'
 import GetUserListCallback from './GetUserListCallback'
 import UserProfileCallback from './UserProfileCallback'
+import BankCallback from './BankCallback'
 
 export default (msg: string) => {
   const status = []
@@ -26,6 +27,7 @@ export default (msg: string) => {
   status.push(paymentCallback(msg))
   status.push(GetUserListCallback(msg))
   status.push(UserProfileCallback(msg))
+  status.push(BankCallback(msg))
 
   status.filter(e => e)
 

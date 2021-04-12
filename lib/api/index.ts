@@ -27,6 +27,7 @@ import whiteList from '../encoder/admin/whiteList'
 import GetUserList from '../encoder/system/GetUserList'
 import UserProfile from '../encoder/user/UserProfile'
 import { moveTo } from '../core'
+import bank from '../encoder/system/bank'
 
 export const Event = Bot
 
@@ -258,6 +259,14 @@ export const method = {
   bot: {
     moveTo: (roomId: string) => {
       return moveTo(roomId)
+    }
+  },
+  system: {
+    bank: () => {
+      return new Promise((resolve, reject) => {
+        Bot.once('BankCallback', resolve)
+        send(bank())
+      })
     }
   }
 }
