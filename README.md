@@ -1,4 +1,6 @@
 # YkumoRan
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fiirose-tools%2FYakumoRan.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fiirose-tools%2FYakumoRan?ref=badge_shield)
+
 
 ## 写在开头
 - 不推荐使用聊天功能，词库有点怪
@@ -33,3 +35,6 @@
 - - `room`: 房间id
 - `logger`: 日志配置
 - - `level`: 日志级别，默认INFO
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fiirose-tools%2FYakumoRan.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fiirose-tools%2FYakumoRan?ref=badge_large)
