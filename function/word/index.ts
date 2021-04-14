@@ -19,7 +19,7 @@ const isAdmin = (name: string) => {
 }
 const isOp = (name:string) => {
   const op = getAdmin()
-  if (op.op.include(name)) {
+  if (op.op.includes(name)) {
     return true
   } else {
     return false
