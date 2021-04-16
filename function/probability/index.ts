@@ -56,10 +56,11 @@ api.command(new RegExp(`^${config.app.nickname}压(.*)$`), async (m, e, reply) =
   if (m1 <= 0) return reply('下注金额必须大于0', config.app.color)
   if (m1 > nowMoney.money) return reply('下注金额必须小于您当前余额哦~', config.app.color)
   if (m1 <= Math.max() || m1 >= Math.min()) return reply('请输入一个正常的数字', config.app.color)
+
   if (nowMoney.money >= m1) {
     if (await random(0, 100) >= nowMoney.probab) {
       nowMoney.money = nowMoney.money - m1
-      if (nowMoney.money === 0) {
+      if (nowMoney.money <= 0) {
         if (getLimit(e.uid, config.function.probab.huifu)) {
           nowMoney.probab = nowMoney.probab + 10
           nowMoney.money = 100
@@ -67,7 +68,9 @@ api.command(new RegExp(`^${config.app.nickname}压(.*)$`), async (m, e, reply) =
           reply(` [*${e.username}*]   :  已经把您的余额恢复为了 100 钞 , 下次恢复还有20秒！祝您游玩愉快~ `, config.app.color)
         }
         if (!getLimit(e.uid, config.function.probab.huifu)) {
+          nowMoney.probab = nowMoney.probab + 10
           update(e.uid, nowMoney)
+          reply(` [*${e.username}*]   :  余额 - ${m1} 钞   ❌   ,   💰 ${String(nowMoney.money)} 钞`, config.app.color)
         }
       } else {
         nowMoney.probab = nowMoney.probab + 10
