@@ -117,6 +117,7 @@ api.command(/^\.wb rm$/, (m, e, reply) => {
 
 api.Event.on('JoinRoom', (msg) => {
   if (msg.username === config.account.username) return
+  if (users[msg.uid]) return
 
   users[msg.uid] = true
 
