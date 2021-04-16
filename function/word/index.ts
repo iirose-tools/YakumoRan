@@ -19,7 +19,7 @@ const isAdmin = (name: string) => {
 }
 const isOp = (name:string) => {
   const op = getAdmin()
-  if (op.op.include(name)) {
+  if (op.op.includes(name)) {
     return true
   } else {
     return false
@@ -146,7 +146,13 @@ api.Event.on('PublicMessage', msg => {
   if (word[wd1] != null) {
     const ran: number = word[wd1].length
     const rd: number = random(0, ran - 1)
-    reply(word[wd1][rd], config.app.color)
+    const out:string[] = word[wd1][rd].split('【换】')
+    let j:number = 0
+    for (j = 0; j < out.length; j++) {
+      if (out[j]) {
+        reply(out[j], config.app.color)
+      }
+    }
   }
 })
 
