@@ -32,7 +32,6 @@ WebSocket.on('connect', async () => {
         process.exit(1)
       } else {
         status('login_success')
-        send('')
         logger('Core').info('收到服务器返回数据, 登录成功')
         Bot.emit('login')
 

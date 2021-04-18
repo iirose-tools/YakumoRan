@@ -1,12 +1,15 @@
 # YkumoRan
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fiirose-tools%2FYakumoRan.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fiirose-tools%2FYakumoRan?ref=badge_shield)
 
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fiirose-tools%2FYakumoRan.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fiirose-tools%2FYakumoRan?ref=badge_shield)
+[![CodeFactor](https://www.codefactor.io/repository/github/iirose-tools/yakumoran/badge)](https://www.codefactor.io/repository/github/iirose-tools/yakumoran)
 
 ## 写在开头
+
 - 不推荐使用聊天功能，词库有点怪
 - 可以使用由春风开发的关键词回复功能
 
 ## 食用方法
+
 - 安装Nodejs
 - 运行 `npm run build`
 - 运行 `npm start` 启动项目
@@ -14,6 +17,7 @@
 - 再次运行 `npm start` 启动项目
 
 ## 配置文件
+
 - `version`: 版本号，对应package.json中的version
 - `app`: APP配置
 - - `nickname`: 机器人昵称
@@ -37,4 +41,5 @@
 - - `level`: 日志级别，默认INFO
 
 ## License
+
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fiirose-tools%2FYakumoRan.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fiirose-tools%2FYakumoRan?ref=badge_large)
