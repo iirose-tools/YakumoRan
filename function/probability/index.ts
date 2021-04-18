@@ -10,7 +10,8 @@ try {
   fs.mkdirSync(path.join(__dirname, '../../data/probability'))
 } catch (error) {}
 
-const limit: any = {}
+const limit:any = {}
+const limit2:any = {}
 
 const getLimit = (uid: string, tim: number) => {
   if (limit[uid]) return false
@@ -18,6 +19,16 @@ const getLimit = (uid: string, tim: number) => {
   limit[uid] = true
   setTimeout(() => {
     delete limit[uid]
+  }, tim)
+  return true
+}
+
+const secondLimit = (uid: string, tim: number) => {
+  if (limit2[uid]) return false
+
+  limit2[uid] = true
+  setTimeout(() => {
+    delete limit2[uid]
   }, tim)
   return true
 }
@@ -61,16 +72,15 @@ api.command(new RegExp(`^${config.app.nickname}压(.*)$`), async (m, e, reply) =
     if (await random(0, 100) >= nowMoney.probab) {
       nowMoney.money = nowMoney.money - m1
       if (nowMoney.money <= 0) {
-        if (getLimit(e.uid, config.function.probab.huifu)) {
+        if (secondLimit(e.uid, config.function.probab.huifu)) {
           nowMoney.probab = nowMoney.probab + 10
           nowMoney.money = 100
           update(e.uid, nowMoney)
-          reply(` [*${e.username}*]   :  已经把您的余额恢复为了 100 钞 , 下次恢复还有20秒！祝您游玩愉快~ `, config.app.color)
-        }
-        if (!getLimit(e.uid, config.function.probab.huifu)) {
+          reply(` [*${e.username}*]   :  余额 - ${m1} 钞   ❌   ,   已经把您的余额恢复为了 100 钞 , 下次恢复还有${String(config.function.probab.huifu / 1000)}秒！祝您游玩愉快~ `, config.app.color)
+        } else {
           nowMoney.probab = nowMoney.probab + 10
           update(e.uid, nowMoney)
-          reply(` [*${e.username}*]   :  余额 - ${m1} 钞   ❌   ,   💰 ${String(nowMoney.money)} 钞`, config.app.color)
+          reply(` [*${e.username}*]   :  余额 - ${m1} 钞   ❌   ,   💰 ${String(nowMoney.money)} 钞   ,   恢复还在CD哦~请休息一下，等会过一会发送“重启钱包”来重置钱包吧！`, config.app.color)
         }
       } else {
         nowMoney.probab = nowMoney.probab + 10
@@ -97,13 +107,13 @@ api.command(/^查看钱包$/, async function (m, e, reply) {
 // 钱包重启计划
 api.command(/^重启钱包$/, async function (m, e, reply) {
   const nowMoney = getMoney(e.uid)
-  if (!getLimit(e.uid, 10000)) {
+  if (!secondLimit(e.uid, config.function.probab.huifu)) {
     return null
   } else {
     nowMoney.money = 100
     nowMoney.probab = 50
     update(e.uid, nowMoney)
-    reply(` [*${e.username}*]   :  唔~ 请加油哦~ 这是阁下的新钱包~ 祝您能够玩得愉快~!  :  ${String(nowMoney.money)}钞`, config.app.color)
+    reply(` [*${e.username}*]   :  唔~! 请加油哦~ 这是阁下的新钱包~ 祝您能够玩得愉快~!  :  ${String(nowMoney.money)}钞`, config.app.color)
   }
 })
 
