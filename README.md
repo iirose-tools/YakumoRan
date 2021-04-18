@@ -17,28 +17,57 @@
 - 再次运行 `npm start` 启动项目
 
 ## 配置文件
-
-- `version`: 版本号，对应package.json中的version
-- `app`: APP配置
-- - `nickname`: 机器人昵称
-- - `master`: 主人用户名
-- - `master_uid`: 主人uid
-- - `color`: 气泡颜色
-- `function`: 插件配置
-- - `chat`: 聊天功能
-- - - `disable`: 是否关闭聊天功能
-- - `scp079`: SCP-79
-- - - `nsfw_rate`: 涩图检测阈值，默认0.8
-- - - `allowGambling`: 是否允许赌博，默认 `true`
-- - `probab`: 模拟赌博功能
-- - - `every`: 赌博间隔(单位是毫秒)
-- - - `huifu`: 钱包恢复时间(单位是毫秒)
-- `account`: 账号配置
-- - `username`: 用户名
-- - `password`: 密码MD5
-- - `room`: 房间id
-- `logger`: 日志配置
-- - `level`: 日志级别，默认INFO
+```javascript
+{
+  version: '配置文件版本号',
+  // APP配置
+  app: {
+    nickname: '机器人昵称',
+    master: '主人用户名',
+    master_uid: '主人uid',
+    color: '消息颜色'
+  },
+  // 功能配置
+  function: {
+    // 聊天功能
+    chat: {
+      disable: '是否关闭聊天功能，true或者false'
+    },
+    // SCP-079 辅助管理
+    scp079: {
+      nsfw_rate: '涩图检测阈值，默认0.8',
+      allowGambling: '是否允许赌博，默认true',
+      // 发言频率限制
+      rate_limit: {
+        duration: `刷屏检测周期`,
+        limit: `限制消息条数`,
+        action: {
+          type: '执行操作，warn或者mute',
+          warn: {
+            message: '警告消息内容'
+          },
+          mute: {
+            duration: `禁言时长`
+          }
+        }
+      }
+    },
+    // 模拟赌博
+    probab: {
+      every: '赌博间隔(单位是毫秒)',
+      huifu: '钱包恢复时间(单位是毫秒)'
+    }
+  },
+  account: {
+    username: '机器人用户名',
+    password: '机器人密码md5',
+    room: '房间id'
+  },
+  logger: {
+    level: 'INFO'
+  }
+}
+```
 
 ## License
 

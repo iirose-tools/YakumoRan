@@ -7,9 +7,55 @@ Ran.command(/\.go (.*)/, (m, e, reply) => {
   Ran.method.bot.moveTo(m[1])
 })
 
+const limit: any = {}
+
 Ran.Event.on('PublicMessage', async msg => {
   if (msg.username === config.account.username) return
+  // 刷屏检测
+  if (!limit[msg.uid]) {
+    limit[msg.uid] = {
+      message: 1,
+      startAt: Math.round(new Date().getTime() / 1e3)
+    }
+  } else {
+    limit[msg.uid].message++
+    const time = new Date().getTime() / 1e3 - limit[msg.uid].startAt
+    if (time > config.function.scp079.rate_limit.duration) {
+      limit[msg.uid] = {
+        message: 1,
+        startAt: Math.round(new Date().getTime() / 1e3)
+      }
+    }
 
+    if (limit[msg.uid].message > config.function.scp079.rate_limit.limit) {
+      limit[msg.uid] = {
+        message: 1,
+        startAt: Math.round(new Date().getTime() / 1e3)
+      }
+
+      if (config.function.scp079.rate_limit.action.type === 'warn') {
+        const warnMsg = config.function.scp079.rate_limit.action.warn.message
+        Ran.method.sendPrivateMessage(msg.uid, warnMsg, config.app.color)
+      } else if (config.function.scp079.rate_limit.action.type === 'mute') {
+        Ran.method.admin.mute('all', msg.username, `${config.function.scp079.rate_limit.action.mute.duration}s`, '请不要刷屏哦')
+      }
+    }
+  }
+})
+
+Ran.Event.on('PublicMessage', async msg => {
+  if (msg.username === config.account.username) return
+  // 赌博检测
+  const gamblingRegex = /(压|押)(完|\d+)/gm
+  if (gamblingRegex.test(msg.message) && !config.function.scp079.allowGambling) {
+    logger('SCP-079').info(`检测到 ${msg.username} 赌博，已移除`)
+    Ran.method.sendPrivateMessage(msg.uid, '[YakumoRan] 本房禁止赌博', config.app.color)
+    Ran.method.admin.kick(msg.username)
+  }
+})
+
+Ran.Event.on('PublicMessage', async msg => {
+  if (msg.username === config.account.username) return
   // 图片检测
   const imgs = getImg(msg.message)
   if (imgs) {
@@ -33,15 +79,10 @@ Ran.Event.on('PublicMessage', async msg => {
       }
     }
   }
+})
 
-  // 赌博检测
-  const gamblingRegex = /(压|押)(完|\d+)/gm
-  if (gamblingRegex.test(msg.message) && !config.function.scp079.allowGambling) {
-    logger('SCP-079').info(`检测到 ${msg.username} 赌博，已移除`)
-    Ran.method.sendPrivateMessage(msg.uid, '[YakumoRan] 本房禁止赌博', config.app.color)
-    Ran.method.admin.kick(msg.username)
-  }
-
+Ran.Event.on('PublicMessage', async msg => {
+  if (msg.username === config.account.username) return
   // 管理命令
   if (msg.username === config.app.master) {
     const m = msg.message.trim()

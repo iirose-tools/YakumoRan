@@ -17,7 +17,20 @@ const defaultConfig = {
     },
     scp079: {
       nsfw_rate: 0.8,
-      allowGambling: true
+      allowGambling: true,
+      rate_limit: {
+        duration: 60,
+        limit: 45,
+        action: {
+          type: 'warn',
+          warn: {
+            message: '请不要刷屏哦~'
+          },
+          mute: {
+            duration: 60
+          }
+        }
+      }
     },
     probab: {
       every: 2000,
