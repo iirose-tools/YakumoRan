@@ -2,10 +2,25 @@ import got from 'got'
 import config from '../../config'
 import * as Ran from '../../lib/api'
 
+// 屏蔽的标签，作品中包含这些标签会返回没有搜索到任何结果
 const blockTags = [
   'R-18',
-  'R-18G'
+  'R-18G',
+  '機械姦'
 ]
+
+const limit: any = {}
+
+// 限速
+const getLimit = (uid: string, time: number) => {
+  if (limit[uid]) return false
+
+  limit[uid] = true
+  setTimeout(() => {
+    delete limit[uid]
+  }, time)
+  return true
+}
 
 const getRandomInt = (n: number, m: number): number => { return Math.floor(Math.random() * (m - n + 1) + n) }
 
@@ -40,6 +55,7 @@ const pixivSearch = async (word: string) => {
 
 Ran.command(/^搜图(.*)$/, async (m, e, reply) => {
   try {
+    if (!getLimit(e.uid, 10e3)) return
     reply('[Pixiv] Searching...', config.app.color)
     const word: string = m[1].trim()
     if (blockTags.includes(word)) return reply('[Pixiv] 你 想 干 啥?', config.app.color)
@@ -67,5 +83,5 @@ Ran.command(/^搜图(.*)$/, async (m, e, reply) => {
 })
 
 Ran.command(/^搜图$/, async (m, e, reply) => {
-  reply('[https://api.peer.ink/api/v1/pixiv/wallpaper/image?a.jpg#e]', config.app.color)
+  reply(`[https://api.peer.ink/api/v1/pixiv/wallpaper/image?t=${new Date().getTime()}&a.jpg#e]`, config.app.color)
 })
