@@ -55,6 +55,7 @@ const pixivSearch = async (word: string) => {
 }
 
 Ran.command(/^搜图(.*)$/, async (m, e, reply) => {
+  if (config.function.pixiv.disabled) return reply('[Pixiv] 功能未启用...', config.app.color)
   try {
     if (!getLimit(e.uid, 10e3)) return
     reply('[Pixiv] Searching...', config.app.color)

@@ -15,6 +15,9 @@ const defaultConfig = {
     chat: {
       disable: true
     },
+    pixiv: {
+      disable: true
+    },
     scp079: {
       nsfw_rate: 0.8,
       allowGambling: true,
