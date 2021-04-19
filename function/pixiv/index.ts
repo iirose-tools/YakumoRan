@@ -1,6 +1,7 @@
 import got from 'got'
 import config from '../../config'
 import * as Ran from '../../lib/api'
+import { isPorn } from '../SCP-079/utils'
 
 // 屏蔽的标签，作品中包含这些标签会返回没有搜索到任何结果
 const blockTags = [
@@ -69,6 +70,9 @@ Ran.command(/^搜图(.*)$/, async (m, e, reply) => {
     const url = (artwork.meta_pages.length > 0 ? artwork.meta_pages[0].image_urls.original : artwork.meta_single_page.original_image_url).replace('i.pximg.net', 'pix.3m.chat')
 
     if (!tags) return reply('[Pixiv] 没有搜索到任何结果', config.app.color)
+
+    const rate = await isPorn(url)
+    if (rate > config.function.scp079.nsfw_rate) return reply('[Pixiv] 没有搜索到任何结果', config.app.color)
 
     reply([
       `[${url}#e]`,
