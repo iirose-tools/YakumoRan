@@ -30,7 +30,9 @@ WebSocket.on('connect', async () => {
         logger('Core').info('收到服务器返回数据, 登录成功')
         Bot.emit('login')
 
+        logger('Core').info('高性能ですから~')
         logger('Core').info(`启动完成 欢迎使用: ${config.account.username}`)
+        logger('Core').debug('咱的聊天群：700080009')
       }
     })
     logger('Core').info('登录包发送成功')
