@@ -12,7 +12,6 @@ import { PublicMessage as typePublicMessage } from '../decoder/PublicMessage'
 import config from '../../config'
 import mediaCard from '../encoder/messages/media_card'
 import mediaData from '../encoder/messages/media_data'
-import status from '../core/status'
 import blackList from '../encoder/admin/blackList'
 import kick from '../encoder/admin/kick'
 import mediaClear from '../encoder/admin/media_clear'
@@ -38,7 +37,6 @@ export const command = (regexp: RegExp, callback: (m: RegExpExecArray, e: typePu
 
     regexp.lastIndex = 0
     if (regexp.test(e.message)) {
-      status('command')
       logger('Command').info(`${e.username} 触发了 ${regexp} 命令: ${e.message}`)
 
       const reply = (msg: string, color: string) => {
@@ -61,7 +59,6 @@ export const method = {
    * @returns {Promise}
    */
   sendPublicMessage: (message: string, color: string) => {
-    status('sendMsg')
     logger('Bot').debug(`发送了群聊消息: ${message}`)
     const data = PublicMessage(message, color)
     return send(data)

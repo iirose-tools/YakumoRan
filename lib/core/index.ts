@@ -1,4 +1,3 @@
-import status from './status'
 import decoder from '../decoder'
 import login from '../encoder/system/login'
 import { WebSocket, Bot } from '../event'
@@ -19,19 +18,15 @@ WebSocket.once('connect', () => {
 })
 
 WebSocket.on('connect', async () => {
-  status('connected')
   const err = await send(login())
   if (err) {
-    status('login_fail')
     logger('Core').error('登录包发送失败', err)
   } else {
     WebSocket.once('message', (msg) => {
       if (msg === '%*"2') {
-        status('login_fail')
         logger('Core').fatal('登录失败，用户名或密码错误')
         process.exit(1)
       } else {
-        status('login_success')
         logger('Core').info('收到服务器返回数据, 登录成功')
         Bot.emit('login')
 
@@ -43,11 +38,6 @@ WebSocket.on('connect', async () => {
 })
 
 init()
-status('start')
-
-setInterval(() => {
-  status('heartbeat')
-}, 3e4)
 
 export const moveTo = (roomId: string) => {
   logger('Core').info('正在切换房间...')
