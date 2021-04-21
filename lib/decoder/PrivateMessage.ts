@@ -1,3 +1,4 @@
+import { decode } from 'html-entities'
 import { Bot } from '../event'
 
 export interface PrivateMessage {
@@ -18,9 +19,9 @@ export default (message: string) => {
         const msg = {
           timestamp: Number(tmp[0]),
           uid: tmp[1],
-          username: tmp[2],
+          username: decode(tmp[2]),
           avatar: tmp[3],
-          message: tmp[4],
+          message: decode(tmp[4]),
           color: tmp[5],
           messageId: Number(tmp[10])
         }
