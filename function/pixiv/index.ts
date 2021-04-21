@@ -1,13 +1,13 @@
 import got from 'got'
 import config from '../../config'
 import * as Ran from '../../lib/api'
-import { isPorn } from '../SCP-079/utils'
 
 // 屏蔽的标签，作品中包含这些标签会返回没有搜索到任何结果
 const blockTags = [
   'R-18',
   'R-18G',
-  '機械姦'
+  '機械姦',
+  'R-17.9'
 ]
 
 const limit: any = {}
@@ -72,15 +72,12 @@ Ran.command(/^搜图(.*)$/, async (m, e, reply) => {
 
     if (!tags) return reply('[Pixiv] 没有搜索到任何结果', config.app.color)
 
-    const rate = await isPorn(url)
-    if (rate > config.function.scp079.nsfw_rate) return reply('[Pixiv] 没有搜索到任何结果', config.app.color)
-
     reply([
       `[${url}#e]`,
       artwork.title,
       `id: ${artwork.id}`,
       'tags: ',
-      tags.map(e => `#${e}`).join(', ')
+      tags.map(e => `🏷️${e}`).join('  ')
     ].join('\n'), config.app.color)
   } catch (error) {
     reply('[Pixiv] 没有搜索到任何结果', config.app.color)
