@@ -30,7 +30,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: win.exe
-        path: pkg/index-win
+        path: pkg/index-win.exe
         if-no-files-found: warn
     - name: Upload artifact
       uses: actions/upload-artifact@v2
