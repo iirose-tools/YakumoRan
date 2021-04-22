@@ -4,7 +4,7 @@ import config from '../../config'
 import { Event, method } from '../api'
 import logger from '../logger'
 
-const functionPath = path.join(__dirname, '../../function')
+const functionPath = path.join(process.cwd(), '../../function')
 
 const func: any = {}
 
@@ -15,7 +15,7 @@ fs.readdirSync(functionPath).forEach(e => {
   const packageData = JSON.parse(fs.readFileSync(path.join(itemPath, 'package.json')).toString())
 
   try {
-    fs.mkdirSync(path.join(__dirname, `../../data/${packageData.id}`))
+    fs.mkdirSync(path.join(process.cwd(), `../../data/${packageData.id}`))
   } catch (error) {}
 
   if (e !== 'core') require(path.join(itemPath, packageData.main))

@@ -2,4 +2,5 @@ logs/
 dist/
 node_modules/
 data/
+pkg/
 config.json
