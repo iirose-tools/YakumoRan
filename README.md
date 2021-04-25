@@ -10,6 +10,15 @@
 
 ## 食用方法
 
+### 使用二进制包
+
+- 前往[GitHub Actions](https://github.com/iirose-tools/YakumoRan/actions/workflows/build.yml)下载对应系统的二进制包
+- 直接运行
+- 第一次运行会在根目录生成一个`config.json`文件并闪退，这是正常现象
+- 这个时候就手动去修改`config.json`文件，修改完成后再次启动即可
+
+### 手动部署
+
 - 安装Nodejs
 - 运行 `npm run build`
 - 运行 `npm start` 启动项目
@@ -17,6 +26,7 @@
 - 再次运行 `npm start` 启动项目
 
 ## 配置文件
+
 ```javascript
 {
   version: '配置文件版本号',
