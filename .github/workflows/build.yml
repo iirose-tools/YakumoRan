@@ -14,8 +14,6 @@ jobs:
         node-version: 14
     - name: npm install
       run: npm install
-    - name: lint
-      run: npm run lint
     - name: tsc
       run: npm run build
     - name: pkg

@@ -13,10 +13,10 @@ const defaultConfig = {
   },
   function: {
     chat: {
-      disable: true
+      disable: false
     },
     pixiv: {
-      disable: true
+      disable: false
     },
     scp079: {
       nsfw_rate: 0.8,

@@ -19,8 +19,8 @@ if (!config.function.chat.disable) {
         reply('阁下有什么事吗？')
       } else {
         try {
-          const result = JSON.parse((await got(encodeURI(`http://api.qingyunke.com/api.php?key=free&appid=0&msg=${msg}`))).body)
-          reply(result.content.split('{br}').join('\n').replace(/菲菲/gm, config.app.nickname).replace(/妈咪/gm, ' 阁下'))
+          const data = JSON.parse((await got(encodeURI(`https://api.peer.ink/api/v1/nlp/chat?msg=${msg}`))).body)
+          reply(data.result.replace(/{{name}}/gm, config.app.nickname))
         } catch (error) {
           reply([
             '出现了意料之外的错误',
