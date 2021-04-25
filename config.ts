@@ -57,6 +57,8 @@ if (!fs.existsSync(configPath)) {
 } else {
   const conf = JSON.parse(fs.readFileSync('./config.json').toString())
   if (!conf.version || conf.version !== pack.version) {
+    delete conf.function
+    delete conf.version
     const newConf = Object.assign(defaultConfig, conf)
     newConf.version = pack.version
     fs.writeFileSync(configPath, JSON.stringify(newConf, undefined, 4))
