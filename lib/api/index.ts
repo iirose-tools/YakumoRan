@@ -268,7 +268,7 @@ export const method = {
   }
 }
 
-export const Data = path.join(process.cwd(), '../../data')
+export const Data = path.join(process.cwd(), './data')
 
 try {
   mkdirSync(Data)
