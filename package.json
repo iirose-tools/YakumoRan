@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "ts-node .",
-    "start": "node ./dist/index.js",
+    "start": "cd ./dist && node ./dist/index.js",
     "build": "tsc && node ./tools/after-build.js",
     "pkg": "cross-env NODE_ENV=production pkg --out-path ./pkg ./dist/index.js",
     "lint": "eslint . --ext .ts",
