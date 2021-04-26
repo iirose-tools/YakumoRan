@@ -4,3 +4,4 @@ node_modules/
 data/
 pkg/
 config.json
+mentality.allow
