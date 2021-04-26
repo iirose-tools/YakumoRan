@@ -12,7 +12,6 @@ const getSign = (msg: string, time: number) => sha1(`${room}-${msg}-${time}`)
 
 Ran.Event.on('PublicMessage', msg => {
   if (!fs.existsSync(path.join(process.cwd(), './mentality.allow'))) return
-  logger('mentality').info('Mentality已启动')
   const time = new Date().getTime()
   const message = msg.message
   const name = msg.username
