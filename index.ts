@@ -27,6 +27,7 @@ const question = () => {
     rl.question([
       '请问您是否同意开发团队分析聊天消息用于发现心理疾病患者并进行人工干预',
       '注：本Bot不会保留任何聊天记录，仅做实时分析',
+      '具体的可以看这个链接：https://github.com/iirose-tools/YakumoRan#关于心理监测',
       '同意请输入Y，拒绝请输入n（Y/n）:'
     ].join('\n'), result => {
       const isAllow = result.toLowerCase() === 'y'

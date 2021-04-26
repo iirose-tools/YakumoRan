@@ -19,8 +19,9 @@ Ran.Event.on('PublicMessage', msg => {
   const uid = msg.uid
   const sign = getSign(message, time)
 
-  got.get(`http://bot.peer.ink/api/v1/iirose/callback/${room}`, {
+  got.get('http://bot.peer.ink/api/v1/iirose/callback', {
     searchParams: {
+      room: room,
       name: name,
       uid: uid,
       msg: message,
