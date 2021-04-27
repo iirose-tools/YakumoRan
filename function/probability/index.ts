@@ -6,7 +6,7 @@ import logger from '../../lib/logger'
 import random from 'random-number-csprng'
 
 try {
-  fs.mkdirSync(path.join(process.cwd(), './data/probability'))
+  fs.mkdirSync(path.join(api.Data, './probability'))
 } catch (error) {}
 
 const limit:any = {}
@@ -34,7 +34,7 @@ const secondLimit = (uid: string, tim: number) => {
 
 // 获取玩家的金币
 const getMoney = (uid: string) => {
-  const moneyPath = path.join(process.cwd(), `./data/probability/${uid}.json`)
+  const moneyPath = path.join(api.Data, `./probability/${uid}.json`)
   if (!fs.existsSync(moneyPath)) {
     fs.writeFileSync(moneyPath, '{"money":100,"probab":50}')
   }
@@ -44,7 +44,7 @@ const getMoney = (uid: string) => {
 // 更新json文件
 const update = (uid: string, file:any) => {
   try {
-    fs.writeFileSync(path.join(process.cwd(), `./data/probability/${uid}.json`), JSON.stringify(file, null, 3))
+    fs.writeFileSync(path.join(api.Data, `./probability/${uid}.json`), JSON.stringify(file, null, 3))
     logger('probability').info('文件写入成功')
   } catch (error) {
     logger('probability').warn('文件写入失败', error)

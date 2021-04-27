@@ -28,7 +28,7 @@ const isOp = (name:string) => {
 
 // 获取词库列表
 const getWord = () => {
-  const wordPath = path.join(process.cwd(), './data/word/word.json')
+  const wordPath = path.join(api.Data, './word/word.json')
   if (!fs.existsSync(wordPath)) {
     fs.writeFileSync(wordPath, '{}')
   }
@@ -38,7 +38,7 @@ const getWord = () => {
 
 // 获取权限列表
 const getAdmin = () => {
-  const opPath = path.join(process.cwd(), './data/word/op.json')
+  const opPath = path.join(api.Data, './word/op.json')
   if (!fs.existsSync(opPath)) {
     fs.writeFileSync(opPath, '{"admin":[],"op":[]}')
   }
@@ -51,7 +51,7 @@ const random = (n: number, m: number): number => { return Math.floor(Math.random
 // 更新json文件
 const update = (file: any, tyf: string) => {
   try {
-    fs.writeFileSync(path.join(process.cwd(), `./data/word/${tyf}.json`), JSON.stringify(file, null, 3))
+    fs.writeFileSync(path.join(api.Data, `./word/${tyf}.json`), JSON.stringify(file, null, 3))
     logger('Word').info('词库文件写入成功')
   } catch (error) {
     logger('Word').warn('词库文件写入失败', error)

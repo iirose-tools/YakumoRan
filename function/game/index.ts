@@ -14,7 +14,7 @@ const stats = {
 
 const getQuestion = () => {
   try {
-    const data: any = Object.values(JSON.parse(readFileSync(join(process.cwd(), './function/game/LanternRiddles.json')).toString()))
+    const data: any = Object.values(JSON.parse(readFileSync(join(__dirname, './LanternRiddles.json')).toString()))
 
     const len = data.length - 1
     const id = random(0, len)
