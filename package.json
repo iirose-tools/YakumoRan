@@ -5,9 +5,9 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "ts-node .",
-    "start": "cd ./dist && node ./dist/index.js",
+    "start": "cd ./dist && node ./index.js",
     "build": "tsc && node ./tools/after-build.js",
-    "pkg": "cross-env NODE_ENV=production pkg --out-path ./pkg ./dist/index.js",
+    "pkg": "cross-env NODE_ENV=production pkg --out-path ./pkg ./dist/index.js && cp ./function ./pkg",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix"
   },

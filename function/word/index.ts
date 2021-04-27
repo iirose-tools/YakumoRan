@@ -5,7 +5,7 @@ import config from '../../config'
 import logger from '../../lib/logger'
 
 try {
-  fs.mkdirSync(path.join(process.cwd(), './data/word'))
+  fs.mkdirSync(path.join(api.Data, './word'))
 } catch (error) {}
 
 // 是否为管理员

@@ -17,7 +17,12 @@ jobs:
     - name: tsc
       run: npm run build
     - name: pkg
-      run: npm run pkg
+      run: |
+        npm run pkg
+        cd pkg
+        tar -czvf macos.tar.gz index-macos function
+        tar -czvf win.tar.gz index-win.exe function
+        tar -czvf linux.tar.gz index-linux function
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
