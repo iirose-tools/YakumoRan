@@ -224,14 +224,26 @@ const getAdmin = () => {
 // 核心功能：回复
 api.Event.on('PublicMessage', msg => {
   if (msg.username === config.account.username) return // 不响应自己发送的消息
-  const wd1: string = msg.message.trim()
+  let wd1: string = msg.message.trim()
+  wd1 = wd1.replace(/\s/g, '')
   const reply = api.method.sendPublicMessage
   const word = getjson('word', 'word')
   const wd2 = wd1.replace(/(\[\*.*\*\])/g, '【艾特】')
-  let wd3 = wd2.replace(/(\[@.*@\])/g, '【uid】')
-  wd3 = wd3.replace(/\s/g, '')
+  const wd3 = wd2.replace(/(\[@.*@\])/g, '【uid】')
   const wd4:any = wd1.match(/.*\[\*(.*)\*\].*/) === null ? ['', ''] : wd1.match(/.*\[\*(.*)\*\].*/)
   try {
+    if (word[wd1]) {
+      const ran: number = word[wd1].length
+      const rd: number = random(0, ran - 1)
+      const a:any = makereply(word[wd1][rd], msg.uid, wd4[1])
+      const out = a.split('#换#')
+      let j:number = 0
+      for (j = 0; j < out.length; j++) {
+        if (out[j]) {
+          reply(out[j], config.app.color)
+        }
+      }
+    }
     if (word[wd3]) {
       const ran: number = word[wd3].length
       const rd: number = random(0, ran - 1)
@@ -251,8 +263,9 @@ api.Event.on('PublicMessage', msg => {
 api.command(/^\.问(.*)答(.*)$/, async (m, e, reply) => {
   if (!isAdmin(e.uid) && e.uid !== config.app.master_uid && !isOp(e.uid)) return
   const word = getjson('word', 'word')
-  const wd1: string = m[1]// 问后面的内容
+  let wd1: string = m[1]// 问后面的内容
   const wd2: string = m[2]// 答后面的内容
+  wd1 = wd1.replace(/\s/g, '')
   if (word[wd1] == null) {
     word[wd1] = []
   }
