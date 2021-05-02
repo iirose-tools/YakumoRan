@@ -1,15 +1,35 @@
 {
-  "name": "tools",
-  "id": "tools",
+  "name": "word",
+  "id": "word",
   "main": "index",
   "author": {
-    "name": "涂山苏苏",
-    "github": "TheresaQWQ",
-    "iirose": "涂山苏苏"
+    "name": "春风~",
+    "github": "BSTluo",
+    "iirose": "春风萧落"
   },
-  "intro": [],
+  "intro": [
+    "自定义词库"
+  ],
   "commands": [{
-    "cmd": "赞我",
-    "helper": "让机器人给你点个赞"
-  }]
+    "cmd": ".问<message1>答<message2>",
+    "helper": "设置对话词库"
+  }, {
+    "cmd": ".删全问<message1>",
+    "helper": "删除一个触发词的所有结果"
+  },{
+    "cmd": ".删问<message1>序号<词库序号>",
+    "helper": "删除一个触发词的某个结果"
+  },{
+    "cmd": ".问表<message1>",
+    "helper": "查看一个触发词的结果(可看序号)"
+  },{
+    "cmd": ".添加权限<message1>:<高级|普通>",
+    "helper": "添加一位机器人词库构建狮,普通权限可以修改词库，高级权限可以添加普通权限"
+  },{
+    "cmd": ".移除权限<message1>:<高级|普通>",
+    "helper": "移除一位机器人词库构建狮"
+  }
+
+
+]
 }
