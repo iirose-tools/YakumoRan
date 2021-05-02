@@ -5,13 +5,12 @@ api.command(/^赞我$/, (m, e, reply) => {
   api.method.like(e.uid, 'qwq')
 })
 
-api.Event.on('PrivateMessage', msg => {
-  if (msg.username === config.account.username) return // 不响应自己发送的消息
-  if (msg.uid !== config.app.master_uid) return
-  const wd1: string = msg.message.trim()
+api.command(/^带去(.*)$/, (m, e, reply) => {
+  if (e.username === config.account.username) return // 不响应自己发送的消息
+  if (e.uid !== config.app.master_uid) return
   let a:any = ''
-  if (wd1.match(/ \[_(.*)_\] /)) {
-    a = wd1.match(/ \[_(.*)_\] /)
+  if (m[1].match(/ \[_(.*)_\] /)) {
+    a = m[1].match(/ \[_(.*)_\] /)
   } else {
     a = ['', '']
   }
