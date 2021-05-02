@@ -20,11 +20,13 @@ api.Event.on('PrivateMessage', msg => {
 let a = 0
 
 api.command(/^订阅$/, (m, e, reply) => {
+  if (e.uid !== config.app.master_uid) return
   a = 1
   reply('订阅成功', '66ccff')
 })
 
 api.command(/^取消订阅$/, (m, e, reply) => {
+  if (e.uid !== config.app.master_uid) return
   a = 0
   reply('取消订阅成功', '66ccff')
 })
