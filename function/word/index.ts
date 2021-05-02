@@ -243,8 +243,7 @@ api.Event.on('PublicMessage', msg => {
           reply(out[j], config.app.color)
         }
       }
-    }
-    if (word[wd3]) {
+    } else if (word[wd3]) {
       const ran: number = word[wd3].length
       const rd: number = random(0, ran - 1)
       const a:any = makereply(word[wd3][rd], msg.uid, wd4[1])
