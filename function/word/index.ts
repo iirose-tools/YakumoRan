@@ -226,58 +226,66 @@ api.Event.on('PublicMessage', msg => {
 
 // 添加问答...
 api.command(/^\.问(.*)答(.*)$/, async (m, e, reply) => {
-  if (!per.users.hasPermission(e.uid, 'word.admin.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
-  const word = getjson('word', 'word')
-  let wd1: string = m[1]// 问后面的内容
-  const wd2: string = m[2]// 答后面的内容
-  wd1 = wd1.replace(/\s/g, '')
-  if (word[wd1] == null) {
-    word[wd1] = []
-  }
-  const i = word[wd1].push(wd2)// 新增对象（属性
+  try {
+    if (!per.users.hasPermission(e.uid, 'word.admin.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
+    const word = getjson('word', 'word')
+    let wd1: string = m[1]// 问后面的内容
+    const wd2: string = m[2]// 答后面的内容
+    wd1 = wd1.replace(/\s/g, '')
+    if (word[wd1] == null) {
+      word[wd1] = []
+    }
+    const i = word[wd1].push(wd2)// 新增对象（属性
 
-  update(word, 'word', 'word')
-  reply('添加成功,当前序列为' + i, config.app.color)
+    update(word, 'word', 'word')
+    reply('添加成功,当前序列为' + i, config.app.color)
+  } catch (error) {}
 })
 
 // 删除部分问答
 api.command(/^\.删问(.*)序[号|列](.*)$/, async (m, e, reply) => {
-  if (!per.users.hasPermission(e.uid, 'word.admin.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
-  const word = getjson('word', 'word')
-  const wd1: string = m[1]// 问后面的内容
-  const wd2 = Number(m[2]) - 1
-  word[wd1].splice(wd2, 1)
-  const passed = word[wd1].every(isError)
-  if (passed === true) {
-    delete word[wd1]
-  }
+  try {
+    if (!per.users.hasPermission(e.uid, 'word.admin.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
+    const word = getjson('word', 'word')
+    const wd1: string = m[1]// 问后面的内容
+    const wd2 = Number(m[2]) - 1
+    word[wd1].splice(wd2, 1)
+    const passed = word[wd1].every(isError)
+    if (passed === true) {
+      delete word[wd1]
+    }
 
-  update(word, 'word', 'word')
-  reply('删除成功', config.app.color)
+    update(word, 'word', 'word')
+    reply('删除成功', config.app.color)
+  } catch (error) {}
 })
 
 // 查看词库list
 api.command(/^\.问表(.*)$/, async (m, e, reply) => {
-  if (!per.users.hasPermission(e.uid, 'word.admin.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
-  const word = getjson('word', 'word')
-  const wd1: string = m[1]
-  let ran: number = 0
-  for (const list of word[wd1]) {
-    ran++
-    reply(ran + ':' + list, config.app.color)
-  }
+  try {
+    if (!per.users.hasPermission(e.uid, 'word.admin.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
+    const word = getjson('word', 'word')
+    const wd1: string = m[1]
+    let ran: number = 0
+    for (const list of word[wd1]) {
+      ran++
+      reply(ran + ':' + list, config.app.color)
+    }
+  } catch (error) {}
 })
 
 // 删除一整个回复
 api.command(/^\.删全问(.*)$/, async (m, e, reply) => {
-  if (!per.users.hasPermission(e.uid, 'word.admin.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
-  const wd1: string = m[1]// 问后面的内容
-  const word = getjson('word', 'word')
+  try {
+    if (!per.users.hasPermission(e.uid, 'word.admin.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
+    const wd1: string = m[1]// 问后面的内容
+    const word = getjson('word', 'word')
 
-  delete word[wd1]
+    delete word[wd1]
 
-  update(word, 'word', 'word')
-  reply('删除成功', config.app.color)
+    update(word, 'word', 'word')
+    reply('删除成功', config.app.color)
+  } catch (error) {}
 })
 
 // 添加权限
