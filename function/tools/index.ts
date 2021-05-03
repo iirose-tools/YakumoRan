@@ -48,7 +48,12 @@ api.command(/^带去(.*)$/, (m, e, reply) => {
 
 api.command(/^订阅$/, (m, e, reply) => {
   try {
+    try {
+      per.users.create(e.uid)
+    } catch (error) {
+    }
     if (!per.users.hasPermission(e.uid, 'tool.op') && !per.users.hasPermission(e.uid, 'permission.tool.op')) return
+
     const user = getjson()
     user.user.push(e.uid)
     update(user)
@@ -58,6 +63,10 @@ api.command(/^订阅$/, (m, e, reply) => {
 
 api.command(/^取消订阅$/, (m, e, reply) => {
   try {
+    try {
+      per.users.create(e.uid)
+    } catch (error) {
+    }
     if (!per.users.hasPermission(e.uid, 'tool.op') && !per.users.hasPermission(e.uid, 'permission.tool.op')) return
     const user = getjson()
     for (let i = 0; i < user.user.length; i++) {
