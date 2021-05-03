@@ -8,7 +8,8 @@
     "iirose": "涂山苏苏"
   },
   "intro": [
-    "一个权限组插件"
+    "一个权限组插件",
+    "完整文档：https://github.com/iirose-tools/YakumoRan/blob/main/docs/Permission.md"
   ],
   "commands": [{
     "cmd": ".p group create <name>",

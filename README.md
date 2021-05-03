@@ -11,6 +11,9 @@
 ## 食用方法
 ### 权限组插件使用方法（请务必去查看一下）
 [点我](./docs/Permission.md)
+
+### 词库插件使用指北
+[点我](https://blog.bstluo.top/index.php/2021/04/26/%e8%8a%b1%e5%9b%ad%e6%96%b0%e7%89%88%e8%af%8d%e5%ba%93%e5%bc%95%e6%93%8e%e4%bd%bf%e7%94%a8%e6%8c%87%e5%8c%97/)
 ### 使用二进制包
 
 - 前往[GitHub Actions](https://github.com/iirose-tools/YakumoRan/actions/workflows/build.yml)下载对应系统的二进制包
