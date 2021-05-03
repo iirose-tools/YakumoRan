@@ -49,6 +49,17 @@ const api = {
       const data = { ...template.emptyGroup }
       api.group.saveGroup(name, data)
     },
+    // 删除权限组
+    delete: (name: String) => {
+      const file = path.join(conf.group, `${name.toUpperCase()}.json`)
+      if (!fs.existsSync(file)) throw new Error('权限组不存在')
+
+      fs.unlinkSync(file)
+    },
+    // 查看权限组列表
+    list: () => {
+      return fs.readdirSync(conf.group).map(e => e.replace('.json', ''))
+    },
     // 获取权限组信息
     getGroup: (name: String): Group => {
       const file = path.join(conf.group, `${name}.json`)
@@ -67,6 +78,16 @@ const api = {
       const g = api.group.getGroup(group)
       if (g.permission.includes(permission)) throw new Error('权限已存在')
       g.permission.push(permission)
+      return api.group.saveGroup(group, g)
+    },
+    // 删除权限
+    removePermission: (group: String, permission: String) => {
+      const g = api.group.getGroup(group)
+      if (!g.permission.includes(permission)) throw new Error('权限不存在')
+      g.permission = g.permission.filter(e => {
+        if (e === permission) return false
+        return true
+      })
       return api.group.saveGroup(group, g)
     },
     // 判断是否拥有某个权限
@@ -93,13 +114,24 @@ const api = {
   },
   users: {
     // 创建用户
-    create: (uid: string) => {
+    create: (uid: String) => {
       const file = path.join(conf.users, `${uid.toUpperCase()}.json`)
 
       if (fs.existsSync(file)) throw new Error('用户已存在')
 
       const data = { ...template.emptyUsers }
       api.users.saveUser(uid, data)
+    },
+    // 删除用户
+    delete: (uid: String) => {
+      const file = path.join(conf.users, `${uid.toUpperCase()}.json`)
+      if (!fs.existsSync(file)) throw new Error('用户不存在')
+
+      fs.unlinkSync(file)
+    },
+    // 查看用户列表
+    list: () => {
+      return fs.readdirSync(conf.users).map(e => e.replace('.json', ''))
     },
     // 保存权限信息
     saveUser: (user: String, data: User) => {
@@ -129,6 +161,16 @@ const api = {
       const g = api.users.getUser(user)
       if (g.permission.includes(permission)) throw new Error('权限已存在')
       g.permission.push(permission)
+      return api.users.saveUser(user, g)
+    },
+    // 删除权限
+    removePermission: (user: String, permission: String) => {
+      const g = api.users.getUser(user)
+      if (!g.permission.includes(permission)) throw new Error('权限不存在')
+      g.permission = g.permission.filter(e => {
+        if (e === permission) return false
+        return true
+      })
       return api.users.saveUser(user, g)
     },
     // 添加至用户组

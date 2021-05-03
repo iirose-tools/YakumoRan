@@ -6,12 +6,18 @@
   - [关于uid](#关于uid)
   - [指令](#指令)
     - [创建权限组](#创建权限组)
+    - [删除权限组](#删除权限组)
+    - [查看权限组列表](#查看权限组列表)
     - [查看权限组信息](#查看权限组信息)
     - [给权限组添加权限](#给权限组添加权限)
+    - [给权限组删除权限](#给权限组删除权限)
     - [查看权限组是否拥有某个权限](#查看权限组是否拥有某个权限)
     - [创建用户](#创建用户)
+    - [删除用户](#删除用户)
+    - [查看用户列表](#查看用户列表)
     - [查看用户信息](#查看用户信息)
     - [给用户添加权限](#给用户添加权限)
+    - [给用户删除权限](#给用户删除权限)
     - [查看用户是否拥有某个权限](#查看用户是否拥有某个权限)
     - [把用户加入到权限组](#把用户加入到权限组)
     - [查看自己是否拥有某个权限](#查看自己是否拥有某个权限)
@@ -33,6 +39,14 @@
 > .p group create 权限组名称
 - 权限节点：permission.group.create
 
+### 删除权限组
+> .p group del 权限组名称
+- 权限节点：permission.group.delete
+
+### 查看权限组列表
+> .p group list
+- 权限节点 permission.group.list
+
 ### 查看权限组信息
 > .p group info 权限组名称
 - 权限节点：permission.group.info
@@ -41,6 +55,10 @@
 > .p group add 权限组 权限节点
 - 权限节点：permission.group.add
 
+### 给权限组删除权限
+> .p group rm 权限组 权限节点
+- 权限节点：permission.group.remove
+
 ### 查看权限组是否拥有某个权限
 > .p group has 权限组 权限节点
 - 权限节点：permission.group.has
@@ -48,6 +66,14 @@
 ### 创建用户
 > .p user create uid
 - 权限节点：permission.user.create
+- 
+### 删除用户
+> .p user del uid
+- 权限节点：permission.user.delete
+
+### 查看用户列表
+> .p user list
+- 权限节点：permission.user.list
 
 ### 查看用户信息
 > .p user info uid
@@ -56,6 +82,10 @@
 ### 给用户添加权限
 > .p user add uid 权限节点
 - 权限节点：permission.user.add
+
+### 给用户删除权限
+> .p user rm uid 权限节点
+- 权限节点：permission.user.remove
 
 ### 查看用户是否拥有某个权限
 > .p user has uid 权限节点
