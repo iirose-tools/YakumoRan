@@ -12,6 +12,29 @@ Ran.command(/\.p group create (\S+)/, (m, e, reply) => {
   }
 })
 
+Ran.command(/\.p group del (\S+)/, (m, e, reply) => {
+  try {
+    if (!api.users.hasPermission(e.uid, 'permission.group.delete')) return reply('权限不足', config.app.color)
+    api.group.delete(m[1])
+    reply('[Permission] 权限组删除成功', config.app.color)
+  } catch (error) {
+    reply(`[Permission] 权限组删除失败: ${error.message}`, config.app.color)
+  }
+})
+
+Ran.command(/\.p group list/, (m, e, reply) => {
+  try {
+    if (!api.users.hasPermission(e.uid, 'permission.group.list')) return reply('权限不足', config.app.color)
+    reply([
+      ...api.group.list().map((v, i) => {
+        return `${i}. ${v}`
+      })
+    ].join('\n'), config.app.color)
+  } catch (error) {
+    reply(`[Permission] 权限组读取失败: ${error.message}`, config.app.color)
+  }
+})
+
 Ran.command(/\.p group info (\S+)/, (m, e, reply) => {
   try {
     if (!api.users.hasPermission(e.uid, 'permission.group.info')) return reply('权限不足', config.app.color)
@@ -39,6 +62,18 @@ Ran.command(/\.p group add (\S+) (\S+)/, (m, e, reply) => {
   }
 })
 
+Ran.command(/\.p group rm (\S+) (\S+)/, (m, e, reply) => {
+  try {
+    if (!api.users.hasPermission(e.uid, 'permission.group.remove')) return reply('权限不足', config.app.color)
+    const group = m[1]
+    const permission = m[2]
+    api.group.removePermission(group, permission)
+    reply('[Permission] 权限删除成功', config.app.color)
+  } catch (error) {
+    reply(`[Permission] 权限删除失败: ${error.message}`, config.app.color)
+  }
+})
+
 Ran.command(/\.p group has (\S+) (\S+)/, (m, e, reply) => {
   try {
     if (!api.users.hasPermission(e.uid, 'permission.group.has')) return reply('权限不足', config.app.color)
@@ -58,6 +93,29 @@ Ran.command(/\.p user create (\S+)/, (m, e, reply) => {
     reply('[Permission] 用户创建成功', config.app.color)
   } catch (error) {
     reply(`[Permission] 用户创建失败: ${error.message}`, config.app.color)
+  }
+})
+
+Ran.command(/\.p user del (\S+)/, (m, e, reply) => {
+  try {
+    if (!api.users.hasPermission(e.uid, 'permission.user.delete')) return reply('权限不足', config.app.color)
+    api.users.delete(m[1])
+    reply('[Permission] 用户删除成功', config.app.color)
+  } catch (error) {
+    reply(`[Permission] 用户删除失败: ${error.message}`, config.app.color)
+  }
+})
+
+Ran.command(/\.p user list/, (m, e, reply) => {
+  try {
+    if (!api.users.hasPermission(e.uid, 'permission.user.list')) return reply('权限不足', config.app.color)
+    reply([
+      ...api.users.list().map((v, i) => {
+        return `${i}. [@${v}@] `
+      })
+    ].join('\n'), config.app.color)
+  } catch (error) {
+    reply(`[Permission] 用户读取失败: ${error.message}`, config.app.color)
   }
 })
 
@@ -87,6 +145,18 @@ Ran.command(/\.p user add (\S+) (\S+)/, (m, e, reply) => {
     reply('[Permission] 权限添加成功', config.app.color)
   } catch (error) {
     reply(`[Permission] 权限添加失败: ${error.message}`, config.app.color)
+  }
+})
+
+Ran.command(/\.p user rm (\S+) (\S+)/, (m, e, reply) => {
+  try {
+    if (!api.users.hasPermission(e.uid, 'permission.user.remove')) return reply('权限不足', config.app.color)
+    const uid = m[1]
+    const permission = m[2]
+    api.users.removePermission(uid, permission)
+    reply('[Permission] 权限删除成功', config.app.color)
+  } catch (error) {
+    reply(`[Permission] 权限删除失败: ${error.message}`, config.app.color)
   }
 })
 
