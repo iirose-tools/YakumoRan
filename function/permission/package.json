@@ -1,0 +1,39 @@
+{
+  "name": "permission",
+  "id": "permission",
+  "main": "index",
+  "author": {
+    "name": "涂山苏苏",
+    "github": "TheresaQWQ",
+    "iirose": "涂山苏苏"
+  },
+  "intro": [
+    "一个权限组插件",
+    "完整文档：https://github.com/iirose-tools/YakumoRan/blob/main/docs/Permission.md"
+  ],
+  "commands": [{
+    "cmd": ".p group create <name>",
+    "helper": "创建权限组"
+  },{
+    "cmd": ".p group add <name> <permission>",
+    "helper": "给权限组添加权限"
+  },{
+    "cmd": ".p group has <name> <permission>",
+    "helper": "查看权限组是否拥有某个权限"
+  },{
+    "cmd": ".p user create <uid>",
+    "helper": "创建用户"
+  },{
+    "cmd": ".p user add <uid> <permission>",
+    "helper": "给用户添加权限"
+  },{
+    "cmd": ".p user join <uid> <group>",
+    "helper": "把用户加入权限组"
+  },{
+    "cmd": ".p user has <uid> <permission>",
+    "helper": "查看用户是否拥有某个权限"
+  },{
+    "cmd": ".p me has <permission>",
+    "helper": "查看自己是否拥有某个权限"
+  }]
+}
