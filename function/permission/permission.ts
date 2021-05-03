@@ -20,19 +20,6 @@ const conf = {
   users: path.join(Ran.Data, './permission/users')
 }
 
-const template: {
-  emptyGroup: Group
-  emptyUsers: User
-} = {
-  emptyGroup: {
-    permission: []
-  },
-  emptyUsers: {
-    group: [],
-    permission: []
-  }
-}
-
 const init = () => {
   try { fs.mkdirSync(conf.group) } catch (error) {}
   try { fs.mkdirSync(conf.users) } catch (error) {}
@@ -46,7 +33,9 @@ const api = {
 
       if (fs.existsSync(file)) throw new Error('权限组已存在')
 
-      const data = { ...template.emptyGroup }
+      const data = {
+        permission: []
+      }
       api.group.saveGroup(name, data)
     },
     // 删除权限组
@@ -119,7 +108,10 @@ const api = {
 
       if (fs.existsSync(file)) throw new Error('用户已存在')
 
-      const data = { ...template.emptyUsers }
+      const data = {
+        group: [],
+        permission: []
+      }
       api.users.saveUser(uid, data)
     },
     // 删除用户
@@ -141,9 +133,12 @@ const api = {
     getUser: (uid: String): User => {
       const file = path.join(conf.users, `${uid.toUpperCase()}.json`)
 
-      if (conf.master === uid) {
+      if (conf.master.toUpperCase() === uid.toUpperCase()) {
         if (!fs.existsSync(file)) {
-          const p = template.emptyUsers
+          const p: User = {
+            group: [],
+            permission: []
+          }
           p.permission.push('permission.*')
           return p
         }
