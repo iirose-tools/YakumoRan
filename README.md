@@ -9,7 +9,8 @@
 - 可以使用由春风开发的关键词回复功能
 
 ## 食用方法
-
+### 权限组插件使用方法（请务必去查看一下）
+[点我](./docs/Permission.md)
 ### 使用二进制包
 
 - 前往[GitHub Actions](https://github.com/iirose-tools/YakumoRan/actions/workflows/build.yml)下载对应系统的二进制包
