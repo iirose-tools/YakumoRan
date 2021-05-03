@@ -2,22 +2,16 @@ import fs from 'fs'
 import path from 'path'
 import * as api from '../../lib/api'
 import config from '../../config'
+import per from '../permission/permission'
 
 try {
   fs.mkdirSync(path.join(api.Data, './word/user'))
   fs.mkdirSync(path.join(api.Data, './word/word'))
-  fs.mkdirSync(path.join(api.Data, './word/op'))
 } catch (error) {}
 
 // 判断error
 const isError = (element: any, index: any, array: any) => {
   return (element === null)
-}
-
-// 过滤
-const fitter = (txt: string) => {
-  txt = txt.replace(/[@[\] ]/g, '')
-  return txt
 }
 
 // 苏苏的随机数生成姬
@@ -193,34 +187,6 @@ const makereply = (word:any, id:string, aite:string) => {
   return word
 }
 
-// 是否为管理员
-const isAdmin = (name: string) => {
-  const allowed = getAdmin()
-  if (allowed.admin.includes(name)) {
-    return true
-  } else {
-    return false
-  }
-}
-const isOp = (name:string) => {
-  const op = getAdmin()
-  if (op.op.includes(name)) {
-    return true
-  } else {
-    return false
-  }
-}
-
-// 获取op
-const getAdmin = () => {
-  const opPath = path.join(process.cwd(), './data/word/op/op.json')
-  if (!fs.existsSync(opPath)) {
-    fs.writeFileSync(opPath, '{"admin":[],"op":[]}')
-  }
-
-  return JSON.parse(fs.readFileSync(opPath).toString())
-}
-
 // 核心功能：回复
 api.Event.on('PublicMessage', msg => {
   if (msg.username === config.account.username) return // 不响应自己发送的消息
@@ -260,7 +226,7 @@ api.Event.on('PublicMessage', msg => {
 
 // 添加问答...
 api.command(/^\.问(.*)答(.*)$/, async (m, e, reply) => {
-  if (!isAdmin(e.uid) && e.uid !== config.app.master_uid && !isOp(e.uid)) return
+  if (!per.users.hasPermission(e.uid, 'word.admin.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
   const word = getjson('word', 'word')
   let wd1: string = m[1]// 问后面的内容
   const wd2: string = m[2]// 答后面的内容
@@ -276,7 +242,7 @@ api.command(/^\.问(.*)答(.*)$/, async (m, e, reply) => {
 
 // 删除部分问答
 api.command(/^\.删问(.*)序[号|列](.*)$/, async (m, e, reply) => {
-  if (!isAdmin(e.uid) && e.uid !== config.app.master_uid && !isOp(e.uid)) return
+  if (!per.users.hasPermission(e.uid, 'word.admin.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
   const word = getjson('word', 'word')
   const wd1: string = m[1]// 问后面的内容
   const wd2 = Number(m[2]) - 1
@@ -292,7 +258,7 @@ api.command(/^\.删问(.*)序[号|列](.*)$/, async (m, e, reply) => {
 
 // 查看词库list
 api.command(/^\.问表(.*)$/, async (m, e, reply) => {
-  if (!isAdmin(e.uid) && e.uid !== config.app.master_uid && !isOp(e.uid)) return
+  if (!per.users.hasPermission(e.uid, 'word.admin.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
   const word = getjson('word', 'word')
   const wd1: string = m[1]
   let ran: number = 0
@@ -304,7 +270,7 @@ api.command(/^\.问表(.*)$/, async (m, e, reply) => {
 
 // 删除一整个回复
 api.command(/^\.删全问(.*)$/, async (m, e, reply) => {
-  if (!isAdmin(e.uid) && e.uid !== config.app.master_uid && !isOp(e.uid)) return
+  if (!per.users.hasPermission(e.uid, 'word.admin.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
   const wd1: string = m[1]// 问后面的内容
   const word = getjson('word', 'word')
 
@@ -314,54 +280,66 @@ api.command(/^\.删全问(.*)$/, async (m, e, reply) => {
   reply('删除成功', config.app.color)
 })
 
-// 饼修改的部分：
-api.command(/^.添加权限(.*):(.*)$/, async (m, e, reply) => {
-  // 只允许master和admin进行该操作。
-  let added: string = m[1]
-  added = fitter(added)
-  const allowed = getAdmin()
-
+// 添加权限
+api.command(/^\.添加权限 (\S+) :(.*)$/, async (m, e, reply) => {
   if (m[2] === '高级') {
-    if (e.uid !== config.app.master_uid) return
-    allowed.admin.push(added)
-    update(allowed, 'op', 'op')
-    reply('高级权限添加成功', config.app.color)
+    try {
+      if (!per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
+      const uid = m[1]
+      try {
+        per.users.create(uid)
+      } catch (error) {
+      }
+      per.users.addPermission(uid, 'word.admin')
+      reply('[Permission] 权限添加成功', config.app.color)
+    } catch (error) {
+      reply(`[Permission] 权限添加失败: ${error.message}`, config.app.color)
+    }
   }
-  if (m[2] === '普通') {
-    if (e.uid !== config.app.master_uid && !isAdmin(e.uid)) return
-    allowed.op.push(added)
-    update(allowed, 'op', 'op')
-    reply('权限添加成功', config.app.color)
+  if (m[2] === '高级') {
+    try {
+      if (!per.users.hasPermission(e.uid, 'permission.word') && !per.users.hasPermission(e.uid, 'word.op')) return reply('权限不足', config.app.color)
+      const uid = m[1]
+      try {
+        per.users.create(uid)
+      } catch (error) {
+      }
+      per.users.addPermission(uid, 'word.admin.op')
+      reply('[Permission] 权限添加成功', config.app.color)
+    } catch (error) {
+      reply(`[Permission] 权限添加失败: ${error.message}`, config.app.color)
+    }
   }
 })
 
-api.command(/^.移除权限(.*):(.*)$/, async (m, e, reply) => {
-  // 只允许master和admin进行该操作。
-  let username: string = m[1]
-  username = fitter(username)
-  const allowed = getAdmin()
-
+// 删除权限
+api.command(/^\.删除权限 (\S+) :(.*)$/, async (m, e, reply) => {
   if (m[2] === '高级') {
-    if (e.uid !== config.app.master_uid) return
-    allowed.admin.forEach(function (item: any, index: any, arr: any) {
-      if (item === username) {
-        allowed.admin.splice(index, 1)
+    try {
+      if (!per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
+      const uid = m[1]
+      try {
+        per.users.create(uid)
+      } catch (error) {
       }
-    })
-    update(allowed, 'op', 'op')
-    // 将username写到一个json里...然后我研究下怎么写json...哎。
-    reply('权限移除成功', config.app.color)
+      per.users.removePermission(uid, 'word.admin')
+      reply('[Permission] 权限删除成功', config.app.color)
+    } catch (error) {
+      reply(`[Permission] 权限删除失败: ${error.message}`, config.app.color)
+    }
   }
-  if (m[2] === '普通') {
-    if (e.uid !== config.app.master_uid && !isAdmin(e.uid)) return
-    allowed.op.forEach(function (item: any, index: any, arr: any) {
-      if (item === username) {
-        allowed.op.splice(index, 1)
+  if (m[2] === '高级') {
+    try {
+      if (!per.users.hasPermission(e.uid, 'permission.word') && !per.users.hasPermission(e.uid, 'word.op')) return reply('权限不足', config.app.color)
+      const uid = m[1]
+      try {
+        per.users.create(uid)
+      } catch (error) {
       }
-    })
-    update(allowed, 'op', 'op')
-    // 将username写到一个json里...然后我研究下怎么写json...哎。
-    reply('权限移除成功', config.app.color)
+      per.users.removePermission(uid, 'word.admin.op')
+      reply('[Permission] 权限删除成功', config.app.color)
+    } catch (error) {
+      reply(`[Permission] 权限删除失败: ${error.message}`, config.app.color)
+    }
   }
-  // 找到并删除。
 })
