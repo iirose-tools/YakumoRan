@@ -3,7 +3,6 @@ import config from '../../config'
 import per from '../permission/permission'
 import fs from 'fs'
 import path from 'path'
-import { user } from '../bangumi/api'
 
 // 创建存储文件夹
 try {
