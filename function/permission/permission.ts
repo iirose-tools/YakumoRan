@@ -148,7 +148,7 @@ const api = {
           return p
         }
         const p: User = JSON.parse(fs.readFileSync(file).toString())
-        p.permission.push('permission.*')
+        if (!p.permission.includes('permission.*')) p.permission.push('permission.*')
         return p
       }
 
