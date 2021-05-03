@@ -34,55 +34,65 @@ api.command(/^赞我$/, (m, e, reply) => {
 
 api.command(/^带去(.*)$/, (m, e, reply) => {
   if (e.username === config.account.username) return // 不响应自己发送的消息
-  if (!per.users.hasPermission(e.uid, 'tool.op') && !per.users.hasPermission(e.uid, 'permission.tool.op')) return
-  let a:any = ''
-  if (m[1].match(/ \[_(.*)_\] /)) {
-    a = m[1].match(/ \[_(.*)_\] /)
-  } else {
-    a = ['', '']
-  }
-  api.method.bot.moveTo(a[1])
+  try {
+    if (!per.users.hasPermission(e.uid, 'tool.op') && !per.users.hasPermission(e.uid, 'permission.tool.op')) return
+    let a:any = ''
+    if (m[1].match(/ \[_(.*)_\] /)) {
+      a = m[1].match(/ \[_(.*)_\] /)
+    } else {
+      a = ['', '']
+    }
+    api.method.bot.moveTo(a[1])
+  } catch (error) {}
 })
 
 api.command(/^订阅$/, (m, e, reply) => {
-  if (!per.users.hasPermission(e.uid, 'tool.op') && !per.users.hasPermission(e.uid, 'permission.tool.op')) return
-  const user = getjson()
-  user.user.push(e.uid)
-  update(user)
-  reply('订阅成功', '66ccff')
+  try {
+    if (!per.users.hasPermission(e.uid, 'tool.op') && !per.users.hasPermission(e.uid, 'permission.tool.op')) return
+    const user = getjson()
+    user.user.push(e.uid)
+    update(user)
+    reply('订阅成功', '66ccff')
+  } catch (error) {}
 })
 
 api.command(/^取消订阅$/, (m, e, reply) => {
-  if (!per.users.hasPermission(e.uid, 'tool.op') && !per.users.hasPermission(e.uid, 'permission.tool.op')) return
-  const user = getjson()
-  for (let i = 0; i < user.user.length; i++) {
-    if (user.user[i] === e.uid) {
-      user.user.splice(i - 1, 1)
+  try {
+    if (!per.users.hasPermission(e.uid, 'tool.op') && !per.users.hasPermission(e.uid, 'permission.tool.op')) return
+    const user = getjson()
+    for (let i = 0; i < user.user.length; i++) {
+      if (user.user[i] === e.uid) {
+        user.user.splice(i - 1, 1)
+      }
     }
-  }
-  update(user)
-  reply('取消订阅成功', '66ccff')
+    update(user)
+    reply('取消订阅成功', '66ccff')
+  } catch (error) {}
 })
 
 api.Event.on('PublicMessage', msg => {
-  if (msg.username === config.account.username) return // 不响应自己发送的消息
-  const wd1: string = msg.message.trim()
-  const reply = api.method.sendPrivateMessage
-  const user = getjson()
-  for (let i = 0; i < user.user.length; i++) {
-    if (user.user[i]) {
-      reply(user.user[i], `${msg.username}: ${wd1}`, '66ccff')
+  try {
+    if (msg.username === config.account.username) return // 不响应自己发送的消息
+    const wd1: string = msg.message.trim()
+    const reply = api.method.sendPrivateMessage
+    const user = getjson()
+    for (let i = 0; i < user.user.length; i++) {
+      if (user.user[i]) {
+        reply(user.user[i], `${msg.username}: ${wd1}`, '66ccff')
+      }
     }
-  }
+  } catch (error) {}
 })
 
 api.Event.on('PrivateMessage', msg => {
-  if (msg.username === config.account.username) return // 不响应自己发送的消息
-  if (!per.users.hasPermission(msg.uid, 'tool.op') && !per.users.hasPermission(msg.uid, 'permission.tool.op')) return
-  const wd1: string = msg.message.trim()
-  const reply = api.method.sendPublicMessage
-  const user = getjson()
-  if (user.user.includes(msg.uid)) {
-    reply(`${msg.username}: ${wd1}`, '66ccff')
-  }
+  try {
+    if (msg.username === config.account.username) return // 不响应自己发送的消息
+    if (!per.users.hasPermission(msg.uid, 'tool.op') && !per.users.hasPermission(msg.uid, 'permission.tool.op')) return
+    const wd1: string = msg.message.trim()
+    const reply = api.method.sendPublicMessage
+    const user = getjson()
+    if (user.user.includes(msg.uid)) {
+      reply(`${msg.username}: ${wd1}`, '66ccff')
+    }
+  } catch (error) {}
 })
