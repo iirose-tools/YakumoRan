@@ -35,6 +35,11 @@ const update = (file:any, tyf:string, list:string) => {
   }
 }
 
+// 过滤
+const fitter = (txt:string) => {
+  txt = txt.replace(/[\s[\]@]/g, '')
+  return txt
+}
 // 核心:判断
 const toswitch = (te:string, st:string, t:string, word:any, use:any, id:string, aite:string) => {
   let noew:any = {}
@@ -289,11 +294,12 @@ api.command(/^\.删全问(.*)$/, async (m, e, reply) => {
 })
 
 // 添加权限
-api.command(/^\.添加权限 (\S+) :(.*)$/, async (m, e, reply) => {
+api.command(/^\.添加权限(.*):(.*)$/, async (m, e, reply) => {
   if (m[2] === '高级') {
     try {
       if (!per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
-      const uid = m[1]
+      let uid = m[1]
+      uid = fitter(uid)
       try {
         per.users.create(uid)
       } catch (error) {
@@ -307,7 +313,8 @@ api.command(/^\.添加权限 (\S+) :(.*)$/, async (m, e, reply) => {
   if (m[2] === '高级') {
     try {
       if (!per.users.hasPermission(e.uid, 'permission.word') && !per.users.hasPermission(e.uid, 'word.op')) return reply('权限不足', config.app.color)
-      const uid = m[1]
+      let uid = m[1]
+      uid = fitter(uid)
       try {
         per.users.create(uid)
       } catch (error) {
@@ -325,7 +332,8 @@ api.command(/^\.删除权限 (\S+) :(.*)$/, async (m, e, reply) => {
   if (m[2] === '高级') {
     try {
       if (!per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
-      const uid = m[1]
+      let uid = m[1]
+      uid = fitter(uid)
       try {
         per.users.create(uid)
       } catch (error) {
@@ -339,7 +347,8 @@ api.command(/^\.删除权限 (\S+) :(.*)$/, async (m, e, reply) => {
   if (m[2] === '高级') {
     try {
       if (!per.users.hasPermission(e.uid, 'permission.word') && !per.users.hasPermission(e.uid, 'word.op')) return reply('权限不足', config.app.color)
-      const uid = m[1]
+      let uid = m[1]
+      uid = fitter(uid)
       try {
         per.users.create(uid)
       } catch (error) {
