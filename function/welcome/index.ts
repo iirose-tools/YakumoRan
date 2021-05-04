@@ -2,6 +2,7 @@ import path from 'path'
 import fs from 'fs'
 import * as api from '../../lib/api'
 import config from '../../config'
+import permission from '../permission/permission'
 
 try {
   fs.mkdirSync(path.join(api.Data, 'welcome'))
@@ -119,6 +120,8 @@ api.Event.on('JoinRoom', (msg) => {
   if (msg.username === config.account.username) return
   if (users[msg.uid]) return
 
+  if (permission.users.hasPermission(msg.uid, 'welcome.ignore')) return
+
   users[msg.uid] = true
 
   if (msg.uid.substr(0, 1) === 'X') {
@@ -169,9 +172,19 @@ api.Event.on('JoinRoom', (msg) => {
     welcome = sentences[5][random(0, len - 1)]
   }
 
+  if (permission.users.hasPermission(msg.uid, 'welcome.sp.bh3') && (week === 3 || week === 7)) {
+    welcome = sp.bh3.week_3or7
+    isSp = true
+  }
+
   // 周三和周日，1%概率触发
   if ((week === 3 || week === 7) && (t >= 14 && t <= 18) && random(1, 100) === 1) {
     welcome = sp.bh3.week_3or7
+    isSp = true
+  }
+
+  if (permission.users.hasPermission(msg.uid, 'welcome.sp.ark') && week === 7) {
+    welcome = sp.ak.week_7
     isSp = true
   }
 
