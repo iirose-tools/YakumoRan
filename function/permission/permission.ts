@@ -254,6 +254,18 @@ const api = {
       return api.users.saveUser(user, g)
     },
     /**
+     * @description 查看拥有指定权限的人
+     * @param permission 权限节点
+     */
+    has: (permission: String): String[] => {
+      const list = api.users.list()
+      const plist: String[] = []
+      for (const user of list) {
+        if (api.users.hasPermission(user, permission)) plist.push(user)
+      }
+      return plist
+    },
+    /**
      * @description 判断是否拥有某个权限
      * @param uid uid
      * @param permission 权限节点

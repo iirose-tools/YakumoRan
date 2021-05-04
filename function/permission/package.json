@@ -39,6 +39,9 @@
     "cmd": ".p user list",
     "helper": "查看用户列表"
   },{
+    "cmd": ".p user list <permission>",
+    "helper": "查看拥有指定权限的用户"
+  },{
     "cmd": ".p user add <uid> <permission>",
     "helper": "给用户添加权限"
   },{

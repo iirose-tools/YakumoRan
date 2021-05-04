@@ -119,6 +119,19 @@ Ran.command(/\.p user list/, (m, e, reply) => {
   }
 })
 
+Ran.command(/\.p user list (.*)/, (m, e, reply) => {
+  try {
+    if (!api.users.hasPermission(e.uid, 'permission.user.plist')) return reply('权限不足', config.app.color)
+    reply([
+      ...api.users.has(m[1]).map((v, i) => {
+        return `${i}. [@${v}@] `
+      })
+    ].join('\n'), config.app.color)
+  } catch (error) {
+    reply(`[Permission] 用户读取失败: ${error.message}`, config.app.color)
+  }
+})
+
 Ran.command(/\.p user info (\S+)/, (m, e, reply) => {
   try {
     if (!api.users.hasPermission(e.uid, 'permission.user.info')) return reply('权限不足', config.app.color)
