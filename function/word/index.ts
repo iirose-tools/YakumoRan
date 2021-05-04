@@ -35,11 +35,6 @@ const update = (file:any, tyf:string, list:string) => {
   }
 }
 
-// 过滤
-const fitter = (txt:string) => {
-  txt = txt.replace(/[\s[\]@]/g, '')
-  return txt
-}
 // 核心:判断
 const toswitch = (te:string, st:string, t:string, word:any, use:any, id:string, aite:string) => {
   let noew:any = {}
@@ -232,7 +227,7 @@ api.Event.on('PublicMessage', msg => {
 // 添加问答...
 api.command(/^\.问(.*)答(.*)$/, async (m, e, reply) => {
   try {
-    if (!per.users.hasPermission(e.uid, 'word.admin.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
+    if (!per.users.hasPermission(e.uid, 'word.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
     const word = getjson('word', 'word')
     let wd1: string = m[1]// 问后面的内容
     const wd2: string = m[2]// 答后面的内容
@@ -250,7 +245,7 @@ api.command(/^\.问(.*)答(.*)$/, async (m, e, reply) => {
 // 删除部分问答
 api.command(/^\.删问(.*)序[号|列](.*)$/, async (m, e, reply) => {
   try {
-    if (!per.users.hasPermission(e.uid, 'word.admin.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
+    if (!per.users.hasPermission(e.uid, 'word.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
     const word = getjson('word', 'word')
     const wd1: string = m[1]// 问后面的内容
     const wd2 = Number(m[2]) - 1
@@ -268,7 +263,7 @@ api.command(/^\.删问(.*)序[号|列](.*)$/, async (m, e, reply) => {
 // 查看词库list
 api.command(/^\.问表(.*)$/, async (m, e, reply) => {
   try {
-    if (!per.users.hasPermission(e.uid, 'word.admin.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
+    if (!per.users.hasPermission(e.uid, 'word.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
     const word = getjson('word', 'word')
     const wd1: string = m[1]
     let ran: number = 0
@@ -282,7 +277,7 @@ api.command(/^\.问表(.*)$/, async (m, e, reply) => {
 // 删除一整个回复
 api.command(/^\.删全问(.*)$/, async (m, e, reply) => {
   try {
-    if (!per.users.hasPermission(e.uid, 'word.admin.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
+    if (!per.users.hasPermission(e.uid, 'word.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
     const wd1: string = m[1]// 问后面的内容
     const word = getjson('word', 'word')
 
@@ -291,72 +286,4 @@ api.command(/^\.删全问(.*)$/, async (m, e, reply) => {
     update(word, 'word', 'word')
     reply('删除成功', config.app.color)
   } catch (error) {}
-})
-
-// 添加权限
-api.command(/^\.添加权限(.*):(.*)$/, async (m, e, reply) => {
-  if (m[2] === '高级') {
-    try {
-      if (!per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
-      let uid = m[1]
-      uid = fitter(uid)
-      try {
-        per.users.create(uid)
-      } catch (error) {
-      }
-      per.users.addPermission(uid, 'word.admin')
-      reply('[Permission] 权限添加成功', config.app.color)
-    } catch (error) {
-      reply(`[Permission] 权限添加失败: ${error.message}`, config.app.color)
-    }
-  }
-  if (m[2] === '高级') {
-    try {
-      if (!per.users.hasPermission(e.uid, 'permission.word') && !per.users.hasPermission(e.uid, 'word.op')) return reply('权限不足', config.app.color)
-      let uid = m[1]
-      uid = fitter(uid)
-      try {
-        per.users.create(uid)
-      } catch (error) {
-      }
-      per.users.addPermission(uid, 'word.admin.op')
-      reply('[Permission] 权限添加成功', config.app.color)
-    } catch (error) {
-      reply(`[Permission] 权限添加失败: ${error.message}`, config.app.color)
-    }
-  }
-})
-
-// 删除权限
-api.command(/^\.删除权限 (\S+) :(.*)$/, async (m, e, reply) => {
-  if (m[2] === '高级') {
-    try {
-      if (!per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
-      let uid = m[1]
-      uid = fitter(uid)
-      try {
-        per.users.create(uid)
-      } catch (error) {
-      }
-      per.users.removePermission(uid, 'word.admin')
-      reply('[Permission] 权限删除成功', config.app.color)
-    } catch (error) {
-      reply(`[Permission] 权限删除失败: ${error.message}`, config.app.color)
-    }
-  }
-  if (m[2] === '高级') {
-    try {
-      if (!per.users.hasPermission(e.uid, 'permission.word') && !per.users.hasPermission(e.uid, 'word.op')) return reply('权限不足', config.app.color)
-      let uid = m[1]
-      uid = fitter(uid)
-      try {
-        per.users.create(uid)
-      } catch (error) {
-      }
-      per.users.removePermission(uid, 'word.admin.op')
-      reply('[Permission] 权限删除成功', config.app.color)
-    } catch (error) {
-      reply(`[Permission] 权限删除失败: ${error.message}`, config.app.color)
-    }
-  }
 })
