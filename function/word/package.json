@@ -8,7 +8,12 @@
     "iirose": "春风萧落"
   },
   "intro": [
-    "自定义词库"
+    "自定义词库",
+    "权限节点",
+    "word.op  : 拥有这个权限的用户能够修改词库",
+    "",
+    "词库使用指北",
+    "链接  ：https://blog.bstluo.top/index.php/2021/04/26/花园新版词库引擎使用指北/"
   ],
   "commands": [{
     "cmd": ".问<message1>答<message2>",
