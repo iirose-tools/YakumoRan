@@ -104,7 +104,7 @@ export const method = {
   },
   /**
    * @description 点赞
-   * @param uid ｕｉｄ
+   * @param uid uid
    * @param message 消息内容
    * @returns {Promise}
    */
