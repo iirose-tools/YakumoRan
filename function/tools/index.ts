@@ -35,7 +35,7 @@ api.command(/^赞我$/, (m, e, reply) => {
 api.command(/^带去(.*)$/, (m, e, reply) => {
   if (e.username === config.account.username) return // 不响应自己发送的消息
   try {
-    if (!per.users.hasPermission(e.uid, 'tool.op') && !per.users.hasPermission(e.uid, 'permission.tool.op')) return
+    if (!per.users.hasPermission(e.uid, 'tool.mov') && !per.users.hasPermission(e.uid, 'permission.tool.mov')) return
     let a:any = ''
     if (m[1].match(/ \[_(.*)_\] /)) {
       a = m[1].match(/ \[_(.*)_\] /)
