@@ -48,9 +48,9 @@ api.command(/^带去(.*)$/, (m, e, reply) => {
 
 api.command(/^订阅$/, (m, e, reply) => {
   try {
-    if (!per.users.hasPermission(e.uid, 'tool.op') && !per.users.hasPermission(e.uid, 'permission.tool.op')) return
-
     const user = getjson()
+    if (!per.users.hasPermission(e.uid, 'tool.op') && !per.users.hasPermission(e.uid, 'permission.tool.op')) return
+    if (user.user.includes(e.uid)) return reply('已经订阅过咯~', '66ccff')
     user.user.push(e.uid)
     update(user)
     reply('订阅成功', '66ccff')
@@ -59,8 +59,9 @@ api.command(/^订阅$/, (m, e, reply) => {
 
 api.command(/^取消订阅$/, (m, e, reply) => {
   try {
-    if (!per.users.hasPermission(e.uid, 'tool.op') && !per.users.hasPermission(e.uid, 'permission.tool.op')) return
     const user = getjson()
+    if (!per.users.hasPermission(e.uid, 'tool.op') && !per.users.hasPermission(e.uid, 'permission.tool.op')) return
+    if (!user.user.includes(e.uid)) return reply('还没有订阅过哦~', '66ccff')
     for (let i = 0; i < user.user.length; i++) {
       if (user.user[i] === e.uid) {
         user.user.splice(i - 1, 1)
