@@ -32,12 +32,29 @@ export const Event = Bot
 
 export const command = (regexp: RegExp, callback: (m: RegExpExecArray, e: typePublicMessage, reply: (message: string, color: string) => void) => void) => {
   logger('Command').debug(`开始注册 ${regexp} 命令`)
+  Bot.on('PrivateMessage', e => {
+    if (e.username === config.account.username) return
+
+    regexp.lastIndex = 0
+    if (regexp.test(e.message)) {
+      logger('Command').info(`${e.username} 在私聊中触发了 ${regexp} 命令: ${e.message}`)
+
+      const reply = (msg: string, color: string) => {
+        return method.sendPrivateMessage(e.uid, msg, color)
+      }
+
+      regexp.lastIndex = 0
+      // @ts-ignore
+      callback(regexp.exec(e.message), e, reply)
+    }
+  })
+
   Bot.on('PublicMessage', e => {
     if (e.username === config.account.username) return
 
     regexp.lastIndex = 0
     if (regexp.test(e.message)) {
-      logger('Command').info(`${e.username} 触发了 ${regexp} 命令: ${e.message}`)
+      logger('Command').info(`${e.username} 在群聊中触发了 ${regexp} 命令: ${e.message}`)
 
       const reply = (msg: string, color: string) => {
         return method.sendPublicMessage(msg, color)
