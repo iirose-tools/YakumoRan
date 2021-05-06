@@ -10,7 +10,7 @@ test('arknights.query.item', async () => {
       resolve()
     })
   })
-}, 5000)
+}, 10000)
 
 test('arknights.query.drops', async () => {
   await new Promise<void>((resolve, reject) => {
@@ -23,4 +23,4 @@ test('arknights.query.drops', async () => {
       resolve()
     })
   })
-}, 5000)
+}, 10000)
