@@ -49,7 +49,7 @@ Ran.Event.on('PublicMessage', msg => {
   }
 })
 
-Ran.command(/^结束灯谜$/, (m, msg) => {
+Ran.command(/^结束灯谜$/, 'game.LanternRiddles.stop', (m, msg) => {
   stats.allow = false
   stats.question = ''
   stats.answer = ''
@@ -63,7 +63,7 @@ Ran.command(/^结束灯谜$/, (m, msg) => {
   reply('已结束本场灯谜，要开始灯谜请发送 "灯谜"')
 })
 
-Ran.command(/^灯谜$/, () => {
+Ran.command(/^灯谜$/, 'game.LanternRiddles.start', () => {
   if (stats.allow) {
     Ran.method.sendPublicMessage('有一个正在进行的游戏', 'f02d2d')
     return

@@ -2,7 +2,7 @@ import config from '../../config'
 import * as api from '../../lib/api'
 import { bili } from './api'
 
-api.command(/(a|A)(v|V)(\d+)/gm, async (m, e, reply) => {
+api.command(/(a|A)(v|V)(\d+)/gm, 'bili.video.aid', async (m, e, reply) => {
   const aid = m[3]
   const data = await bili.video_aid(aid)
   if (!data) return
@@ -23,7 +23,7 @@ api.command(/(a|A)(v|V)(\d+)/gm, async (m, e, reply) => {
   reply(t.join('\n'), config.app.color)
 })
 
-api.command(/BV(\w{10})/gm, async (m, e, reply) => {
+api.command(/BV(\w{10})/gm, 'bili.video.bvid', async (m, e, reply) => {
   const bvid = m[1]
   const data = await bili.video_bvid(bvid)
   const t = []
@@ -43,7 +43,7 @@ api.command(/BV(\w{10})/gm, async (m, e, reply) => {
   reply(t.join('\n'), config.app.color)
 })
 
-api.command(/^B站热搜$/gm, async (m, e, reply) => {
+api.command(/^B站热搜$/gm, 'bili.hotword', async (m, e, reply) => {
   const data = await bili.hotword()
 
   if (!data) {
@@ -58,7 +58,7 @@ api.command(/^B站热搜$/gm, async (m, e, reply) => {
   }
 })
 
-api.command(/^今日新番$/, async (m, e, reply) => {
+api.command(/^今日新番$/, 'bili.bangumi.today', async (m, e, reply) => {
   const data: any = await bili.bangumi.today()
   const mapping: any = {
     1: '一',

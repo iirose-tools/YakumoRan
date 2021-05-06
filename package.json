@@ -1,30 +1,38 @@
 {
   "name": "yakumo-ran",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "iirose bot",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "ts-node .",
-    "start": "node ./dist/index.js",
-    "build": "tsc && node ./tools/after-build.js",
+    "dev": "cross-env NODE_ENV=dev ts-node .",
+    "start": "cross-env NODE_ENV=production node ./dist/index.js",
+    "build": "cross-env NODE_ENV=production tsc && node ./tools/after-build.js",
     "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix"
+    "lint:fix": "eslint . --ext .ts --fix",
+    "test": "cross-env NODE_ENV=test jest --detectOpenHandles --forceExit"
   },
-  "author": "",
+  "author": "iirose-tools",
   "license": "ISC",
   "devDependencies": {
+    "@babel/core": "^7.14.0",
+    "@babel/preset-env": "^7.14.1",
+    "@types/jest": "^26.0.23",
     "@types/node": "^14.14.41",
     "@types/random-number-csprng": "^1.0.0",
     "@types/request": "^2.48.5",
     "@types/sha1": "^1.1.2",
     "@typescript-eslint/eslint-plugin": "^4.19.0",
     "@typescript-eslint/parser": "^4.19.0",
+    "babel-jest": "^26.6.3",
     "cross-env": "^7.0.3",
     "eslint": "7.12.1",
     "eslint-config-standard": "^16.0.2",
     "eslint-plugin-import": "2.22.1",
     "eslint-plugin-node": "11.1.0",
-    "eslint-plugin-promise": "4.2.1"
+    "eslint-plugin-promise": "4.2.1",
+    "jest": "^26.6.3",
+    "ts-jest": "^26.5.6",
+    "ts-node": "^9.1.1"
   },
   "dependencies": {
     "@types/pako": "^1.0.1",
@@ -39,7 +47,7 @@
     "random-number-csprng": "^1.0.2",
     "request": "^2.88.2",
     "sha1": "^1.1.1",
-    "typescript": "^4.1.5",
+    "typescript": "^4.2.4",
     "ws": "^7.4.3"
   }
 }
