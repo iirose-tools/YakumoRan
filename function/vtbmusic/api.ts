@@ -1,7 +1,7 @@
 import * as mm from 'music-metadata'
 import got from 'got'
-
-const random = (n: number, m: number): number => { return Math.floor(Math.random() * (m - n + 1) + n) }
+import random from 'random-number-csprng'
+import logger from '../../lib/logger'
 
 export const vtbmusic = {
   getMusicInfo: async (url: string): Promise<{ duration: number, bitrate: number }> => {
@@ -80,8 +80,10 @@ export const vtbmusic = {
 
       const music: any = Object.values(result.Data)
 
-      return vtbmusic.parseMusic(music[random(0, music.length - 1)])
+      const offset = music.length === 1 ? 0 : await random(0, music.length - 1)
+      return vtbmusic.parseMusic(music[offset])
     } catch (error) {
+      logger('VtbMusic').error(error)
       return null
     }
   },
@@ -103,7 +105,7 @@ export const vtbmusic = {
 
       const music = Object.values(result.Data)
 
-      return vtbmusic.parseMusic(music[random(0, music.length - 1)])
+      return vtbmusic.parseMusic(music[await random(0, music.length - 1)])
     } catch (error) {
       return null
     }
