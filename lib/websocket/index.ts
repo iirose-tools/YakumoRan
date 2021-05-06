@@ -2,6 +2,7 @@ import WS from 'ws'
 import pako from 'pako'
 import { WebSocket } from '../event'
 import logger from '../logger'
+import { isTest } from '../utils'
 
 let socket: WS
 const status = {
@@ -9,6 +10,7 @@ const status = {
 }
 
 const init = () => {
+  if (isTest) return
   // @ts-ignore
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0
   socket = new WS('wss://m2.iirose.com:8778')
@@ -68,6 +70,8 @@ export const close = () => {
 
 export const send = (data: string): Promise<Error | null> => {
   return new Promise((resolve, reject) => {
+    WebSocket.emit('send', data)
+    if (isTest) return
     try {
       const deflatedData = pako.gzip(data)
       const deflatedArray = new Uint8Array(deflatedData.length + 1)

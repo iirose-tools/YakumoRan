@@ -225,7 +225,7 @@ api.Event.on('PublicMessage', msg => {
 })
 
 // 添加问答...
-api.command(/^\.问(.*)答(.*)$/, async (m, e, reply) => {
+api.command(/^\.问(.*)答(.*)$/, 'word.add', async (m, e, reply) => {
   try {
     if (!per.users.hasPermission(e.uid, 'word.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
     const word = getjson('word', 'word')
@@ -243,7 +243,7 @@ api.command(/^\.问(.*)答(.*)$/, async (m, e, reply) => {
 })
 
 // 删除部分问答
-api.command(/^\.删问(.*)序[号|列](.*)$/, async (m, e, reply) => {
+api.command(/^\.删问(.*)序[号|列](.*)$/, 'word.delete.one', async (m, e, reply) => {
   try {
     if (!per.users.hasPermission(e.uid, 'word.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
     const word = getjson('word', 'word')
@@ -261,7 +261,7 @@ api.command(/^\.删问(.*)序[号|列](.*)$/, async (m, e, reply) => {
 })
 
 // 查看词库list
-api.command(/^\.问表(.*)$/, async (m, e, reply) => {
+api.command(/^\.问表(.*)$/, 'word.list', async (m, e, reply) => {
   try {
     if (!per.users.hasPermission(e.uid, 'word.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
     const word = getjson('word', 'word')
@@ -275,7 +275,7 @@ api.command(/^\.问表(.*)$/, async (m, e, reply) => {
 })
 
 // 删除一整个回复
-api.command(/^\.删全问(.*)$/, async (m, e, reply) => {
+api.command(/^\.删全问(.*)$/, 'word.delete.all', async (m, e, reply) => {
   try {
     if (!per.users.hasPermission(e.uid, 'word.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
     const wd1: string = m[1]// 问后面的内容

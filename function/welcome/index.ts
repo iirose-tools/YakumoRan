@@ -96,7 +96,7 @@ const sp = {
 
 const users: { [index: string]: boolean } = {}
 
-api.command(/^\.wb set (.*)$/, (m, e, reply) => {
+api.command(/^\.wb set (.*)$/, 'welcome.set', (m, e, reply) => {
   const file = path.join(api.Data, 'welcome', e.uid)
   try {
     fs.writeFileSync(file, m[1])
@@ -106,7 +106,7 @@ api.command(/^\.wb set (.*)$/, (m, e, reply) => {
   }
 })
 
-api.command(/^\.wb rm$/, (m, e, reply) => {
+api.command(/^\.wb rm$/, 'welcome.rm', (m, e, reply) => {
   const file = path.join(api.Data, 'welcome', e.uid)
   try {
     fs.unlinkSync(file)

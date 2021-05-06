@@ -28,11 +28,11 @@ const update = (file:any) => {
 }
 
 // 正文↓
-api.command(/^赞我$/, (m, e, reply) => {
+api.command(/^赞我$/, 'tools.like', (m, e, reply) => {
   api.method.like(e.uid, 'qwq')
 })
 
-api.command(/^带去(.*)$/, (m, e, reply) => {
+api.command(/^带去(.*)$/, 'toole.goto', (m, e, reply) => {
   if (e.username === config.account.username) return // 不响应自己发送的消息
   try {
     if (!per.users.hasPermission(e.uid, 'tool.op') && !per.users.hasPermission(e.uid, 'permission.tool.op')) return
@@ -46,7 +46,7 @@ api.command(/^带去(.*)$/, (m, e, reply) => {
   } catch (error) {}
 })
 
-api.command(/^订阅$/, (m, e, reply) => {
+api.command(/^订阅$/, 'tools.feed', (m, e, reply) => {
   try {
     if (!per.users.hasPermission(e.uid, 'tool.op') && !per.users.hasPermission(e.uid, 'permission.tool.op')) return
 
@@ -57,7 +57,7 @@ api.command(/^订阅$/, (m, e, reply) => {
   } catch (error) {}
 })
 
-api.command(/^取消订阅$/, (m, e, reply) => {
+api.command(/^取消订阅$/, 'tools.feed.calcel', (m, e, reply) => {
   try {
     if (!per.users.hasPermission(e.uid, 'tool.op') && !per.users.hasPermission(e.uid, 'permission.tool.op')) return
     const user = getjson()
