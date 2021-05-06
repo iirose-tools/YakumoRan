@@ -8,10 +8,18 @@
     "iirose": "涂山苏苏"
   },
   "intro": [
-    "所有歌曲均来自 https://vtbmusic.com"
+    "所有歌曲均来自 https://vtbmusic.com",
+    "权限节点：",
+    "vtbmusic.cut：切歌权限"
   ],
   "commands": [{
+    "cmd": "vtb点歌",
+    "helper": "随机点播一首热门歌曲"
+  },{
     "cmd": "vtb点歌 <keywrod>",
     "helper": "点歌"
+  },{
+    "cmd": "vcut",
+    "helper": "切歌"
   }]
 }
