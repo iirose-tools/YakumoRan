@@ -16,11 +16,11 @@ jobs:
       run: npm install
     - name: lint
       run: npm run lint
-    - name: tsc
-      run: npm run build
     - name: touch
       run: touch mentality.allow
     - name: run
       run: npm run dev
     - name: test
       run: npm run test
+    - name: tsc
+      run: npm run build
