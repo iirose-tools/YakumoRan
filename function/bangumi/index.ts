@@ -2,7 +2,7 @@ import config from '../../config'
 import * as api from '../../lib/api'
 import { user } from './api'
 
-api.command(/^(.*)在看啥$/, async (m, e, reply) => {
+api.command(/^(.*)在看啥$/, 'bangumi.watching', async (m, e, reply) => {
   const username: string = m[1]
   const userInfo = await user.userInfo(username)
   const collection = await user.userCollection(username, 'watching')

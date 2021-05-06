@@ -52,8 +52,7 @@ const update = (uid: string, file:any) => {
 }
 
 // 核心源码
-// eslint-disable-next-line no-useless-escape
-api.command(new RegExp(`^${config.app.nickname}压(.*)$`), async (m, e, reply) => {
+api.command(new RegExp(`^${config.app.nickname}压(.*)$`), 'probability.do', async (m, e, reply) => {
   if (!getLimit(e.uid, config.function.probab.every)) return
 
   const nowMoney = getMoney(e.uid)
@@ -98,13 +97,13 @@ api.command(new RegExp(`^${config.app.nickname}压(.*)$`), async (m, e, reply) =
 })
 
 // 查看钱包
-api.command(/^查看钱包$/, async function (m, e, reply) {
+api.command(/^查看钱包$/, 'probability.query', async function (m, e, reply) {
   const nowMoney = getMoney(e.uid)
   reply(` [*${e.username}*]   :  您的余额为  :  ${String(nowMoney.money)}钞`, config.app.color)
 })
 
 // 钱包重启计划
-api.command(/^重启钱包$/, async function (m, e, reply) {
+api.command(/^重启钱包$/, 'probability.reset', async function (m, e, reply) {
   const nowMoney = getMoney(e.uid)
   if (!secondLimit(e.uid, config.function.probab.huifu)) {
     return null
@@ -117,7 +116,7 @@ api.command(/^重启钱包$/, async function (m, e, reply) {
 })
 
 // 设置积分
-api.command(/^设置(.*):(.*)$/, async function (m, e, reply) {
+api.command(/^设置(.*):(.*)$/, 'probability.setting', async function (m, e, reply) {
   const m1 = Number(m[2].trim())
   if (m1 <= Math.max() || m1 >= Math.min()) return reply('请输入一个正常的数字', config.app.color)
   const nowMoney = getMoney(e.uid)

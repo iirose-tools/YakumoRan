@@ -54,7 +54,7 @@ const pixivSearch = async (word: string) => {
   return illusts
 }
 
-Ran.command(/^搜图(.*)$/, async (m, e, reply) => {
+Ran.command(/^搜图(.*)$/, 'pixiv.search', async (m, e, reply) => {
   if (config.function.pixiv.disabled) return reply('[Pixiv] 功能未启用...', config.app.color)
   try {
     if (!getLimit(e.uid, 10e3)) return
@@ -84,6 +84,6 @@ Ran.command(/^搜图(.*)$/, async (m, e, reply) => {
   }
 })
 
-Ran.command(/^搜图$/, async (m, e, reply) => {
+Ran.command(/^搜图$/, 'pixiv.random', async (m, e, reply) => {
   reply(`[https://api.peer.ink/api/v1/pixiv/wallpaper/image?t=${new Date().getTime()}&a.jpg#e]`, config.app.color)
 })

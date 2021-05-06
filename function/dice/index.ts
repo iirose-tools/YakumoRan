@@ -3,7 +3,7 @@ import * as api from '../../lib/api'
 
 const getRandomInt = (n: number, m: number): number => { return Math.floor(Math.random() * (m - n + 1) + n) }
 
-api.command(/^骰子 (\d+)(D|d)(\d+)$/, (m, e, reply) => {
+api.command(/^骰子 (\d+)(D|d)(\d+)$/, 'dice.do', (m, e, reply) => {
   const count = Number(m[1])
   const max = Number(m[3])
 

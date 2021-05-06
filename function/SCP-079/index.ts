@@ -3,10 +3,6 @@ import * as Ran from '../../lib/api'
 import logger from '../../lib/logger'
 import { getImg, getRealUrl, isPorn } from './utils'
 
-Ran.command(/\.go (.*)/, (m, e, reply) => {
-  Ran.method.bot.moveTo(m[1])
-})
-
 const limit: any = {}
 
 Ran.Event.on('PublicMessage', async msg => {
