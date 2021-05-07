@@ -24,7 +24,17 @@ WebSocket.on('connect', async () => {
   } else {
     WebSocket.once('message', (msg) => {
       if (msg === '%*"2') {
-        logger('Core').fatal('登录失败，用户名或密码错误')
+        logger('Core').fatal('登录失败，密码错误')
+        process.exit(1)
+      } else if (msg === '%*"1') {
+        logger('Core').fatal('登录失败，用户不存在')
+        process.exit(1)
+      } else if (msg === '%*"0') {
+        // 鬼知道我为什么要处理一个只有游客才会触发的错误
+        logger('Core').fatal('登录失败，此名字已被占用')
+        process.exit(1)
+      } else if (msg.includes('%*"')) {
+        logger('Core').fatal('登录失败，未知错误，服务器返回:', msg)
         process.exit(1)
       } else {
         logger('Core').info('收到服务器返回数据, 登录成功')
