@@ -6,7 +6,8 @@ import { isTest } from '../utils'
 
 let socket: WS
 const status = {
-  allowClose: false
+  allowClose: false,
+  count: 0
 }
 
 const init = () => {
@@ -26,6 +27,13 @@ const init = () => {
     if (status.allowClose) return
     logger('WebSocket').warn('WebSocket 断开连接, code: ', event.code, ', reason: ', event.reason)
     WebSocket.emit('disconnect')
+
+    status.count++
+
+    if (status.count > 10) {
+      logger('WebSocket').fatal('多次断开连接，程序退出')
+      process.exit(1)
+    }
 
     try {
       socket.close()
@@ -54,6 +62,8 @@ const init = () => {
       message = Buffer.from(array).toString('utf8')
     }
 
+    logger('WebSocket').debug('RX:', message)
+
     WebSocket.emit('message', message)
   }
 }
@@ -69,6 +79,7 @@ export const close = () => {
 }
 
 export const send = (data: string): Promise<Error | null> => {
+  logger('WebSocket').debug('TX:', data)
   return new Promise((resolve, reject) => {
     WebSocket.emit('send', data)
     if (isTest) return

@@ -1,4 +1,5 @@
 import config from '../../../config'
+import md5 from 'md5'
 
 export default () => {
   const data = {
@@ -8,7 +9,8 @@ export default () => {
     st: 'n',
     mo: '',
     mb: '',
-    mu: '01'
+    mu: '01',
+    fp: `@${md5(config.account.username)}`
   }
 
   return `*${JSON.stringify(data)}`
