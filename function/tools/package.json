@@ -7,7 +7,11 @@
     "github": "TheresaQWQ",
     "iirose": "涂山苏苏"
   },
-  "intro": [],
+  "intro": [
+  "权限节点",
+  "tool.op  ：拥有这个权限的用户能够订阅",
+  "tool.mov  ：拥有这个权限的用户能够移动机器人"
+  ],
   "commands": [{
     "cmd": "赞我",
     "helper": "让机器人给你点个赞"

@@ -8,7 +8,9 @@
     "iirose": "春风萧落"
   },
   "intro": [
-    "模拟赌博"
+    "模拟赌博",
+    "权限节点",
+    "probability.op  : 拥有这个权限的用户能够修改积分"
   ],
   "commands": [{
     "cmd": "{{nickname}}压<金额>",

@@ -4,6 +4,7 @@ import * as api from '../../lib/api'
 import config from '../../config'
 import logger from '../../lib/logger'
 import random from 'random-number-csprng'
+import per from '../permission/permission'
 
 try {
   fs.mkdirSync(path.join(api.Data, './probability'))
@@ -120,13 +121,13 @@ api.command(/^设置(.*):(.*)$/, 'probability.setting', async function (m, e, re
   const m1 = Number(m[2].trim())
   if (m1 <= Math.max() || m1 >= Math.min()) return reply('请输入一个正常的数字', config.app.color)
   const nowMoney = getMoney(e.uid)
-  if (e.username !== config.app.master) {
+  if (!per.users.hasPermission(e.uid, 'permission.probability') && !per.users.hasPermission(e.uid, 'probability.op')) {
     reply(` [*${e.username}*]   :  ${config.app.nickname}做不到啦...去叫叫咱的主人来试试..(?`, config.app.color)
     return null
   }
 
   const theUid = m[1].replace(/[@[\] ]/g, '').trim()
   nowMoney.money = m1
-  update(theUid, m1)
+  update(theUid, nowMoney)
   reply(` [*${e.username}*]   :  您的余额为  :  ${String(nowMoney.money)}钞`, config.app.color)
 })
