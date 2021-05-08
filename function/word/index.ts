@@ -264,7 +264,9 @@ api.command(/^\.删问(.*)序[号|列](.*)$/, 'word.delete.one', async (m, e, re
 
     update(word, 'word', 'word')
     reply('删除成功', config.app.color)
-  } catch (error) {}
+  } catch (error) {
+    reply('删除失败', config.app.color)
+  }
 })
 
 // 查看词库list
@@ -279,7 +281,9 @@ api.command(/^\.问表(.*)$/, 'word.list', async (m, e, reply) => {
       ran++
       reply(ran + ':' + list, config.app.color)
     }
-  } catch (error) {}
+  } catch (error) {
+    reply('查询失败', config.app.color)
+  }
 })
 
 // 删除一整个回复
@@ -293,5 +297,7 @@ api.command(/^\.删全问(.*)$/, 'word.delete.all', async (m, e, reply) => {
 
     update(word, 'word', 'word')
     reply('删除成功', config.app.color)
-  } catch (error) {}
+  } catch (error) {
+    reply('删除失败', config.app.color)
+  }
 })

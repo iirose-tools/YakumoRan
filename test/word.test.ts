@@ -9,7 +9,7 @@ test('word.add', async () => {
 
     // @ts-ignore
     commands['word.add'](['', '测试', '测试成功'], { uid: 'user' }, (msg, color) => {
-      expect(msg).toMatch('测试成功')
+      expect(msg).toMatch('添加成功')
       resolve()
     })
   })
@@ -20,9 +20,12 @@ test('word.delete.all', async () => {
     try { permission.users.addPermission('user', 'word.op') } catch (e) {}
 
     // @ts-ignore
-    commands['word.delete.all'](['', '测试'], { uid: 'user' }, (msg, color) => {
-      expect(msg).toMatch('删除成功')
-      resolve()
+    commands['word.add'](['', '测试', '测试成功'], { uid: 'user' }, (msg, color) => {
+      // @ts-ignore
+      commands['word.delete.all'](['', '测试'], { uid: 'user' }, (msg, color) => {
+        expect(msg).toMatch('删除成功')
+        resolve()
+      })
     })
   })
 }, 5000)
@@ -30,11 +33,13 @@ test('word.delete.all', async () => {
 test('word.delete.one', async () => {
   await new Promise<void>((resolve, reject) => {
     try { permission.users.addPermission('user', 'word.op') } catch (e) {}
-
     // @ts-ignore
-    commands['word.delete.one'](['', '测试', '1'], { uid: 'user' }, (msg, color) => {
-      expect(msg).toMatch('删除成功')
-      resolve()
+    commands['word.add'](['', '测试', '测试成功'], { uid: 'user' }, (msg, color) => {
+      // @ts-ignore
+      commands['word.delete.one'](['', '测试', '1'], { uid: 'user' }, (msg, color) => {
+        expect(msg).toMatch('删除成功')
+        resolve()
+      })
     })
   })
 }, 5000)
