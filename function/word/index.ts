@@ -115,8 +115,8 @@ const toswitch = (te:string, st:string, t:string, word:any, use:any, id:string, 
       break
     }
     case ('添加'): {
-      const st1:any = st.match(/\[(.*),(.*),(.*)\]/)
-      st = `{"添加":["${st1[1]}","${st1[2]}",${Number(st1[3])}]}`
+      const st1:any = st.match(/\[(.*),(.*),(.*),(.*)\]/)
+      st = `{"添加":["${st1[1]}","${st1[2]}",${Number(st1[3])}]},${Number(st1[4])}`
       noew = JSON.parse(st)
       if (use[noew['添加'][0]] == null) { use[noew['添加'][0]] = {} }
       if (use['属性'] == null) { use['属性'] = {} }
@@ -126,15 +126,26 @@ const toswitch = (te:string, st:string, t:string, word:any, use:any, id:string, 
       use[noew['添加'][0]][noew['添加'][1]] = use[noew['添加'][0]][noew['添加'][1]] + noew['添加'][2]
       use['属性'][noew['添加'][1]] = use['属性'][noew['添加'][1]] + noew['添加'][2]
       update(use, id, 'user')
-      word = word.replace(t, noew['添加'][0])
+      if (noew(['添加'][3]) === 0) {
+        word = word.replace(t, '添加成功')
+      }
+      if (noew(['添加'][3]) === 1) {
+        word = word.replace(t, String(noew['添加'][0]))
+      }
+      if (noew(['添加'][3]) === 2) {
+        word = word.replace(t, String(noew['添加'][1]))
+      }
+      if (noew(['添加'][3]) === 3) {
+        word = word.replace(t, String(noew['添加'][2]))
+      }
       break
     }
     case ('销毁'): {
-      const st1:any = st.match(/\[(.*),(.*),(.*)\]/)
-      st = `{"销毁":["${st1[1]}","${st1[2]}",${Number(st1[3])}]}`
+      console.log('true')
+      const st1:any = st.match(/\[(.*),(.*),(.*),(.*)\]/)
+      st = `{"销毁":["${st1[1]}","${st1[2]}",${Number(st1[3])},${Number(st1[4])}]}`
       noew = JSON.parse(st)
       if (use[noew['销毁'][0]] === {}) {
-        console.log('true')
         delete use[noew['销毁'][0]]
       }
       use[noew['销毁'][0]][noew['销毁'][1]] = use[noew['销毁'][0]][noew['销毁'][1]] - noew['销毁'][2]
@@ -142,7 +153,18 @@ const toswitch = (te:string, st:string, t:string, word:any, use:any, id:string, 
       if (use[noew['销毁'][0]][noew['销毁'][1]] <= 0) { delete use[noew['销毁'][0]][noew['销毁'][1]] }
       if (use['属性'][noew['销毁'][1]] <= 0) { delete use['属性'][noew['销毁'][1]] }
       update(use, id, 'user')
-      word = word.replace(t, noew['销毁'][0])
+      if (noew(['添加'][3]) === 0) {
+        word = word.replace(t, '销毁成功')
+      }
+      if (noew(['销毁'][3]) === 1) {
+        word = word.replace(t, String(noew['销毁'][0]))
+      }
+      if (noew(['销毁'][3]) === 2) {
+        word = word.replace(t, String(noew['销毁'][1]))
+      }
+      if (noew(['销毁'][3]) === 3) {
+        word = word.replace(t, String(noew['销毁'][2]))
+      }
       break
     }
     case ('属性'): {
