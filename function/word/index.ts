@@ -3,6 +3,7 @@ import path from 'path'
 import * as api from '../../lib/api'
 import config from '../../config'
 import per from '../permission/permission'
+import logger from '../../lib/logger'
 
 try {
   fs.mkdirSync(path.join(api.Data, './word/user'))
@@ -245,7 +246,10 @@ api.command(/^\.问(.*)答(.*)$/, 'word.add', async (m, e, reply) => {
 
     update(word, 'word', 'word')
     reply('添加成功,当前序列为' + i, config.app.color)
-  } catch (error) {}
+  } catch (error) {
+    logger('Word').warn(error)
+    reply('添加失败', config.app.color)
+  }
 })
 
 // 删除部分问答
@@ -264,7 +268,10 @@ api.command(/^\.删问(.*)序[号|列](.*)$/, 'word.delete.one', async (m, e, re
 
     update(word, 'word', 'word')
     reply('删除成功', config.app.color)
-  } catch (error) {}
+  } catch (error) {
+    logger('Word').warn(error)
+    reply('删除失败', config.app.color)
+  }
 })
 
 // 查看词库list
@@ -279,7 +286,10 @@ api.command(/^\.问表(.*)$/, 'word.list', async (m, e, reply) => {
       ran++
       reply(ran + ':' + list, config.app.color)
     }
-  } catch (error) {}
+  } catch (error) {
+    logger('Word').warn(error)
+    reply('查询失败', config.app.color)
+  }
 })
 
 // 删除一整个回复
@@ -293,5 +303,8 @@ api.command(/^\.删全问(.*)$/, 'word.delete.all', async (m, e, reply) => {
 
     update(word, 'word', 'word')
     reply('删除成功', config.app.color)
-  } catch (error) {}
+  } catch (error) {
+    logger('Word').warn(error)
+    reply('删除失败', config.app.color)
+  }
 })

@@ -62,7 +62,7 @@ const init = () => {
       message = Buffer.from(array).toString('utf8')
     }
 
-    logger('WebSocket').debug('RX:', message)
+    logger('WebSocket').debug('RX:', message.length > 50 ? `${message.substr(0, 50)}...` : message)
 
     WebSocket.emit('message', message)
   }
