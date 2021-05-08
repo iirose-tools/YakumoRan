@@ -116,7 +116,7 @@ const toswitch = (te:string, st:string, t:string, word:any, use:any, id:string, 
     }
     case ('添加'): {
       const st1:any = st.match(/\[(.*),(.*),(.*),(.*)\]/)
-      st = `{"添加":["${st1[1]}","${st1[2]}",${Number(st1[3])}]},${Number(st1[4])}`
+      st = `{"添加":["${st1[1]}","${st1[2]}",${Number(st1[3])},${Number(st1[4])}]}`
       noew = JSON.parse(st)
       if (use[noew['添加'][0]] == null) { use[noew['添加'][0]] = {} }
       if (use['属性'] == null) { use['属性'] = {} }
@@ -126,22 +126,22 @@ const toswitch = (te:string, st:string, t:string, word:any, use:any, id:string, 
       use[noew['添加'][0]][noew['添加'][1]] = use[noew['添加'][0]][noew['添加'][1]] + noew['添加'][2]
       use['属性'][noew['添加'][1]] = use['属性'][noew['添加'][1]] + noew['添加'][2]
       update(use, id, 'user')
-      if (noew(['添加'][3]) === 0) {
+      const tty:number = noew['添加'][3]
+      if (tty === 0) {
         word = word.replace(t, '添加成功')
       }
-      if (noew(['添加'][3]) === 1) {
+      if (tty === 1) {
         word = word.replace(t, String(noew['添加'][0]))
       }
-      if (noew(['添加'][3]) === 2) {
+      if (tty === 2) {
         word = word.replace(t, String(noew['添加'][1]))
       }
-      if (noew(['添加'][3]) === 3) {
+      if (tty === 3) {
         word = word.replace(t, String(noew['添加'][2]))
       }
       break
     }
     case ('销毁'): {
-      console.log('true')
       const st1:any = st.match(/\[(.*),(.*),(.*),(.*)\]/)
       st = `{"销毁":["${st1[1]}","${st1[2]}",${Number(st1[3])},${Number(st1[4])}]}`
       noew = JSON.parse(st)
@@ -153,16 +153,17 @@ const toswitch = (te:string, st:string, t:string, word:any, use:any, id:string, 
       if (use[noew['销毁'][0]][noew['销毁'][1]] <= 0) { delete use[noew['销毁'][0]][noew['销毁'][1]] }
       if (use['属性'][noew['销毁'][1]] <= 0) { delete use['属性'][noew['销毁'][1]] }
       update(use, id, 'user')
-      if (noew(['添加'][3]) === 0) {
+      const tty:number = noew['销毁'][3]
+      if (tty === 0) {
         word = word.replace(t, '销毁成功')
       }
-      if (noew(['销毁'][3]) === 1) {
+      if (tty === 1) {
         word = word.replace(t, String(noew['销毁'][0]))
       }
-      if (noew(['销毁'][3]) === 2) {
+      if (tty === 2) {
         word = word.replace(t, String(noew['销毁'][1]))
       }
-      if (noew(['销毁'][3]) === 3) {
+      if (tty === 3) {
         word = word.replace(t, String(noew['销毁'][2]))
       }
       break
@@ -209,7 +210,6 @@ const makereply = (word:any, id:string, aite:string) => {
     const te = st.match(/(随机数字|判断|禁言|踢|解除禁言|艾特|添加|销毁|属性|延迟)/)[1]
     st = st.replace(te, '"' + te + '"')
     st = '{' + st + '}'
-    console.log(st)
     word = toswitch(te, st, t, word, use, id, aite)
   }
   return word
