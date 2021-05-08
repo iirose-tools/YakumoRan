@@ -48,7 +48,7 @@ const update = (file:any, tyf:string, list:string) => {
 }
 
 // 核心:判断
-const toswitch = (te:string, st:string, t:string, word:any, use:any, id:string, aite:string) => {
+const toswitch = (te:string, st:string, t:string, word:any, use:any, id:string, aite:string, msg:any) => {
   let noew:any = {}
   switch (te) {
     case ('随机数字'): {
@@ -177,11 +177,42 @@ const toswitch = (te:string, st:string, t:string, word:any, use:any, id:string, 
       break
     }
     case ('延迟'): {
-      const st1:any = st.match(/\[(.*),(.*)\]/)
-      st = `{"延迟":["${st1[1]}","${st1[2]}"]}`
+      const st1:any = st.match(/\[(.*),(.*),(.*),(.*)\]/)
+      st = `{"延迟":["${st1[1]}","${st1[2]}","${st1[3]}","${st1[4]}"]}`
       noew = JSON.parse(st)
       const yanchi:number = getLimit(id, noew['延迟'][0], noew['延迟'][1])
-      word = word.replace(t, String(yanchi))
+      if (yanchi === 0) {
+        word = word.replace(t, noew['延迟'][2])
+      }
+      if (yanchi === 1) {
+        word = word.replace(t, noew['延迟'][3])
+      }
+      break
+    }
+    case ('发送名'): {
+      const st1:any = st.match(/\[(.*)\]/)
+      st = `{"发送名":[${Number(st1[1])}]}`
+      noew = JSON.parse(st)
+      const tty:number = noew['发送名'][0]
+      if (tty === 0) {
+        word = word.replace(t, msg.username)
+      }
+      if (tty === 1) {
+        word = word.replace(t, ` [*${msg.username}*] `)
+      }
+      break
+    }
+    case ('发送id'): {
+      const st1:any = st.match(/\[(.*)\]/)
+      st = `{"发送id":[${Number(st1[1])}]}`
+      noew = JSON.parse(st)
+      const tty:number = noew['发送id'][0]
+      if (tty === 0) {
+        word = word.replace(t, msg.uid)
+      }
+      if (tty === 1) {
+        word = word.replace(t, ` [@${msg.uid}@] `)
+      }
       break
     }
     default: {
@@ -192,25 +223,25 @@ const toswitch = (te:string, st:string, t:string, word:any, use:any, id:string, 
 }
 
 // 词库引擎核心
-const makereply = (word:any, id:string, aite:string) => {
+const makereply = (word:any, id:string, aite:string, msg:any) => {
   const use = getjson(id, 'user')
   while (/【.*】/.test(word)) {
     let t = word.match(/(.*?】).*/)[1]
     t = t.match(/.*(【.*?】)$/)[1]
     let st = t.match(/【(.*)】/)[1]
-    const te = st.match(/(随机数字|判断|禁言|踢|解除禁言|艾特|添加|销毁|属性|延迟)/)[1]
+    const te = st.match(/(随机数字|判断|禁言|踢|解除禁言|艾特|添加|销毁|属性|延迟|发送名|发送id)/)[1]
     st = st.replace(te, '"' + te + '"')
     st = '{' + st + '}'
-    word = toswitch(te, st, t, word, use, id, aite)
+    word = toswitch(te, st, t, word, use, id, aite, msg)
   }
   while (/〖.*〗/.test(word)) {
     let t = word.match(/(.*?〗).*/)[1]
     t = t.match(/.*(〖.*?〗)$/)[1]
     let st = t.match(/〖(.*)〗/)[1]
-    const te = st.match(/(随机数字|判断|禁言|踢|解除禁言|艾特|添加|销毁|属性|延迟)/)[1]
+    const te = st.match(/(随机数字|判断|禁言|踢|解除禁言|艾特|添加|销毁|属性|延迟|发送名|发送id)/)[1]
     st = st.replace(te, '"' + te + '"')
     st = '{' + st + '}'
-    word = toswitch(te, st, t, word, use, id, aite)
+    word = toswitch(te, st, t, word, use, id, aite, msg)
   }
   return word
 }
@@ -229,7 +260,7 @@ api.Event.on('PublicMessage', msg => {
     if (word[wd1]) {
       const ran: number = word[wd1].length
       const rd: number = random(0, ran - 1)
-      const a:any = makereply(word[wd1][rd], msg.uid, wd4[1])
+      const a:any = makereply(word[wd1][rd], msg.uid, wd4[1], msg)
       const out = a.split('#换#')
       let j:number = 0
       for (j = 0; j < out.length; j++) {
@@ -240,7 +271,7 @@ api.Event.on('PublicMessage', msg => {
     } else if (word[wd3]) {
       const ran: number = word[wd3].length
       const rd: number = random(0, ran - 1)
-      const a:any = makereply(word[wd3][rd], msg.uid, wd4[1])
+      const a:any = makereply(word[wd3][rd], msg.uid, wd4[1], msg)
       const out = a.split('#换#')
       let j:number = 0
       for (j = 0; j < out.length; j++) {
