@@ -1,0 +1,14 @@
+{
+  "name": "pastebin",
+  "id": "pastebin",
+  "main": "index",
+  "author": {
+    "name": "涂山苏苏",
+    "github": "TheresaQWQ",
+    "iirose": "涂山苏苏"
+  },
+  "intro": [
+    "Ubuntu Pastebin API"
+  ],
+  "commands": []
+}
