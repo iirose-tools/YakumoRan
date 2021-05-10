@@ -49,6 +49,7 @@ const pixivSearch = async (word: string) => {
     return false
   })
   for (const item of tmp) {
+    if (item.sanity_level > 5) continue
     illusts.push(item)
   }
   return illusts
