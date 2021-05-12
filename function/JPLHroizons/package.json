@@ -1,0 +1,16 @@
+{
+  "name": "JPLHroizons",
+  "id": "JPLHroizons",
+  "main": "index",
+  "author": {
+    "name": "涂山苏苏",
+    "github": "TheresaQWQ",
+    "iirose": "涂山苏苏"
+  },
+  "intro": [
+    "查询星球轨道"
+  ],
+  "commands": [{
+    "cmd": ".jpl <目标> <中心点> <开始时间> <结束时间> <打点间隔> <缩放>"
+  }]
+}
