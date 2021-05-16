@@ -48,7 +48,7 @@ const update = (file:any, tyf:string, list:string) => {
 }
 
 // 核心:判断
-const toswitch = (te:string, st:string, t:string, word:any, use:any, id:string, aite:string, msg:any, matc:any) => {
+const toswitch = (te:string, st:string, t:string, word:any, id:string, aite:string, msg:any, matc:any) => {
   let noew:any = {}
   switch (te) {
     case ('随机数字'): {
@@ -115,9 +115,15 @@ const toswitch = (te:string, st:string, t:string, word:any, use:any, id:string, 
       break
     }
     case ('添加'): {
-      const st1:any = st.match(/\[(.*),(.*),(.*),(.*)\]/)
-      st = `{"添加":["${st1[1]}","${st1[2]}",${Number(st1[3])},${Number(st1[4])}]}`
+      const st1:any = st.match(/\[(.*),(.*),(.*),(.*),(.*)\]/)
+      st = `{"添加":["${st1[1]}","${st1[2]}",${Number(st1[3])},${Number(st1[4])},"${st1[5]}"]}`
       noew = JSON.parse(st)
+      let use:any
+      if (st1[5] === '0' || st1[5] === '') {
+        use = getjson(id, 'user')
+      } else {
+        use = getjson(st1[5], 'user')
+      }
       if (use[noew['添加'][0]] == null) { use[noew['添加'][0]] = {} }
       if (use['属性'] == null) { use['属性'] = {} }
       if (use[noew['添加'][0]] == null) { use[noew['添加'][0]] = {} }
@@ -142,9 +148,15 @@ const toswitch = (te:string, st:string, t:string, word:any, use:any, id:string, 
       break
     }
     case ('销毁'): {
-      const st1:any = st.match(/\[(.*),(.*),(.*),(.*)\]/)
-      st = `{"销毁":["${st1[1]}","${st1[2]}",${Number(st1[3])},${Number(st1[4])}]}`
+      const st1:any = st.match(/\[(.*),(.*),(.*),(.*),(.*)\]/)
+      st = `{"销毁":["${st1[1]}","${st1[2]}",${Number(st1[3])},${Number(st1[4])},"${st1[5]}"]}`
       noew = JSON.parse(st)
+      let use:any
+      if (st1[5] === '0' || st1[5] === '') {
+        use = getjson(id, 'user')
+      } else {
+        use = getjson(st1[5], 'user')
+      }
       if (use[noew['销毁'][0]] === {}) {
         delete use[noew['销毁'][0]]
       }
@@ -169,9 +181,15 @@ const toswitch = (te:string, st:string, t:string, word:any, use:any, id:string, 
       break
     }
     case ('属性'): {
-      const st1:any = st.match(/\[(.*),(.*)\]/)
-      st = `{"属性":["${st1[1]}","${st1[2]}"]}`
+      const st1:any = st.match(/\[(.*),(.*),(.*)\]/)
+      st = `{"属性":["${st1[1]}","${st1[2]}","${st1[3]}"]}`
       noew = JSON.parse(st)
+      let use:any
+      if (st1[3] === '0' || st1[3] === '') {
+        use = getjson(id, 'user')
+      } else {
+        use = getjson(st1[5], 'user')
+      }
       if (use[noew['属性'][0]] == null) { use[noew['属性'][0]] = {} }
       if (use['属性'] == null) { use['属性'] = {} }
       if (use[noew['属性'][0]] == null) { use[noew['属性'][0]] = {} }
@@ -235,7 +253,6 @@ const toswitch = (te:string, st:string, t:string, word:any, use:any, id:string, 
 
 // 词库引擎核心
 const makereply = (word:any, id:string, aite:string, msg:any, matc:any) => {
-  const use = getjson(id, 'user')
   while (/【.*】/.test(word)) {
     let t = word.match(/(.*?】).*/)[1]
     t = t.match(/.*(【.*?】)$/)[1]
@@ -243,7 +260,7 @@ const makereply = (word:any, id:string, aite:string, msg:any, matc:any) => {
     const te = st.match(/(随机数字|判断|禁言|踢|解除禁言|艾特|添加|销毁|属性|延迟|发送名|发送id|数字)/)[1]
     st = st.replace(te, '"' + te + '"')
     st = '{' + st + '}'
-    word = toswitch(te, st, t, word, use, id, aite, msg, matc)
+    word = toswitch(te, st, t, word, id, aite, msg, matc)
   }
   while (/〖.*〗/.test(word)) {
     let t = word.match(/(.*?〗).*/)[1]
@@ -252,7 +269,7 @@ const makereply = (word:any, id:string, aite:string, msg:any, matc:any) => {
     const te = st.match(/(随机数字|判断|禁言|踢|解除禁言|艾特|添加|销毁|属性|延迟|发送名|发送id|数字)/)[1]
     st = st.replace(te, '"' + te + '"')
     st = '{' + st + '}'
-    word = toswitch(te, st, t, word, use, id, aite, msg, matc)
+    word = toswitch(te, st, t, word, id, aite, msg, matc)
   }
   return word
 }
