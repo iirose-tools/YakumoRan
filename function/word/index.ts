@@ -162,21 +162,40 @@ const toswitch = (te:string, st:string, t:string, word:any, id:string, aite:stri
       }
       use[noew['销毁'][0]][noew['销毁'][1]] = use[noew['销毁'][0]][noew['销毁'][1]] - noew['销毁'][2]
       use['属性'][noew['销毁'][1]] = use['属性'][noew['销毁'][1]] - noew['销毁'][2]
-      if (use[noew['销毁'][0]][noew['销毁'][1]] <= 0) { delete use[noew['销毁'][0]][noew['销毁'][1]] }
-      if (use['属性'][noew['销毁'][1]] <= 0) { delete use['属性'][noew['销毁'][1]] }
+      let wd6:number = 1
+      if (use[noew['销毁'][0]][noew['销毁'][1]] <= 0) {
+        delete use[noew['销毁'][0]][noew['销毁'][1]]
+        wd6 = 0
+      }
+      if (use['属性'][noew['销毁'][1]] <= 0) {
+        delete use['属性'][noew['销毁'][1]]
+        wd6 = 0
+      }
       update(use, id, 'user')
       const tty:number = noew['销毁'][3]
       if (tty === 0) {
         word = word.replace(t, '销毁成功')
       }
       if (tty === 1) {
-        word = word.replace(t, String(noew['销毁'][0]))
+        if (wd6 === 1) {
+          word = word.replace(t, String(noew['销毁'][0]))
+        } else if (wd6 === 0) {
+          word = word.replace(t, -1)
+        }
       }
       if (tty === 2) {
-        word = word.replace(t, String(noew['销毁'][1]))
+        if (wd6 === 1) {
+          word = word.replace(t, String(noew['销毁'][1]))
+        } else if (wd6 === 0) {
+          word = word.replace(t, -1)
+        }
       }
       if (tty === 3) {
-        word = word.replace(t, String(noew['销毁'][2]))
+        if (wd6 === 1) {
+          word = word.replace(t, String(noew['销毁'][2]))
+        } else if (wd6 === 0) {
+          word = word.replace(t, -1)
+        }
       }
       break
     }
