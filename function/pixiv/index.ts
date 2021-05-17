@@ -1,6 +1,7 @@
 import got from 'got'
 import config from '../../config'
 import * as Ran from '../../lib/api'
+import per from '../permission/permission'
 
 // 屏蔽的标签，作品中包含这些标签会返回没有搜索到任何结果
 const blockTags = [
@@ -55,36 +56,42 @@ const pixivSearch = async (word: string) => {
   return illusts
 }
 
-Ran.command(/^搜图(.*)$/, 'pixiv.search', async (m, e, reply) => {
-  if (config.function.pixiv.disabled) return reply('[Pixiv] 功能未启用...', config.app.color)
-  try {
-    if (!getLimit(e.uid, 10e3)) return
-    reply('[Pixiv] Searching...', config.app.color)
-    const word: string = m[1].trim()
-    if (blockTags.includes(word)) return reply('[Pixiv] 你 想 干 啥?', config.app.color)
+try {
+  per.users.create('function')
+} catch (error) {
+}
+if (!per.users.hasPermission('function', 'function.pixiv')) {
+  Ran.command(/^搜图(.*)$/, 'pixiv.search', async (m, e, reply) => {
+    if (config.function.pixiv.disabled) return reply('[Pixiv] 功能未启用...', config.app.color)
+    try {
+      if (!getLimit(e.uid, 10e3)) return
+      reply('[Pixiv] Searching...', config.app.color)
+      const word: string = m[1].trim()
+      if (blockTags.includes(word)) return reply('[Pixiv] 你 想 干 啥?', config.app.color)
 
-    const illusts = await pixivSearch(word)
+      const illusts = await pixivSearch(word)
 
-    if (illusts.length === 0) return reply('[Pixiv] 没有搜索到任何结果', config.app.color)
+      if (illusts.length === 0) return reply('[Pixiv] 没有搜索到任何结果', config.app.color)
 
-    const artwork: any = illusts[getRandomInt(0, illusts.length - 1)]
-    const tags = parserTag(artwork.tags)
-    const url = (artwork.meta_pages.length > 0 ? artwork.meta_pages[0].image_urls.original : artwork.meta_single_page.original_image_url).replace('i.pximg.net', 'pix.3m.chat')
+      const artwork: any = illusts[getRandomInt(0, illusts.length - 1)]
+      const tags = parserTag(artwork.tags)
+      const url = (artwork.meta_pages.length > 0 ? artwork.meta_pages[0].image_urls.original : artwork.meta_single_page.original_image_url).replace('i.pximg.net', 'pix.3m.chat')
 
-    if (!tags) return reply('[Pixiv] 没有搜索到任何结果', config.app.color)
+      if (!tags) return reply('[Pixiv] 没有搜索到任何结果', config.app.color)
 
-    reply([
+      reply([
       `[${url}#e]`,
       artwork.title,
       `id: ${artwork.id}`,
       'tags: ',
       tags.map(e => `🏷️${e}`).join('  ')
-    ].join('\n'), config.app.color)
-  } catch (error) {
-    reply('[Pixiv] 没有搜索到任何结果', config.app.color)
-  }
-})
+      ].join('\n'), config.app.color)
+    } catch (error) {
+      reply('[Pixiv] 没有搜索到任何结果', config.app.color)
+    }
+  })
 
-Ran.command(/^搜图$/, 'pixiv.random', async (m, e, reply) => {
-  reply(`[https://api.peer.ink/api/v1/pixiv/wallpaper/image?t=${new Date().getTime()}&a.jpg#e]`, config.app.color)
-})
+  Ran.command(/^搜图$/, 'pixiv.random', async (m, e, reply) => {
+    reply(`[https://api.peer.ink/api/v1/pixiv/wallpaper/image?t=${new Date().getTime()}&a.jpg#e]`, config.app.color)
+  })
+}

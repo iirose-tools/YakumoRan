@@ -96,109 +96,115 @@ const sp = {
 
 const users: { [index: string]: boolean } = {}
 
-api.command(/^\.wb set (.*)$/, 'welcome.set', (m, e, reply) => {
-  const file = path.join(api.Data, 'welcome', e.uid)
-  try {
-    fs.writeFileSync(file, m[1])
-    reply('[Welcome] 设置成功', config.app.color)
-  } catch (error) {
-    reply('[Welcome] 设置失败', config.app.color)
-  }
-})
+try {
+  permission.users.create('function')
+} catch (error) {
+}
+if (!permission.users.hasPermission('function', 'function.welcome')) {
+  api.command(/^\.wb set (.*)$/, 'welcome.set', (m, e, reply) => {
+    const file = path.join(api.Data, 'welcome', e.uid)
+    try {
+      fs.writeFileSync(file, m[1])
+      reply('[Welcome] 设置成功', config.app.color)
+    } catch (error) {
+      reply('[Welcome] 设置失败', config.app.color)
+    }
+  })
 
-api.command(/^\.wb rm$/, 'welcome.rm', (m, e, reply) => {
-  const file = path.join(api.Data, 'welcome', e.uid)
-  try {
-    fs.unlinkSync(file)
-    reply('[Welcome] 设置成功', config.app.color)
-  } catch (error) {
-    reply('[Welcome] 设置失败', config.app.color)
-  }
-})
+  api.command(/^\.wb rm$/, 'welcome.rm', (m, e, reply) => {
+    const file = path.join(api.Data, 'welcome', e.uid)
+    try {
+      fs.unlinkSync(file)
+      reply('[Welcome] 设置成功', config.app.color)
+    } catch (error) {
+      reply('[Welcome] 设置失败', config.app.color)
+    }
+  })
 
-api.Event.on('JoinRoom', (msg) => {
-  if (msg.username === config.account.username) return
-  if (users[msg.uid]) return
+  api.Event.on('JoinRoom', (msg) => {
+    if (msg.username === config.account.username) return
+    if (users[msg.uid]) return
 
-  if (permission.users.hasPermission(msg.uid, 'welcome.ignore')) return
+    if (permission.users.hasPermission(msg.uid, 'welcome.ignore')) return
 
-  users[msg.uid] = true
+    users[msg.uid] = true
 
-  if (msg.uid.substr(0, 1) === 'X') {
-    api.method.sendPublicMessage(sp.first[random(0, sp.first.length - 1)], config.app.color)
+    if (msg.uid.substr(0, 1) === 'X') {
+      api.method.sendPublicMessage(sp.first[random(0, sp.first.length - 1)], config.app.color)
+      setTimeout(() => {
+        delete users[msg.uid]
+      }, 6e4)
+      return
+    }
+
     setTimeout(() => {
       delete users[msg.uid]
-    }, 6e4)
-    return
-  }
+    }, 1e4)
 
-  setTimeout(() => {
-    delete users[msg.uid]
-  }, 1e4)
+    let isSp = false
 
-  let isSp = false
+    const username = ` [*${msg.username}*] `
+    const t = new Date().getHours()
+    const week = new Date().getDay()
+    let welcome = '欢迎回来~'
 
-  const username = ` [*${msg.username}*] `
-  const t = new Date().getHours()
-  const week = new Date().getDay()
-  let welcome = '欢迎回来~'
-
-  if (t >= 5 && t <= 10) {
+    if (t >= 5 && t <= 10) {
     // 5:00 ~ 10:00
-    const len = sentences[0].length
-    welcome = sentences[0][random(0, len - 1)]
-  } else if (t >= 11 && t <= 13) {
+      const len = sentences[0].length
+      welcome = sentences[0][random(0, len - 1)]
+    } else if (t >= 11 && t <= 13) {
     // 11:00 ~ 13:00
-    const len = sentences[1].length
-    welcome = sentences[1][random(0, len - 1)]
-  } else if (t >= 14 && t <= 18) {
+      const len = sentences[1].length
+      welcome = sentences[1][random(0, len - 1)]
+    } else if (t >= 14 && t <= 18) {
     // 14:00 ~ 19:00
-    const len = sentences[2].length
-    welcome = sentences[2][random(0, len - 1)]
-  } else if (t >= 19 && t <= 23) {
+      const len = sentences[2].length
+      welcome = sentences[2][random(0, len - 1)]
+    } else if (t >= 19 && t <= 23) {
     // 20:00 ~ 23:00
-    const len = sentences[3].length
-    welcome = sentences[3][random(0, len - 1)]
-  } else if (t <= 4 || t >= 24) {
+      const len = sentences[3].length
+      welcome = sentences[3][random(0, len - 1)]
+    } else if (t <= 4 || t >= 24) {
     // 24:00 ~ 28:00
-    const len = sentences[4].length
-    welcome = sentences[4][random(0, len - 1)]
-  }
+      const len = sentences[4].length
+      welcome = sentences[4][random(0, len - 1)]
+    }
 
-  // 特殊
-  if (random(1, 10) <= 1) {
-    isSp = true
-    const len = sentences[5].length
-    welcome = sentences[5][random(0, len - 1)]
-  }
+    // 特殊
+    if (random(1, 10) <= 1) {
+      isSp = true
+      const len = sentences[5].length
+      welcome = sentences[5][random(0, len - 1)]
+    }
 
-  if (permission.users.hasPermission(msg.uid, 'welcome.sp.bh3') && (week === 3 || week === 7)) {
-    welcome = sp.bh3.week_3or7
-    isSp = true
-  }
+    if (permission.users.hasPermission(msg.uid, 'welcome.sp.bh3') && (week === 3 || week === 7)) {
+      welcome = sp.bh3.week_3or7
+      isSp = true
+    }
 
-  // 周三和周日，1%概率触发
-  if ((week === 3 || week === 7) && (t >= 14 && t <= 18) && random(1, 100) === 1) {
-    welcome = sp.bh3.week_3or7
-    isSp = true
-  }
+    // 周三和周日，1%概率触发
+    if ((week === 3 || week === 7) && (t >= 14 && t <= 18) && random(1, 100) === 1) {
+      welcome = sp.bh3.week_3or7
+      isSp = true
+    }
 
-  if (permission.users.hasPermission(msg.uid, 'welcome.sp.ark') && week === 7) {
-    welcome = sp.ak.week_7
-    isSp = true
-  }
+    if (permission.users.hasPermission(msg.uid, 'welcome.sp.ark') && week === 7) {
+      welcome = sp.ak.week_7
+      isSp = true
+    }
 
-  // 周日，1%概率触发
-  if (week === 7 && random(1, 100) === 1) {
-    welcome = sp.ak.week_7
-    isSp = true
-  }
+    // 周日，1%概率触发
+    if (week === 7 && random(1, 100) === 1) {
+      welcome = sp.ak.week_7
+      isSp = true
+    }
 
-  const tmp = GetWelcomeBack(msg.uid)
+    const tmp = GetWelcomeBack(msg.uid)
 
-  if (!isSp && tmp) {
-    welcome = `{at} ${tmp}`
-  }
+    if (!isSp && tmp) {
+      welcome = `{at} ${tmp}`
+    }
 
-  api.method.sendPublicMessage(welcome.replace(/{at}/gm, username).replace(/{nickname}/gm, config.app.nickname), config.app.color)
-})
+    api.method.sendPublicMessage(welcome.replace(/{at}/gm, username).replace(/{nickname}/gm, config.app.nickname), config.app.color)
+  })
+}
