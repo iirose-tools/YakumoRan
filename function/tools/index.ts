@@ -13,7 +13,7 @@ try {
 const getjson = () => {
   const wordPath = path.join(api.Data, './tools/user.json')
   if (!fs.existsSync(wordPath)) {
-    fs.writeFileSync(wordPath, '{"user":[]}')
+    fs.writeFileSync(wordPath, '{"list":[]}')
   }
 
   return JSON.parse(fs.readFileSync(wordPath).toString())
@@ -50,8 +50,8 @@ api.command(/^订阅$/, 'tools.feed', (m, e, reply) => {
   try {
     const user = getjson()
     if (!per.users.hasPermission(e.uid, 'tool.op') && !per.users.hasPermission(e.uid, 'permission.tool.op')) return
-    if (user.user.includes(e.uid)) return reply('已经订阅过咯~', '66ccff')
-    user.user.push(e.uid)
+    if (user.list.includes(e.uid)) return reply('已经订阅过咯~', '66ccff')
+    user.list.push(e.uid)
     update(user)
     reply('订阅成功', '66ccff')
   } catch (error) {}
@@ -61,10 +61,10 @@ api.command(/^取消订阅$/, 'tools.feed.calcel', (m, e, reply) => {
   try {
     const user = getjson()
     if (!per.users.hasPermission(e.uid, 'tool.op') && !per.users.hasPermission(e.uid, 'permission.tool.op')) return
-    if (!user.user.includes(e.uid)) return reply('还没有订阅过哦~', '66ccff')
-    for (let i = 0; i < user.user.length; i++) {
-      if (user.user[i] === e.uid) {
-        user.user.splice(i - 1, 1)
+    if (!user.list.includes(e.uid)) return reply('还没有订阅过哦~', '66ccff')
+    for (let i = 0; i < user.list.length; i++) {
+      if (user.list[i] === e.uid) {
+        user.list.splice(i - 1, 1)
       }
     }
     update(user)
@@ -78,9 +78,9 @@ api.Event.on('PublicMessage', msg => {
     const wd1: string = msg.message.trim()
     const reply = api.method.sendPrivateMessage
     const user = getjson()
-    for (let i = 0; i < user.user.length; i++) {
-      if (user.user[i]) {
-        reply(user.user[i], `${msg.username}: ${wd1}`, '66ccff')
+    for (let i = 0; i < user.list.length; i++) {
+      if (user.listr[i]) {
+        reply(user.list[i], `${msg.username}: ${wd1}`, '66ccff')
       }
     }
   } catch (error) {}
@@ -93,7 +93,7 @@ api.Event.on('PrivateMessage', msg => {
     const wd1: string = msg.message.trim()
     const reply = api.method.sendPublicMessage
     const user = getjson()
-    if (user.user.includes(msg.uid)) {
+    if (user.list.includes(msg.uid)) {
       reply(`${msg.username}: ${wd1}`, '66ccff')
     }
   } catch (error) {}
