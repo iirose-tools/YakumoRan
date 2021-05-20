@@ -28,8 +28,6 @@ Ran.Event.on('PublicMessage', async msg => {
     status.rate += result
   }
 
-  logger('SCP-079').info(`${msg.username}: ${status.rate}`)
-
   if (status.rate > config.function.scp079.rate_limit.limit) {
     // 执行操作
     const time = config.function.scp079.rate_limit.action.mute.duration
