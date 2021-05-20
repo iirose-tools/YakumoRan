@@ -48,7 +48,7 @@ const update = (file:any, tyf:string, list:string) => {
 }
 
 // 核心:判断
-const toswitch = (te:string, st:string, t:string, word:any, use:any, id:string, aite:string, msg:any) => {
+const toswitch = (te:string, st:string, t:string, word:any, id:string, aite:string, msg:any, matc:any) => {
   let noew:any = {}
   switch (te) {
     case ('随机数字'): {
@@ -115,9 +115,15 @@ const toswitch = (te:string, st:string, t:string, word:any, use:any, id:string, 
       break
     }
     case ('添加'): {
-      const st1:any = st.match(/\[(.*),(.*),(.*),(.*)\]/)
-      st = `{"添加":["${st1[1]}","${st1[2]}",${Number(st1[3])},${Number(st1[4])}]}`
+      const st1:any = st.match(/\[(.*),(.*),(.*),(.*),(.*)\]/)
+      st = `{"添加":["${st1[1]}","${st1[2]}",${Number(st1[3])},${Number(st1[4])},"${st1[5]}"]}`
       noew = JSON.parse(st)
+      let use:any
+      if (st1[5] === '0' || st1[5] === '') {
+        use = getjson(id, 'user')
+      } else {
+        use = getjson(st1[5], 'user')
+      }
       if (use[noew['添加'][0]] == null) { use[noew['添加'][0]] = {} }
       if (use['属性'] == null) { use['属性'] = {} }
       if (use[noew['添加'][0]] == null) { use[noew['添加'][0]] = {} }
@@ -142,36 +148,71 @@ const toswitch = (te:string, st:string, t:string, word:any, use:any, id:string, 
       break
     }
     case ('销毁'): {
-      const st1:any = st.match(/\[(.*),(.*),(.*),(.*)\]/)
-      st = `{"销毁":["${st1[1]}","${st1[2]}",${Number(st1[3])},${Number(st1[4])}]}`
+      const st1:any = st.match(/\[(.*),(.*),(.*),(.*),(.*)\]/)
+      st = `{"销毁":["${st1[1]}","${st1[2]}",${Number(st1[3])},${Number(st1[4])},"${st1[5]}"]}`
       noew = JSON.parse(st)
+      let use:any
+      if (st1[5] === '0' || st1[5] === '') {
+        use = getjson(id, 'user')
+      } else {
+        use = getjson(st1[5], 'user')
+      }
       if (use[noew['销毁'][0]] === {}) {
         delete use[noew['销毁'][0]]
       }
       use[noew['销毁'][0]][noew['销毁'][1]] = use[noew['销毁'][0]][noew['销毁'][1]] - noew['销毁'][2]
       use['属性'][noew['销毁'][1]] = use['属性'][noew['销毁'][1]] - noew['销毁'][2]
-      if (use[noew['销毁'][0]][noew['销毁'][1]] <= 0) { delete use[noew['销毁'][0]][noew['销毁'][1]] }
-      if (use['属性'][noew['销毁'][1]] <= 0) { delete use['属性'][noew['销毁'][1]] }
+      let wd6:number = 1
+      if (use[noew['销毁'][0]][noew['销毁'][1]] <= 0) {
+        delete use[noew['销毁'][0]][noew['销毁'][1]]
+        wd6 = 0
+      }
+      if (use['属性'][noew['销毁'][1]] <= 0) {
+        delete use['属性'][noew['销毁'][1]]
+        wd6 = 0
+      }
       update(use, id, 'user')
       const tty:number = noew['销毁'][3]
       if (tty === 0) {
         word = word.replace(t, '销毁成功')
       }
       if (tty === 1) {
-        word = word.replace(t, String(noew['销毁'][0]))
+        if (wd6 === 1) {
+          word = word.replace(t, String(noew['销毁'][0]))
+        } else if (wd6 === 0) {
+          word = word.replace(t, -1)
+        }
       }
       if (tty === 2) {
-        word = word.replace(t, String(noew['销毁'][1]))
+        if (wd6 === 1) {
+          word = word.replace(t, String(noew['销毁'][1]))
+        } else if (wd6 === 0) {
+          word = word.replace(t, -1)
+        }
       }
       if (tty === 3) {
-        word = word.replace(t, String(noew['销毁'][2]))
+        if (wd6 === 1) {
+          word = word.replace(t, String(noew['销毁'][2]))
+        } else if (wd6 === 0) {
+          word = word.replace(t, -1)
+        }
       }
       break
     }
     case ('属性'): {
-      const st1:any = st.match(/\[(.*),(.*)\]/)
-      st = `{"属性":["${st1[1]}","${st1[2]}"]}`
+      const st1:any = st.match(/\[(.*),(.*),(.*)\]/)
+      st = `{"属性":["${st1[1]}","${st1[2]}","${st1[3]}"]}`
       noew = JSON.parse(st)
+      let use:any
+      if (st1[3] === '0' || st1[3] === '') {
+        use = getjson(id, 'user')
+      } else {
+        use = getjson(st1[5], 'user')
+      }
+      if (use[noew['属性'][0]] == null) { use[noew['属性'][0]] = {} }
+      if (use['属性'] == null) { use['属性'] = {} }
+      if (use[noew['属性'][0]] == null) { use[noew['属性'][0]] = {} }
+      if (use['属性'][noew['属性'][1]] == null) { use['属性'][noew['属性'][1]] = 0 }
       if (use[noew['属性'][0]][noew['属性'][1]] == null) { use[noew['属性'][0]][noew['属性'][1]] = 0 }
       word = word.replace(t, use[noew['属性'][0]][noew['属性'][1]])
       break
@@ -215,6 +256,13 @@ const toswitch = (te:string, st:string, t:string, word:any, use:any, id:string, 
       }
       break
     }
+    case ('数字'): {
+      const st1:any = st.match(/\[(.*)\]/)
+      st = `{"数字":[${Number(st1[1])}]}`
+      noew = JSON.parse(st)
+      word = word.replace(t, matc[noew['数字'][0] - 1])
+      break
+    }
     default: {
       break
     }
@@ -223,27 +271,39 @@ const toswitch = (te:string, st:string, t:string, word:any, use:any, id:string, 
 }
 
 // 词库引擎核心
-const makereply = (word:any, id:string, aite:string, msg:any) => {
-  const use = getjson(id, 'user')
+const makereply = (word:any, id:string, aite:string, msg:any, matc:any) => {
   while (/【.*】/.test(word)) {
     let t = word.match(/(.*?】).*/)[1]
     t = t.match(/.*(【.*?】)$/)[1]
     let st = t.match(/【(.*)】/)[1]
-    const te = st.match(/(随机数字|判断|禁言|踢|解除禁言|艾特|添加|销毁|属性|延迟|发送名|发送id)/)[1]
+    const te = st.match(/(随机数字|判断|禁言|踢|解除禁言|艾特|添加|销毁|属性|延迟|发送名|发送id|数字)/)[1]
     st = st.replace(te, '"' + te + '"')
     st = '{' + st + '}'
-    word = toswitch(te, st, t, word, use, id, aite, msg)
+    word = toswitch(te, st, t, word, id, aite, msg, matc)
   }
   while (/〖.*〗/.test(word)) {
     let t = word.match(/(.*?〗).*/)[1]
     t = t.match(/.*(〖.*?〗)$/)[1]
     let st = t.match(/〖(.*)〗/)[1]
-    const te = st.match(/(随机数字|判断|禁言|踢|解除禁言|艾特|添加|销毁|属性|延迟|发送名|发送id)/)[1]
+    const te = st.match(/(随机数字|判断|禁言|踢|解除禁言|艾特|添加|销毁|属性|延迟|发送名|发送id|数字)/)[1]
     st = st.replace(te, '"' + te + '"')
     st = '{' + st + '}'
-    word = toswitch(te, st, t, word, use, id, aite, msg)
+    word = toswitch(te, st, t, word, id, aite, msg, matc)
   }
   return word
+}
+
+// 解析输入化为输出
+const input = (msage:string) => {
+  let hello:any = []
+  const out:any = []
+  while (/(\d+)/.test(msage)) {
+    hello = msage.match(/(\d+)/g)
+    const test = hello[0]
+    out.push(test)
+    msage = msage.replace(test, '【数字】')
+  }
+  return out
 }
 
 // 核心功能：回复
@@ -251,16 +311,19 @@ api.Event.on('PublicMessage', msg => {
   if (msg.username === config.account.username) return // 不响应自己发送的消息
   let wd1: string = msg.message.trim()
   wd1 = wd1.replace(/\s/g, '')
+  let over:any = []
+  over = input(wd1)
   const reply = api.method.sendPublicMessage
   const word = getjson('word', 'word')
   const wd2 = wd1.replace(/(\[\*.*\*\])/g, '【艾特】')
   const wd3 = wd2.replace(/(\[@.*@\])/g, '【uid】')
   const wd4:any = wd1.match(/.*\[\*(.*)\*\].*/) === null ? ['', ''] : wd1.match(/.*\[\*(.*)\*\].*/)
+  const wd5 = wd1.replace(/(\d+)/g, '【数字】')
   try {
     if (word[wd1]) {
       const ran: number = word[wd1].length
       const rd: number = random(0, ran - 1)
-      const a:any = makereply(word[wd1][rd], msg.uid, wd4[1], msg)
+      const a:any = makereply(word[wd1][rd], msg.uid, wd4[1], msg, over)
       const out = a.split('#换#')
       let j:number = 0
       for (j = 0; j < out.length; j++) {
@@ -271,7 +334,18 @@ api.Event.on('PublicMessage', msg => {
     } else if (word[wd3]) {
       const ran: number = word[wd3].length
       const rd: number = random(0, ran - 1)
-      const a:any = makereply(word[wd3][rd], msg.uid, wd4[1], msg)
+      const a:any = makereply(word[wd3][rd], msg.uid, wd4[1], msg, over)
+      const out = a.split('#换#')
+      let j:number = 0
+      for (j = 0; j < out.length; j++) {
+        if (out[j]) {
+          reply(out[j], config.app.color)
+        }
+      }
+    } else if (word[wd5]) {
+      const ran: number = word[wd5].length
+      const rd: number = random(0, ran - 1)
+      const a:any = makereply(word[wd5][rd], msg.uid, wd4[1], msg, over)
       const out = a.split('#换#')
       let j:number = 0
       for (j = 0; j < out.length; j++) {
@@ -284,7 +358,7 @@ api.Event.on('PublicMessage', msg => {
 })
 
 // 添加问答...
-api.command(/^\.问(.*)答(.*)$/, 'word.add', async (m, e, reply) => {
+api.command(/^\.问(.*?)答(.*)$/, 'word.add', async (m, e, reply) => {
   try {
     if (!per.users.hasPermission(e.uid, 'word.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
     const word = getjson('word', 'word')
@@ -302,7 +376,7 @@ api.command(/^\.问(.*)答(.*)$/, 'word.add', async (m, e, reply) => {
 })
 
 // 删除部分问答
-api.command(/^\.删问(.*)序[号|列](.*)$/, 'word.delete.one', async (m, e, reply) => {
+api.command(/^\.删问(.*?)序[号|列](.*)$/, 'word.delete.one', async (m, e, reply) => {
   try {
     if (!per.users.hasPermission(e.uid, 'word.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
     const word = getjson('word', 'word')

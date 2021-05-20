@@ -3,38 +3,39 @@ import * as Ran from '../../lib/api'
 import logger from '../../lib/logger'
 import { getImg, getRealUrl, isPorn } from './utils'
 
-const limit: any = {}
+const limit: {
+  [index: string]: string[]
+} = {}
 
 Ran.Event.on('PublicMessage', async msg => {
   if (msg.username === config.account.username) return
   // 刷屏检测
-  if (!limit[msg.uid]) {
-    limit[msg.uid] = {
-      message: 1,
-      startAt: Math.round(new Date().getTime() / 1e3)
-    }
-  } else {
-    limit[msg.uid].message++
-    const time = new Date().getTime() / 1e3 - limit[msg.uid].startAt
-    if (time > config.function.scp079.rate_limit.duration) {
-      limit[msg.uid] = {
-        message: 1,
-        startAt: Math.round(new Date().getTime() / 1e3)
-      }
-    }
+  if (!limit[msg.uid]) limit[msg.uid] = []
 
-    if (limit[msg.uid].message > config.function.scp079.rate_limit.limit) {
-      limit[msg.uid] = {
-        message: 1,
-        startAt: Math.round(new Date().getTime() / 1e3)
-      }
+  limit[msg.uid].push(msg.message)
 
-      if (config.function.scp079.rate_limit.action.type === 'warn') {
-        const warnMsg = config.function.scp079.rate_limit.action.warn.message
-        Ran.method.sendPrivateMessage(msg.uid, warnMsg, config.app.color)
-      } else if (config.function.scp079.rate_limit.action.type === 'mute') {
-        Ran.method.admin.mute('all', msg.username, `${config.function.scp079.rate_limit.action.mute.duration}s`, '请不要刷屏哦')
-      }
+  if (limit[msg.uid].length > config.function.scp079.rate_limit.length) limit[msg.uid].shift()
+
+  const status = {
+    rate: 0
+  }
+
+  for (const word1 of limit[msg.uid]) {
+    let result = 0
+    for (const word2 of limit[msg.uid]) {
+      if (word1 === word2) result++
+    }
+    status.rate += result
+  }
+
+  if (status.rate > config.function.scp079.rate_limit.limit) {
+    // 执行操作
+    const time = config.function.scp079.rate_limit.action.mute.duration
+    const message = config.function.scp079.rate_limit.action.warn.message
+    if (config.function.scp079.rate_limit.action.type === 'mute') {
+      Ran.method.admin.mute('all', msg.username, `${time}s`, message)
+    } else {
+      Ran.method.sendPrivateMessage(msg.uid, message, '#d44')
     }
   }
 })
