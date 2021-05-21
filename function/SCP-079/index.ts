@@ -16,20 +16,21 @@ Ran.Event.on('PublicMessage', async msg => {
 
   if (limit[msg.uid].length > config.function.scp079.rate_limit.length) limit[msg.uid].shift()
 
-  const status = {
-    rate: 0
-  }
+  const status: {
+    [index: string]: number
+  } = {}
 
-  for (const word1 of limit[msg.uid]) {
-    let result = 0
-    for (const word2 of limit[msg.uid]) {
-      if (word1 === word2) result++
+  for (const word of limit[msg.uid]) {
+    if (!status[word]) {
+      status[word] = 1
+    } else {
+      status[word]++
     }
-    result--
-    status.rate += result
   }
 
-  if (status.rate > config.function.scp079.rate_limit.limit) {
+  const rate = Math.max(...Object.values(status))
+
+  if (rate > config.function.scp079.rate_limit.limit) {
     // 执行操作
     const time = config.function.scp079.rate_limit.action.mute.duration
     const message = config.function.scp079.rate_limit.action.warn.message
