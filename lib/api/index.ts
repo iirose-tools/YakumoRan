@@ -27,6 +27,10 @@ import GetUserList from '../encoder/system/GetUserList'
 import UserProfile from '../encoder/user/UserProfile'
 import { moveTo } from '../core'
 import bank from '../encoder/system/bank'
+import MediaList from '../encoder/system/MediaList'
+import { MediaListCallback } from '../decoder/MediaListCallback'
+import { UserProfileCallback } from '../decoder/UserProfileCallback'
+import { GetUserListCallback } from '../decoder/GetUserListCallback'
 
 export const Event = Bot
 
@@ -163,7 +167,7 @@ export const method = {
      * @description 获取用户列表
      * @returns {Promise}
      */
-    getUserList: () => {
+    getUserList: (): Promise<GetUserListCallback[]> => {
       return new Promise((resolve, reject) => {
         Bot.once('GetUserListCallback', resolve)
         send(GetUserList())
@@ -174,10 +178,20 @@ export const method = {
      * @param username 用户名
      * @returns {Promise}
      */
-    getUserProfile: (username: string) => {
+    getUserProfile: (username: string): Promise<UserProfileCallback> => {
       return new Promise((resolve, reject) => {
         Bot.once('UserProfileCallback', resolve)
         send(UserProfile(username))
+      })
+    },
+    /**
+     * @description 获取媒体列表
+     * @returns {Promise}
+     */
+    getMediaList: (): Promise<MediaListCallback[]> => {
+      return new Promise((resolve, reject) => {
+        Bot.once('MediaListCallback', resolve)
+        send(MediaList())
       })
     }
   },
@@ -254,7 +268,7 @@ export const method = {
         send(data)
       },
       /**
-       * @description 媒体排序
+       * @description 交换两个媒体的位置
        * @param id1 第一个id
        * @param id2 第二个id
        */

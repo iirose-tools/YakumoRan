@@ -25,6 +25,7 @@ Ran.Event.on('PublicMessage', async msg => {
     for (const word2 of limit[msg.uid]) {
       if (word1 === word2) result++
     }
+    result--
     status.rate += result
   }
 

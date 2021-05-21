@@ -2,6 +2,7 @@ logs/
 dist/
 node_modules/
 data/
+function/debug/
 yarn-error.log
 yarn.lock
 package-lock.json
