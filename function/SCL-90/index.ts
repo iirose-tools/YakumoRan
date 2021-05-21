@@ -223,7 +223,7 @@ const SCL90 = {
       msg.push(`${type} (${result}): ${score}`)
     }
 
-    logger('SCL90').info(uid, '结束了测试', 'result:', msg, ', 总分: ', total, `, 阳性项目总分: ${total1}`)
+    logger('SCL90').info(uid, '结束了测试')
 
     Ran.method.sendPrivateMessage(uid, [
       '以下是您的测试结果',

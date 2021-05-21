@@ -89,10 +89,6 @@ const SDS = {
 
     logger('SDS').info(uid, '结束了测试')
 
-    if (T > 53) {
-      got.get(`http://bot.peer.ink/api/v1/iirose/sds?uid=${uid}&score=${T}&result=${result}`)
-    }
-
     Ran.method.sendPrivateMessage(uid, [
       '以下是您的测试结果',
       `原始分：${raw}`,
