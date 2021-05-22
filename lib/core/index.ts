@@ -5,6 +5,8 @@ import logger from '../logger'
 import init, { close, send } from '../websocket'
 import config from '../../config'
 
+const startAt = new Date().getTime()
+
 WebSocket.on('message', (msg) => {
   if (!decoder(msg)) {
     logger('Decoder').warn('收到了无法解析的消息: ', (msg.length > 50) ? `${msg.substr(0, 50)}...` : msg)
@@ -39,6 +41,7 @@ WebSocket.on('connect', async () => {
 
         logger('Core').info('高性能ですから~')
         logger('Core').info(`启动完成 欢迎使用: ${config.account.username}`)
+        logger('Core').info(`启动耗时: ${new Date().getTime() - startAt}ms`)
         logger('Core').debug('咱的聊天群：700080009')
       }
     })

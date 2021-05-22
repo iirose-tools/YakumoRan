@@ -11,6 +11,7 @@ import userlist from './userlist'
 import GetUserListCallback from './GetUserListCallback'
 import UserProfileCallback from './UserProfileCallback'
 import BankCallback from './BankCallback'
+import MediaListCallback from './MediaListCallback'
 
 export default (msg: string) => {
   const status = []
@@ -28,8 +29,9 @@ export default (msg: string) => {
   status.push(GetUserListCallback(msg))
   status.push(UserProfileCallback(msg))
   status.push(BankCallback(msg))
+  status.push(MediaListCallback(msg))
 
-  status.filter(e => e)
+  status.filter(e => !!e)
 
   if (status.length > 0) return true
   return false

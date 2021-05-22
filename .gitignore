@@ -2,6 +2,9 @@ logs/
 dist/
 node_modules/
 data/
-pkg/
+function/debug/
+yarn-error.log
+yarn.lock
+package-lock.json
 config.json
 mentality.allow
