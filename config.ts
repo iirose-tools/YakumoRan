@@ -22,8 +22,8 @@ const defaultConfig = {
       nsfw_rate: 0.8,
       allowGambling: true,
       rate_limit: {
-        length: 15,
-        limit: 5,
+        duration: 60,
+        limit: 45,
         action: {
           type: 'warn',
           warn: {
