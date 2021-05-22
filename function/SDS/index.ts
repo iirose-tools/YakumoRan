@@ -2,7 +2,6 @@ import * as Ran from '../../lib/api'
 import config from '../../config'
 import { EventEmitter } from 'events'
 import logger from '../../lib/logger'
-import got from 'got/dist/source'
 
 interface Session {
   score: number,
