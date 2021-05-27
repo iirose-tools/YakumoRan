@@ -41,6 +41,12 @@ const session: {
 const SDS = {
   init: (uid: string) => {
     logger('SDS').info(uid, '初始化了测试')
+
+    if (session[uid]) {
+      delete session[uid]
+      choice.emit(uid, 'close')
+    }
+
     session[uid] = {
       index: 0,
       score: 0,
@@ -69,7 +75,7 @@ const SDS = {
     ].join('\n')
   },
   start: (uid: string) => {
-    if (session[uid]) {
+    if (session[uid] && session[uid].index === 0) {
       SDS.next(uid)
       logger('SDS').info(uid, '开始了测试')
     }
@@ -102,6 +108,8 @@ const SDS = {
     const q = SDS.makeReq(session[uid].index)
 
     choice.once(uid, (c: string) => {
+      if (c === 'close') return
+
       const scoreMap: {
         [index: string]: number
       } = {
