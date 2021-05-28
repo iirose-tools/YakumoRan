@@ -88,3 +88,16 @@ Ran.command(/正则表达式/, 'id', async (m, e, reply) => {
   // your code
 })
 ```
+
+### 使用插件管理器
+```typescript
+import { plugin } from '../manager'
+
+plugin.on('id', isEnable => {
+  if (isEnable) {
+    // 启动插件
+  } else {
+    // 停止插件
+  }
+})
+```
