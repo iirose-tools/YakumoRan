@@ -80,7 +80,7 @@ api.Event.on('PublicMessage', msg => {
     const user = getjson()
     for (let i = 0; i < user.list.length; i++) {
       if (user.listr[i]) {
-        reply(user.list[i], `${msg.username}: ${wd1}`, '66ccff')
+        reply(user.list[i], ` [*${msg.username}*]  : ${wd1}`, '66ccff')
       }
     }
   } catch (error) {}
@@ -94,7 +94,7 @@ api.Event.on('PrivateMessage', msg => {
     const reply = api.method.sendPublicMessage
     const user = getjson()
     if (user.list.includes(msg.uid)) {
-      reply(`${msg.username}: ${wd1}`, '66ccff')
+      reply(` [*${msg.username}*]  : ${wd1}`, '66ccff')
     }
   } catch (error) {}
 })
