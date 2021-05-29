@@ -130,6 +130,11 @@ const SCL90 = {
       logs: []
     }
 
+    if (session[uid]) {
+      delete session[uid]
+      choice.emit(uid, 'close')
+    }
+
     Ran.method.sendPrivateMessage(uid, [
       '本测试总共90道选择题，测试结果不完全代表您的实际情况，若需要专业检查请去医院进行',
       'SCL-90 采用 5 级评分，主要评定症状出现的频度，其标如下',
@@ -154,7 +159,7 @@ const SCL90 = {
     ].join('\n')
   },
   start: (uid: string) => {
-    if (session[uid]) {
+    if (session[uid] && session[uid].index === 0) {
       SCL90.next(uid)
       logger('SCL90').info(uid, '开始了测试')
     }
@@ -241,6 +246,8 @@ const SCL90 = {
     const q = SCL90.makeReq(session[uid].index)
 
     choice.once(uid, (c: string) => {
+      if (c === 'close') return
+
       session[uid].logs.push(c)
 
       if (session[uid].index === 89) {
