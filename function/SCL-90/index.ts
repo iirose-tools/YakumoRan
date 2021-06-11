@@ -125,14 +125,14 @@ const session: {
 const SCL90 = {
   init: (uid: string) => {
     logger('SCL90').info(uid, '初始化了测试')
-    session[uid] = {
-      index: 0,
-      logs: []
-    }
-
     if (session[uid]) {
       delete session[uid]
       choice.emit(uid, 'close')
+    }
+
+    session[uid] = {
+      index: 0,
+      logs: []
     }
 
     Ran.method.sendPrivateMessage(uid, [

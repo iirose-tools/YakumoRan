@@ -10,5 +10,8 @@
   "intro": [
     "一些whois工具"
   ],
-  "commands": []
+  "commands": [{
+    "cmd": ".whois <IP/Domain/ASN>",
+    "helper": "进行whois查询"
+  }]
 }

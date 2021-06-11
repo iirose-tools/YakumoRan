@@ -94,14 +94,23 @@ Event.on('PublicMessage', (msg) => {
     }
   }
 
-  if (msg.message.trim() === '.help') {
+  const helpPage = (page: number) => {
     const tmp = []
     for (const id in func) {
       tmp.push(helper(id))
     }
-    method.sendPublicMessage(tmp.join('\n================================\n'), config.app.color)
+
+    method.sendPublicMessage(tmp.slice((page - 1) * 3, page * 3).join('\n================================\n'), config.app.color)
+  }
+
+  if (msg.message.trim() === '.help') {
+    helpPage(1)
   } else if (msg.message.substr(0, 5) === '.help') {
     const id = msg.message.substr(6).trim()
+
+    // @ts-ignore
+    // eslint-disable-next-line eqeqeq
+    if (Number(id) == id) return helpPage(Number(id))
 
     method.sendPublicMessage(helper(id), config.app.color)
   }

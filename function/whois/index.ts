@@ -21,24 +21,8 @@ const parserObj = (obj: any) => {
   return result
 }
 
-Ran.command(/^\.ip (.*)$/, 'whois.ip', async (m, e, reply) => {
-  const result = await whoiser.ip(m[1])
-  const msg = parserObj(result)
-  const url = await create(msg.join('\n'), 'YakumoRan', 'text')
-  if (!url) return reply('结果上传失败', config.app.color)
-  reply(url, config.app.color)
-})
-
-Ran.command(/^\/asn AS(.*)$/, 'whois.asn', async (m, e, reply) => {
-  const result = await whoiser.asn(m[1])
-  const msg = parserObj(result)
-  const url = await create(msg.join('\n'), 'YakumoRan', 'text')
-  if (!url) return reply('结果上传失败', config.app.color)
-  reply(url, config.app.color)
-})
-
-Ran.command(/^\/domain (.*)$/, 'whois.domain', async (m, e, reply) => {
-  const result = await whoiser.domain(m[1])
+Ran.command(/^\.whois (.*)$/, 'whois.do', async (m, e, reply) => {
+  const result = await whoiser(m[1])
   const msg = parserObj(result)
   const url = await create(msg.join('\n'), 'YakumoRan', 'text')
   if (!url) return reply('结果上传失败', config.app.color)
