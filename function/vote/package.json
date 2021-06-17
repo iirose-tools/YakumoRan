@@ -1,0 +1,17 @@
+{
+  "name": "vote",
+  "id": "vote",
+  "main": "index",
+  "author": {
+    "name": "涂山苏苏",
+    "github": "TheresaQWQ",
+    "iirose": "涂山苏苏"
+  },
+  "intro": [
+    "投票插件"
+  ],
+  "commands": [{
+    "cmd": "新建投票",
+    "helper": "新建一个投票（根据机器人提示操作即可）"
+  }]
+}

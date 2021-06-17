@@ -22,6 +22,7 @@
     "@types/random-number-csprng": "^1.0.0",
     "@types/request": "^2.48.5",
     "@types/sha1": "^1.1.2",
+    "@types/uuid": "^8.3.0",
     "@typescript-eslint/eslint-plugin": "^4.19.0",
     "@typescript-eslint/parser": "^4.19.0",
     "babel-jest": "^26.6.3",
@@ -50,6 +51,7 @@
     "request": "^2.88.2",
     "sha1": "^1.1.1",
     "typescript": "^4.2.4",
+    "uuid": "^8.3.2",
     "whoiser": "^1.12.0",
     "ws": "^7.4.3"
   }
