@@ -117,15 +117,18 @@ class CreateVote {
   }
 }
 
+// eslint-disable-next-line no-unused-vars
 const createSession: {
   [index: string]: CreateVote
 } = {}
 
 Ran.command(/^新建投票$/, 'vote.create', (m, event, reply) => {
-  if (createSession[event.uid]) delete createSession[event.uid]
-  createSession[event.uid] = new CreateVote(event.uid, event.username, reply)
+  return reply('[Vote] 没做完')
+  // if (createSession[event.uid]) delete createSession[event.uid]
+  // createSession[event.uid] = new CreateVote(event.uid, event.username, reply)
 })
 
 Ran.command(/^结束$/, 'vote.stop', (m, event, reply) => {
-  if (createSession[event.uid]) delete createSession[event.uid]
+  return reply('[Vote] 没做完')
+  // if (createSession[event.uid]) delete createSession[event.uid]
 })
