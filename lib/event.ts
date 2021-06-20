@@ -12,6 +12,7 @@ import { GetUserListCallback } from './decoder/GetUserListCallback'
 import { UserProfileCallback } from './decoder/UserProfileCallback'
 import { BankCallback } from './decoder/BankCallback'
 import { MediaListCallback } from './decoder/MediaListCallback'
+import { SelfMove } from './decoder/SelfMove'
 
 interface WebSocketEvent {
   on(event: 'send', listener: (msg: string) => void): void;
@@ -51,6 +52,7 @@ interface BotEvent {
   on(event: 'UserProfileCallback', listener: (msg: UserProfileCallback) => void): void;
   on(event: 'BankCallback', listener: (msg: BankCallback) => void): void;
   on(event: 'MediaListCallback', listener: (msg: MediaListCallback[]) => void): void;
+  on(event: 'SelfMove', listener: (msg: SelfMove) => void): void;
 
   once(event: 'login', listener: () => void): void;
   once(event: 'UserList', listener: (msg: UserList[]) => void): void;
@@ -67,6 +69,7 @@ interface BotEvent {
   once(event: 'UserProfileCallback', listener: (msg: UserProfileCallback) => void): void;
   once(event: 'BankCallback', listener: (msg: BankCallback) => void): void;
   once(event: 'MediaListCallback', listener: (msg: MediaListCallback[]) => void): void;
+  once(event: 'SelfMove', listener: (msg: SelfMove) => void): void;
 
   emit(event: 'login'): void;
   emit(event: 'UserList', msg: UserList[]): void;
@@ -83,6 +86,7 @@ interface BotEvent {
   emit(event: 'UserProfileCallback', msg: UserProfileCallback): void;
   emit(event: 'BankCallback', msg: BankCallback): void;
   emit(event: 'MediaListCallback', msg: MediaListCallback[]): void;
+  emit(event: 'SelfMove', msg: SelfMove): void;
 
   removeAllListeners(event: 'login'): void
   removeAllListeners(event: 'UserList'): void
@@ -99,6 +103,7 @@ interface BotEvent {
   removeAllListeners(event: 'UserProfileCallback'): void
   removeAllListeners(event: 'BankCallback'): void
   removeAllListeners(event: 'MediaListCallback'): void
+  removeAllListeners(event: 'SelfMove'): void
 }
 
 export const WebSocket: WebSocketEvent = new EventEmitter()
