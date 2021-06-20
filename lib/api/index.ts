@@ -47,39 +47,44 @@ export const command = (regexp: RegExp, id: string, callback: (m: RegExpExecArra
   }
   commands[id] = callback
 
-  Bot.on('PrivateMessage', e => {
-    if (e.username === config.account.username) return
-
-    regexp.lastIndex = 0
-    if (regexp.test(e.message)) {
-      logger('Command').info(`${e.username} 在私聊中触发了 ${id} 命令: ${e.message}`)
-
-      const reply = (msg: string, color?: string) => {
-        return method.sendPrivateMessage(e.uid, msg, color || config.app.color)
-      }
+  const bind = () => {
+    Bot.on('PrivateMessage', e => {
+      if (e.username === config.account.username) return
 
       regexp.lastIndex = 0
-      // @ts-ignore
-      callback(regexp.exec(e.message), e, reply)
-    }
-  })
+      if (regexp.test(e.message)) {
+        logger('Command').info(`${e.username} 在私聊中触发了 ${id} 命令: ${e.message}`)
 
-  Bot.on('PublicMessage', e => {
-    if (e.username === config.account.username) return
+        const reply = (msg: string, color?: string) => {
+          return method.sendPrivateMessage(e.uid, msg, color || config.app.color)
+        }
 
-    regexp.lastIndex = 0
-    if (regexp.test(e.message)) {
-      logger('Command').info(`${e.username} 在群聊中触发了 ${id} 命令: ${e.message}`)
-
-      const reply = (msg: string, color?: string) => {
-        return method.sendPublicMessage(msg, color || config.app.color)
+        regexp.lastIndex = 0
+        // @ts-ignore
+        callback(regexp.exec(e.message), e, reply)
       }
+    })
+
+    Bot.on('PublicMessage', e => {
+      if (e.username === config.account.username) return
 
       regexp.lastIndex = 0
-      // @ts-ignore
-      callback(regexp.exec(e.message), e, reply)
-    }
-  })
+      if (regexp.test(e.message)) {
+        logger('Command').info(`${e.username} 在群聊中触发了 ${id} 命令: ${e.message}`)
+
+        const reply = (msg: string, color?: string) => {
+          return method.sendPublicMessage(msg, color || config.app.color)
+        }
+
+        regexp.lastIndex = 0
+        // @ts-ignore
+        callback(regexp.exec(e.message), e, reply)
+      }
+    })
+  }
+
+  setTimeout(bind, 1e3)
+
   logger('Command').debug(`${id} 命令注册完成`)
 }
 
