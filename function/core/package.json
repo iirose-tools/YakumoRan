@@ -14,5 +14,8 @@
   }, {
     "cmd": ".help <id>",
     "helper": "查看插件帮助信息"
+  }, {
+    "cmd": ".help <page>",
+    "helper": "查看指定页数的帮助信息"
   }]
 }
