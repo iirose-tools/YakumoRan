@@ -264,10 +264,16 @@ const toswitch = (te:string, st:string, t:string, word:any, id:string, aite:stri
       break
     }
     case ('id'): {
-      const st1:any = st.match(/\[(.*)\]/)
-      st = `{"id":[${Number(st1[1])}]}`
+      const st1:any = st.match(/\[(.*),(.*)\]/)
+      st = `{"id":[${Number(st1[1])},${Number(st1[2])}]}`
       noew = JSON.parse(st)
-      word = word.replace(t, ` ${idc[noew['id'][0] - 1]} `)
+     
+      if (noew['id'][0] === 1) {
+        word = word.replace(t, ` [@${idc[noew['id'][0] - 1]}@] `)
+      }
+      if (noew['id'][0] === 2) {
+        word = word.replace(t, idc[noew['id'][0] - 1])
+      }
       break
     }
     default: {
@@ -319,9 +325,12 @@ const inputId = (msage:string) => {
   const out:any = []
   while (/\[@(.*?)@\]/.test(msage)) {
     hello = msage.match(/\[@(.*?)@\]/g)
-    const test = hello[0]
-    out.push(test)
-    msage = msage.replace(test, '【id】')
+    const hello2 = hello[0]
+    const test = /@(.*)@/.exec(hello2)
+    if (test) {
+      out.push(test[1])
+      msage = msage.replace(`[@${test[1]}@]`, '【id】')
+    }
   }
   return out
 }
