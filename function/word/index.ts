@@ -48,7 +48,7 @@ const update = (file:any, tyf:string, list:string) => {
 }
 
 // 核心:判断
-const toswitch = (te:string, st:string, t:string, word:any, id:string, aite:string, msg:any, matc:any) => {
+const toswitch = (te:string, st:string, t:string, word:any, id:string, aite:string, msg:any, matc:any, idc:any) => {
   let noew:any = {}
   switch (te) {
     case ('随机数字'): {
@@ -263,6 +263,13 @@ const toswitch = (te:string, st:string, t:string, word:any, id:string, aite:stri
       word = word.replace(t, matc[noew['数字'][0] - 1])
       break
     }
+    case ('id'): {
+      const st1:any = st.match(/\[(.*)\]/)
+      st = `{"id":[${Number(st1[1])}]}`
+      noew = JSON.parse(st)
+      word = word.replace(t, ` ${idc[noew['id'][0] - 1]} `)
+      break
+    }
     default: {
       break
     }
@@ -271,30 +278,30 @@ const toswitch = (te:string, st:string, t:string, word:any, id:string, aite:stri
 }
 
 // 词库引擎核心
-const makereply = (word:any, id:string, aite:string, msg:any, matc:any) => {
+const makereply = (word:any, id:string, aite:string, msg:any, matc:any, idc:any) => {
   while (/【.*】/.test(word)) {
     let t = word.match(/(.*?】).*/)[1]
     t = t.match(/.*(【.*?】)$/)[1]
     let st = t.match(/【(.*)】/)[1]
-    const te = st.match(/(随机数字|判断|禁言|踢|解除禁言|艾特|添加|销毁|属性|延迟|发送名|发送id|数字)/)[1]
+    const te = st.match(/(随机数字|判断|禁言|踢|解除禁言|艾特|添加|销毁|属性|延迟|发送名|发送id|数字|id)/)[1]
     st = st.replace(te, '"' + te + '"')
     st = '{' + st + '}'
-    word = toswitch(te, st, t, word, id, aite, msg, matc)
+    word = toswitch(te, st, t, word, id, aite, msg, matc, idc)
   }
   while (/〖.*〗/.test(word)) {
     let t = word.match(/(.*?〗).*/)[1]
     t = t.match(/.*(〖.*?〗)$/)[1]
     let st = t.match(/〖(.*)〗/)[1]
-    const te = st.match(/(随机数字|判断|禁言|踢|解除禁言|艾特|添加|销毁|属性|延迟|发送名|发送id|数字)/)[1]
+    const te = st.match(/(随机数字|判断|禁言|踢|解除禁言|艾特|添加|销毁|属性|延迟|发送名|发送id|数字|id)/)[1]
     st = st.replace(te, '"' + te + '"')
     st = '{' + st + '}'
-    word = toswitch(te, st, t, word, id, aite, msg, matc)
+    word = toswitch(te, st, t, word, id, aite, msg, matc, idc)
   }
   return word
 }
 
 // 解析输入化为输出
-const input = (msage:string) => {
+const inputMath = (msage:string) => {
   let hello:any = []
   const out:any = []
   while (/(\d+)/.test(msage)) {
@@ -306,24 +313,39 @@ const input = (msage:string) => {
   return out
 }
 
+// 解析id为化为输出
+const inputId = (msage:string) => {
+  let hello:any = []
+  const out:any = []
+  while (/\[@(.*?)@\]/.test(msage)) {
+    hello = msage.match(/\[@(.*?)@\]/g)
+    const test = hello[0]
+    out.push(test)
+    msage = msage.replace(test, '【id】')
+  }
+  return out
+}
+
 // 核心功能：回复
 api.Event.on('PublicMessage', msg => {
   if (msg.username === config.account.username) return // 不响应自己发送的消息
   let wd1: string = msg.message.trim()
   wd1 = wd1.replace(/\s/g, '')
   let over:any = []
-  over = input(wd1)
+  let over2:any = []
+  over = inputMath(wd1)
+  over2 = inputId(wd1)
   const reply = api.method.sendPublicMessage
   const word = getjson('word', 'word')
-  const wd2 = wd1.replace(/(\[\*.*\*\])/g, '【艾特】')
-  const wd3 = wd2.replace(/(\[@.*@\])/g, '【uid】')
+  const wd2 = wd1.replace(/(\[\*.*?\*\])/g, '【艾特】')
+  const wd3 = wd2.replace(/(\[@.*?@\])/g, '【id】')
   const wd4:any = wd1.match(/.*\[\*(.*)\*\].*/) === null ? ['', ''] : wd1.match(/.*\[\*(.*)\*\].*/)
   const wd5 = wd1.replace(/(\d+)/g, '【数字】')
   try {
     if (word[wd1]) {
       const ran: number = word[wd1].length
       const rd: number = random(0, ran - 1)
-      const a:any = makereply(word[wd1][rd], msg.uid, wd4[1], msg, over)
+      const a:any = makereply(word[wd1][rd], msg.uid, wd4[1], msg, over, over2)
       const out = a.split('#换#')
       let j:number = 0
       for (j = 0; j < out.length; j++) {
@@ -334,7 +356,7 @@ api.Event.on('PublicMessage', msg => {
     } else if (word[wd3]) {
       const ran: number = word[wd3].length
       const rd: number = random(0, ran - 1)
-      const a:any = makereply(word[wd3][rd], msg.uid, wd4[1], msg, over)
+      const a:any = makereply(word[wd3][rd], msg.uid, wd4[1], msg, over, over2)
       const out = a.split('#换#')
       let j:number = 0
       for (j = 0; j < out.length; j++) {
@@ -345,7 +367,7 @@ api.Event.on('PublicMessage', msg => {
     } else if (word[wd5]) {
       const ran: number = word[wd5].length
       const rd: number = random(0, ran - 1)
-      const a:any = makereply(word[wd5][rd], msg.uid, wd4[1], msg, over)
+      const a:any = makereply(word[wd5][rd], msg.uid, wd4[1], msg, over, over2)
       const out = a.split('#换#')
       let j:number = 0
       for (j = 0; j < out.length; j++) {
