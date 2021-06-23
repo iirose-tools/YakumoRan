@@ -2,6 +2,15 @@ import whoiser from 'whoiser'
 import * as Ran from '../../lib/api'
 import config from '../../config'
 import { create } from '../pastebin'
+import { plugin } from '../manager'
+
+const flag = {
+  status: true
+}
+
+plugin.on('whois', status => {
+  flag.status = status
+})
 
 const parserObj = (obj: any) => {
   const result: string[] = []
@@ -22,6 +31,7 @@ const parserObj = (obj: any) => {
 }
 
 Ran.command(/^\.whois (.*)$/, 'whois.do', async (m, e, reply) => {
+  if (!flag.status) return reply('[Whois] 功能未启用')
   const result = await whoiser(m[1])
   const msg = parserObj(result)
   const url = await create(msg.join('\n'), 'YakumoRan', 'text')
