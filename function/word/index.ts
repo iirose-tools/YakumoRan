@@ -3,6 +3,15 @@ import path from 'path'
 import * as api from '../../lib/api'
 import config from '../../config'
 import per from '../permission/permission'
+import { plugin } from '../manager'
+
+const flag = {
+  status: true
+}
+
+plugin.on('word', status => {
+  flag.status = status
+})
 
 try {
   fs.mkdirSync(path.join(api.Data, './word/user'))
@@ -75,7 +84,7 @@ const toswitch = (te:string, st:string, t:string, word:any, id:string, aite:stri
           break
         }
         case ('='): {
-          if ([noew['判断'][0]] === noew['判断'][2]) {
+          if (noew['判断'][0] === noew['判断'][2]) {
             a = noew['判断'][3]
           } else {
             a = noew['判断'][4]
@@ -267,12 +276,12 @@ const toswitch = (te:string, st:string, t:string, word:any, id:string, aite:stri
       const st1:any = st.match(/\[(.*),(.*)\]/)
       st = `{"id":[${Number(st1[1])},${Number(st1[2])}]}`
       noew = JSON.parse(st)
-     
-      if (noew['id'][0] === 1) {
-        word = word.replace(t, ` [@${idc[noew['id'][0] - 1]}@] `)
+
+      if (noew.id[0] === 1) {
+        word = word.replace(t, ` [@${idc[noew.id[0] - 1]}@] `)
       }
-      if (noew['id'][0] === 2) {
-        word = word.replace(t, idc[noew['id'][0] - 1])
+      if (noew.id[0] === 2) {
+        word = word.replace(t, idc[noew.id[0] - 1])
       }
       break
     }
@@ -334,62 +343,64 @@ const inputId = (msage:string) => {
   }
   return out
 }
-
+if (flag.status) {
 // 核心功能：回复
-api.Event.on('PublicMessage', msg => {
-  if (msg.username === config.account.username) return // 不响应自己发送的消息
-  let wd1: string = msg.message.trim()
-  wd1 = wd1.replace(/\s/g, '')
-  let over:any = []
-  let over2:any = []
-  over = inputMath(wd1)
-  over2 = inputId(wd1)
-  const reply = api.method.sendPublicMessage
-  const word = getjson('word', 'word')
-  const wd2 = wd1.replace(/(\[\*.*?\*\])/g, '【艾特】')
-  const wd3 = wd2.replace(/(\[@.*?@\])/g, '【id】')
-  const wd4:any = wd1.match(/.*\[\*(.*)\*\].*/) === null ? ['', ''] : wd1.match(/.*\[\*(.*)\*\].*/)
-  const wd5 = wd1.replace(/(\d+)/g, '【数字】')
-  try {
-    if (word[wd1]) {
-      const ran: number = word[wd1].length
-      const rd: number = random(0, ran - 1)
-      const a:any = makereply(word[wd1][rd], msg.uid, wd4[1], msg, over, over2)
-      const out = a.split('#换#')
-      let j:number = 0
-      for (j = 0; j < out.length; j++) {
-        if (out[j]) {
-          reply(out[j], config.app.color)
+  api.Event.on('PublicMessage', msg => {
+    if (msg.username === config.account.username) return // 不响应自己发送的消息
+    let wd1: string = msg.message.trim()
+    wd1 = wd1.replace(/\s/g, '')
+    let over:any = []
+    let over2:any = []
+    over = inputMath(wd1)
+    over2 = inputId(wd1)
+    const reply = api.method.sendPublicMessage
+    const word = getjson('word', 'word')
+    const wd2 = wd1.replace(/(\[\*.*?\*\])/g, '【艾特】')
+    const wd3 = wd2.replace(/(\[@.*?@\])/g, '【id】')
+    const wd4:any = wd1.match(/.*\[\*(.*)\*\].*/) === null ? ['', ''] : wd1.match(/.*\[\*(.*)\*\].*/)
+    const wd5 = wd1.replace(/(\d+)/g, '【数字】')
+    try {
+      if (word[wd1]) {
+        const ran: number = word[wd1].length
+        const rd: number = random(0, ran - 1)
+        const a:any = makereply(word[wd1][rd], msg.uid, wd4[1], msg, over, over2)
+        const out = a.split('#换#')
+        let j:number = 0
+        for (j = 0; j < out.length; j++) {
+          if (out[j]) {
+            reply(out[j], config.app.color)
+          }
+        }
+      } else if (word[wd3]) {
+        const ran: number = word[wd3].length
+        const rd: number = random(0, ran - 1)
+        const a:any = makereply(word[wd3][rd], msg.uid, wd4[1], msg, over, over2)
+        const out = a.split('#换#')
+        let j:number = 0
+        for (j = 0; j < out.length; j++) {
+          if (out[j]) {
+            reply(out[j], config.app.color)
+          }
+        }
+      } else if (word[wd5]) {
+        const ran: number = word[wd5].length
+        const rd: number = random(0, ran - 1)
+        const a:any = makereply(word[wd5][rd], msg.uid, wd4[1], msg, over, over2)
+        const out = a.split('#换#')
+        let j:number = 0
+        for (j = 0; j < out.length; j++) {
+          if (out[j]) {
+            reply(out[j], config.app.color)
+          }
         }
       }
-    } else if (word[wd3]) {
-      const ran: number = word[wd3].length
-      const rd: number = random(0, ran - 1)
-      const a:any = makereply(word[wd3][rd], msg.uid, wd4[1], msg, over, over2)
-      const out = a.split('#换#')
-      let j:number = 0
-      for (j = 0; j < out.length; j++) {
-        if (out[j]) {
-          reply(out[j], config.app.color)
-        }
-      }
-    } else if (word[wd5]) {
-      const ran: number = word[wd5].length
-      const rd: number = random(0, ran - 1)
-      const a:any = makereply(word[wd5][rd], msg.uid, wd4[1], msg, over, over2)
-      const out = a.split('#换#')
-      let j:number = 0
-      for (j = 0; j < out.length; j++) {
-        if (out[j]) {
-          reply(out[j], config.app.color)
-        }
-      }
-    }
-  } catch (error) {}
-})
+    } catch (error) {}
+  })
+}
 
 // 添加问答...
 api.command(/^\.问(.*?)答(.*)$/, 'word.add', async (m, e, reply) => {
+  if (!flag.status) return reply('[word] 功能未启用')
   try {
     if (!per.users.hasPermission(e.uid, 'word.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
     const word = getjson('word', 'word')
@@ -408,6 +419,7 @@ api.command(/^\.问(.*?)答(.*)$/, 'word.add', async (m, e, reply) => {
 
 // 删除部分问答
 api.command(/^\.删问(.*?)序[号|列](.*)$/, 'word.delete.one', async (m, e, reply) => {
+  if (!flag.status) return reply('[word] 功能未启用')
   try {
     if (!per.users.hasPermission(e.uid, 'word.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
     const word = getjson('word', 'word')
@@ -427,6 +439,7 @@ api.command(/^\.删问(.*?)序[号|列](.*)$/, 'word.delete.one', async (m, e, r
 
 // 查看词库list
 api.command(/^\.问表(.*)$/, 'word.list', async (m, e, reply) => {
+  if (!flag.status) return reply('[word] 功能未启用')
   try {
     if (!per.users.hasPermission(e.uid, 'word.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
     const word = getjson('word', 'word')
@@ -442,6 +455,7 @@ api.command(/^\.问表(.*)$/, 'word.list', async (m, e, reply) => {
 
 // 删除一整个回复
 api.command(/^\.删全问(.*)$/, 'word.delete.all', async (m, e, reply) => {
+  if (!flag.status) return reply('[word] 功能未启用')
   try {
     if (!per.users.hasPermission(e.uid, 'word.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
     let wd1: string = m[1]// 问后面的内容
