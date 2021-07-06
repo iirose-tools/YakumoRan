@@ -3,15 +3,7 @@ import path from 'path'
 import * as api from '../../lib/api'
 import config from '../../config'
 import per from '../permission/permission'
-import { plugin } from '../manager'
-
-const flag = {
-  status: true
-}
-
-plugin.on('word', status => {
-  flag.status = status
-})
+import logger from '../../lib/logger'
 
 try {
   fs.mkdirSync(path.join(api.Data, './word/user'))
@@ -57,7 +49,7 @@ const update = (file:any, tyf:string, list:string) => {
 }
 
 // 核心:判断
-const toswitch = (te:string, st:string, t:string, word:any, id:string, aite:string, msg:any, matc:any, idc:any) => {
+const toswitch = (te:string, st:string, t:string, word:any, id:string, aite:string, msg:any, matc:any) => {
   let noew:any = {}
   switch (te) {
     case ('随机数字'): {
@@ -272,17 +264,24 @@ const toswitch = (te:string, st:string, t:string, word:any, id:string, aite:stri
       word = word.replace(t, matc[noew['数字'][0] - 1])
       break
     }
-    case ('id'): {
-      const st1:any = st.match(/\[(.*),(.*)\]/)
-      st = `{"id":[${Number(st1[1])},${Number(st1[2])}]}`
+    case ('昵称'): {
+      const st1:any = st.match(/\[(.*)\]/)
+      st = `{"昵称":[${Number(st1[1])}]}`
       noew = JSON.parse(st)
-
-      if (noew.id[0] === 1) {
-        word = word.replace(t, ` [@${idc[noew.id[0] - 1]}@] `)
+      if (noew['昵称'][0] === 0) {
+        word = word.replace(t, config.app.nickname)
       }
-      if (noew.id[0] === 2) {
-        word = word.replace(t, idc[noew.id[0] - 1])
+      break
+    }
+    case ('换行'): {
+      const st1:any = st.match(/\[(.*)\]/)
+      st = `{"换行":[${Number(st1[1])}]}`
+      noew = JSON.parse(st)
+      let a:string = ''
+      for (let num = noew['换行'][0]; num > 0; num--) {
+        a = a + '\n'
       }
+      word = word.replace(t, a)
       break
     }
     default: {
@@ -293,30 +292,30 @@ const toswitch = (te:string, st:string, t:string, word:any, id:string, aite:stri
 }
 
 // 词库引擎核心
-const makereply = (word:any, id:string, aite:string, msg:any, matc:any, idc:any) => {
+const makereply = (word:any, id:string, aite:string, msg:any, matc:any) => {
   while (/【.*】/.test(word)) {
     let t = word.match(/(.*?】).*/)[1]
     t = t.match(/.*(【.*?】)$/)[1]
     let st = t.match(/【(.*)】/)[1]
-    const te = st.match(/(随机数字|判断|禁言|踢|解除禁言|艾特|添加|销毁|属性|延迟|发送名|发送id|数字|id)/)[1]
+    const te = st.match(/(随机数字|判断|禁言|踢|解除禁言|艾特|添加|销毁|属性|延迟|发送名|发送id|数字|昵称|换行)/)[1]
     st = st.replace(te, '"' + te + '"')
     st = '{' + st + '}'
-    word = toswitch(te, st, t, word, id, aite, msg, matc, idc)
+    word = toswitch(te, st, t, word, id, aite, msg, matc)
   }
   while (/〖.*〗/.test(word)) {
     let t = word.match(/(.*?〗).*/)[1]
     t = t.match(/.*(〖.*?〗)$/)[1]
     let st = t.match(/〖(.*)〗/)[1]
-    const te = st.match(/(随机数字|判断|禁言|踢|解除禁言|艾特|添加|销毁|属性|延迟|发送名|发送id|数字|id)/)[1]
+    const te = st.match(/(随机数字|判断|禁言|踢|解除禁言|艾特|添加|销毁|属性|延迟|发送名|发送id|数字|昵称|换行)/)[1]
     st = st.replace(te, '"' + te + '"')
     st = '{' + st + '}'
-    word = toswitch(te, st, t, word, id, aite, msg, matc, idc)
+    word = toswitch(te, st, t, word, id, aite, msg, matc)
   }
   return word
 }
 
 // 解析输入化为输出
-const inputMath = (msage:string) => {
+const input = (msage:string) => {
   let hello:any = []
   const out:any = []
   while (/(\d+)/.test(msage)) {
@@ -328,79 +327,63 @@ const inputMath = (msage:string) => {
   return out
 }
 
-// 解析id为化为输出
-const inputId = (msage:string) => {
-  let hello:any = []
-  const out:any = []
-  while (/\[@(.*?)@\]/.test(msage)) {
-    hello = msage.match(/\[@(.*?)@\]/g)
-    const hello2 = hello[0]
-    const test = /@(.*)@/.exec(hello2)
-    if (test) {
-      out.push(test[1])
-      msage = msage.replace(`[@${test[1]}@]`, '【id】')
-    }
-  }
-  return out
-}
-if (flag.status) {
 // 核心功能：回复
-  api.Event.on('PublicMessage', msg => {
-    if (msg.username === config.account.username) return // 不响应自己发送的消息
-    let wd1: string = msg.message.trim()
-    wd1 = wd1.replace(/\s/g, '')
-    let over:any = []
-    let over2:any = []
-    over = inputMath(wd1)
-    over2 = inputId(wd1)
-    const reply = api.method.sendPublicMessage
-    const word = getjson('word', 'word')
-    const wd2 = wd1.replace(/(\[\*.*?\*\])/g, '【艾特】')
-    const wd3 = wd2.replace(/(\[@.*?@\])/g, '【id】')
-    const wd4:any = wd1.match(/.*\[\*(.*)\*\].*/) === null ? ['', ''] : wd1.match(/.*\[\*(.*)\*\].*/)
-    const wd5 = wd1.replace(/(\d+)/g, '【数字】')
-    try {
-      if (word[wd1]) {
-        const ran: number = word[wd1].length
-        const rd: number = random(0, ran - 1)
-        const a:any = makereply(word[wd1][rd], msg.uid, wd4[1], msg, over, over2)
-        const out = a.split('#换#')
-        let j:number = 0
-        for (j = 0; j < out.length; j++) {
-          if (out[j]) {
-            reply(out[j], config.app.color)
-          }
-        }
-      } else if (word[wd3]) {
-        const ran: number = word[wd3].length
-        const rd: number = random(0, ran - 1)
-        const a:any = makereply(word[wd3][rd], msg.uid, wd4[1], msg, over, over2)
-        const out = a.split('#换#')
-        let j:number = 0
-        for (j = 0; j < out.length; j++) {
-          if (out[j]) {
-            reply(out[j], config.app.color)
-          }
-        }
-      } else if (word[wd5]) {
-        const ran: number = word[wd5].length
-        const rd: number = random(0, ran - 1)
-        const a:any = makereply(word[wd5][rd], msg.uid, wd4[1], msg, over, over2)
-        const out = a.split('#换#')
-        let j:number = 0
-        for (j = 0; j < out.length; j++) {
-          if (out[j]) {
-            reply(out[j], config.app.color)
-          }
+api.Event.on('PublicMessage', msg => {
+  if (msg.username === config.account.username) return // 不响应自己发送的消息
+  let wd1: string = msg.message.trim()
+  wd1 = wd1.replace(/\s/g, '')
+  let over:any = []
+  over = input(wd1)
+  const reply = api.method.sendPublicMessage
+  const word = getjson('word', 'word')
+  const wd2 = wd1.replace(/(\[\*.*\*\])/g, '【艾特】')
+  let wd3 = wd2.replace(/(\[@.*@\])/g, '【uid】')
+  wd3 = wd3.replace(config.app.nickname, '【昵称】')
+  const wd4:any = wd1.match(/.*\[\*(.*)\*\].*/) === null ? ['', ''] : wd1.match(/.*\[\*(.*)\*\].*/)
+  const wd5 = wd1.replace(/(\d+)/g, '【数字】')
+  try {
+    if (word[wd1]) {
+      logger('Word').info(`${msg.username} 触发了词库的 ${wd1}`)
+      const ran: number = word[wd1].length
+      const rd: number = random(0, ran - 1)
+      const a:any = makereply(word[wd1][rd], msg.uid, wd4[1], msg, over)
+      const out = a.split('#换#')
+      let j:number = 0
+      for (j = 0; j < out.length; j++) {
+        if (out[j]) {
+          reply(out[j], config.app.color)
         }
       }
-    } catch (error) {}
-  })
-}
+    } else if (word[wd3]) {
+      logger('Word').info(`${msg.username} 触发了词库的 ${wd3}`)
+      const ran: number = word[wd3].length
+      const rd: number = random(0, ran - 1)
+      const a:any = makereply(word[wd3][rd], msg.uid, wd4[1], msg, over)
+      const out = a.split('#换#')
+      let j:number = 0
+      for (j = 0; j < out.length; j++) {
+        if (out[j]) {
+          reply(out[j], config.app.color)
+        }
+      }
+    } else if (word[wd5]) {
+      logger('Word').info(`${msg.username} 触发了词库的 ${wd5}`)
+      const ran: number = word[wd5].length
+      const rd: number = random(0, ran - 1)
+      const a:any = makereply(word[wd5][rd], msg.uid, wd4[1], msg, over)
+      const out = a.split('#换#')
+      let j:number = 0
+      for (j = 0; j < out.length; j++) {
+        if (out[j]) {
+          reply(out[j], config.app.color)
+        }
+      }
+    }
+  } catch (error) {}
+})
 
 // 添加问答...
 api.command(/^\.问(.*?)答(.*)$/, 'word.add', async (m, e, reply) => {
-  if (!flag.status) return reply('[word] 功能未启用')
   try {
     if (!per.users.hasPermission(e.uid, 'word.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
     const word = getjson('word', 'word')
@@ -419,7 +402,6 @@ api.command(/^\.问(.*?)答(.*)$/, 'word.add', async (m, e, reply) => {
 
 // 删除部分问答
 api.command(/^\.删问(.*?)序[号|列](.*)$/, 'word.delete.one', async (m, e, reply) => {
-  if (!flag.status) return reply('[word] 功能未启用')
   try {
     if (!per.users.hasPermission(e.uid, 'word.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
     const word = getjson('word', 'word')
@@ -439,7 +421,6 @@ api.command(/^\.删问(.*?)序[号|列](.*)$/, 'word.delete.one', async (m, e, r
 
 // 查看词库list
 api.command(/^\.问表(.*)$/, 'word.list', async (m, e, reply) => {
-  if (!flag.status) return reply('[word] 功能未启用')
   try {
     if (!per.users.hasPermission(e.uid, 'word.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
     const word = getjson('word', 'word')
@@ -455,7 +436,6 @@ api.command(/^\.问表(.*)$/, 'word.list', async (m, e, reply) => {
 
 // 删除一整个回复
 api.command(/^\.删全问(.*)$/, 'word.delete.all', async (m, e, reply) => {
-  if (!flag.status) return reply('[word] 功能未启用')
   try {
     if (!per.users.hasPermission(e.uid, 'word.op') && !per.users.hasPermission(e.uid, 'permission.word')) return reply('权限不足', config.app.color)
     let wd1: string = m[1]// 问后面的内容
