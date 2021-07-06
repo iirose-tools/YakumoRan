@@ -28,29 +28,33 @@ const filter = (input: string) => {
 
 // 更新用户在线状态
 const updateMemberStatus = () => {
-  const promise = Ran.method.utils.getUserList()
-  promise.then((res) => {
+  try {
     const uid = checkMemberList()
-    const allonlineuser = res
-    let a = 0
-    do {
-      let b = 0
-      do {
-        if (uid[a] === allonlineuser[b].uid.toLocaleUpperCase()) {
-          if (allonlineuser[b].room === config.account.room) {
-            onJoin(allonlineuser[b].uid)
-          } else {
-            onLeave(allonlineuser[b].uid)
-          }
-          b = allonlineuser.length
-        } else {
-          onLeave(uid[a])
-          b = b + 1
-        }
-      } while (b < allonlineuser.length)
-      a = a + 1
-    } while (a < uid.length)
-  })
+    if (uid.length > 0) {
+      const promise = Ran.method.utils.getUserList()
+      promise.then((res) => {
+        const allonlineuser = res
+        let a = 0
+        do {
+          let b = 0
+          do {
+            if (uid[a] === allonlineuser[b].uid.toLocaleUpperCase()) {
+              if (allonlineuser[b].room === config.account.room) {
+                onJoin(allonlineuser[b].uid)
+              } else {
+                onLeave(allonlineuser[b].uid)
+              }
+              b = allonlineuser.length
+            } else {
+              onLeave(uid[a])
+              b = b + 1
+            }
+          } while (b < allonlineuser.length)
+          a = a + 1
+        } while (a < uid.length)
+      })
+    }
+  } catch (error) {}
 }
 
 // 登记Member
@@ -82,33 +86,30 @@ const onJoin = (uid: string) => {
 }
 // 更新Member在线时间累计
 const updateminutes = () => {
-  const memberlist = checkMemberList()
-  // 目标时区时间，东八区   东时区正数 西市区负数
-  const timezone = 8
-  // 本地时间和格林威治的时间差，单位为分钟
-  const offsetGMT = new Date().getTimezoneOffset()
-  // 本地时间距 1970 年 1 月 1 日午夜（GMT 时间）之间的毫秒数
-  const nowDate = new Date().getTime()
-  const targetDate = new Date(nowDate + offsetGMT * 60 * 1000 + timezone * 60 * 60 * 1000)
-  const hour = targetDate.getHours()
-  const minuses = targetDate.getMinutes()
-  // 东八区（UTC/GMT+08:00), 每天02:00 - 02:05 之间将会把Member的挂机时长清零
-  if (hour === 2) {
-    if (minuses < 5) {
-      let a = 0
-      try {
+  try {
+    const memberlist = checkMemberList()
+    // 目标时区时间，东八区   东时区正数 西市区负数
+    const timezone = 8
+    // 本地时间和格林威治的时间差，单位为分钟
+    const offsetGMT = new Date().getTimezoneOffset()
+    // 本地时间距 1970 年 1 月 1 日午夜（GMT 时间）之间的毫秒数
+    const nowDate = new Date().getTime()
+    const targetDate = new Date(nowDate + offsetGMT * 60 * 1000 + timezone * 60 * 60 * 1000)
+    const hour = targetDate.getHours()
+    const minuses = targetDate.getMinutes()
+    // 东八区（UTC/GMT+08:00), 每天02:00 - 02:05 之间将会把Member的挂机时长清零
+    if (hour === 2) {
+      if (minuses < 5) {
+        let a = 0
         do {
           const info = getMemberInfo(memberlist[a])
           info.Minutes = 0
           update(memberlist[a], info)
           a = a + 1
         } while (a < memberlist.length)
-      } catch (error) {
       }
-    }
-  } else {
-    let a = 0
-    try {
+    } else {
+      let a = 0
       do {
         const info = getMemberInfo(memberlist[a])
         if (info.Online === 1) {
@@ -117,9 +118,8 @@ const updateminutes = () => {
         }
         a = a + 1
       } while (a < memberlist.length)
-    } catch (error) {
     }
-  }
+  } catch (error) {}
 }
 
 // 更新json文件
@@ -134,7 +134,11 @@ const update = (uid:string, data:any) => {
 // 获取Member的UID
 const checkMemberList = () => {
   const file = path.join(Ran.Data, './member/memberworktime')
-  return fs.readdirSync(file).map(e => e.replace('.json', ''))
+  if (fs.readdirSync(file).length !== 0) {
+    return fs.readdirSync(file).map(e => e.replace('.json', ''))
+  } else {
+    throw new Error('没有员工')
+  }
 }
 // 获取Member的信息
 const getMemberInfo = (uid:string) => {
@@ -158,18 +162,15 @@ const deleteMember = (uid: String) => {
 const settle = () => {
   const memberlist = checkMemberList()
   let a = 0
-  try {
-    let msg : string = ''
-    do {
-      const info = getMemberInfo(memberlist[a])
-      const hour = info.Minutes / 60 >> 0
-      const minutes = info.Minutes % 60
-      msg = msg.concat(`${a}. [@${memberlist[a]}@] : ${hour}小时 ${minutes}分钟\n`)
-      a = a + 1
-    } while (a < memberlist.length)
-    Ran.method.sendPublicMessage(msg, config.app.color)
-  } catch (error) {
-  }
+  let msg : string = ''
+  do {
+    const info = getMemberInfo(memberlist[a])
+    const hour = info.Minutes / 60 >> 0
+    const minutes = info.Minutes % 60
+    msg = msg.concat(`${a}. [@${memberlist[a]}@] : ${hour}小时 ${minutes}分钟\n`)
+    a = a + 1
+  } while (a < memberlist.length)
+  Ran.method.sendPublicMessage(msg, config.app.color)
 }
 
 Ran.command(/^\.增加员工(.*)$/, 'permission.member.add', (m, e, reply) => {
@@ -189,7 +190,7 @@ Ran.command(/^\.增加员工(.*)$/, 'permission.member.add', (m, e, reply) => {
   }
 })
 
-Ran.command(/^\.查询员工(.*)$/, 'permission.member.check', (m, e, reply) => {
+Ran.command(/^\.查询员工$/, 'permission.member.check', (m, e, reply) => {
   if (!per.users.hasPermission(e.uid, 'member.op') && !per.users.hasPermission(e.uid, 'permission.member')) {
     reply(` [*${e.username}*]   :  没有权限`, config.app.color)
     return null
@@ -205,7 +206,7 @@ Ran.command(/^\.查询员工(.*)$/, 'permission.member.check', (m, e, reply) => 
   }
 })
 
-Ran.command(/^\.结算(.*)$/, 'permission.member.settle', (m, e, reply) => {
+Ran.command(/^\.结算$/, 'permission.member.settle', (m, e, reply) => {
   if (!per.users.hasPermission(e.uid, 'member.op') && !per.users.hasPermission(e.uid, 'permission.member')) {
     reply(` [*${e.username}*]   :  没有权限`, config.app.color)
     return null
