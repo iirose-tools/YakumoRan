@@ -83,14 +83,18 @@ const onJoin = (uid: string) => {
 // 更新Member在线时间累计
 const updateminutes = () => {
   const memberlist = checkMemberList()
-  const timezone = 8 // 目标时区时间，东八区   东时区正数 西市区负数
-  const offsetGMT = new Date().getTimezoneOffset() // 本地时间和格林威治的时间差，单位为分钟
-  const nowDate = new Date().getTime() // 本地时间距 1970 年 1 月 1 日午夜（GMT 时间）之间的毫秒数
+  // 目标时区时间，东八区   东时区正数 西市区负数
+  const timezone = 8
+  // 本地时间和格林威治的时间差，单位为分钟
+  const offsetGMT = new Date().getTimezoneOffset()
+  // 本地时间距 1970 年 1 月 1 日午夜（GMT 时间）之间的毫秒数
+  const nowDate = new Date().getTime()
   const targetDate = new Date(nowDate + offsetGMT * 60 * 1000 + timezone * 60 * 60 * 1000)
   const hour = targetDate.getHours()
   const minuses = targetDate.getMinutes()
-  if (hour === 3) {
-    if (minuses < 3) {
+  // 东八区（UTC/GMT+08:00), 每天02:00 - 02:05 之间将会把Member的挂机时长清零
+  if (hour === 2) {
+    if (minuses < 5) {
       let a = 0
       try {
         do {
@@ -155,13 +159,15 @@ const settle = () => {
   const memberlist = checkMemberList()
   let a = 0
   try {
+    let msg : string = ''
     do {
       const info = getMemberInfo(memberlist[a])
       const hour = info.Minutes / 60 >> 0
       const minutes = info.Minutes % 60
-      Ran.method.sendPublicMessage(`${a}. [@${memberlist[a]}@] : ${hour}小时 ${minutes}分钟`, config.app.color)
+      msg = msg.concat(`${a}. [@${memberlist[a]}@] : ${hour}小时 ${minutes}分钟\n`)
       a = a + 1
     } while (a < memberlist.length)
+    Ran.method.sendPublicMessage(msg, config.app.color)
   } catch (error) {
   }
 }

@@ -9,7 +9,8 @@
   },
   "intro": [
     "记录员工在线时长",
-    "此插件权限节点: member.op 或者 permission.member"
+    "此插件权限节点: member.op 或者 permission.member",
+    "插件所用时区为东八区（UTC/GMT+08:00), 每天02:00 - 02:05 之间将会把Member的挂机时长清零"
   ],
   "commands": [{
     "cmd": ".增加员工id",
