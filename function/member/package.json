@@ -1,0 +1,27 @@
+{
+  "name": "member",
+  "id": "member",
+  "main": "index",
+  "author": {
+    "name": "铭_",
+    "github": "jingming295",
+    "iirose": "铭_"
+  },
+  "intro": [
+    "记录员工在线时长",
+    "此插件权限节点: member.op 或者 permission.member"
+  ],
+  "commands": [{
+    "cmd": ".增加员工id",
+    "helper": "添加员工, 例子：.增加员工 [@5e6618a028ea0@] "
+  }, {
+    "cmd": ".查询员工",
+    "helper": "查询员工列表"
+  }, {
+    "cmd": ".结算",
+    "helper": "获取员工挂机时长"
+  }, {
+    "cmd": ".删除员工id",
+    "helper": "删除员工, 例子：.删除员工 [@5e6618a028ea0@] "
+  }]
+}
