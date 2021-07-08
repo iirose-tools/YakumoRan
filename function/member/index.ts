@@ -107,6 +107,16 @@ const updateminutes = () => {
           update(memberlist[a], info)
           a = a + 1
         } while (a < memberlist.length)
+      } else {
+        let a = 0
+        do {
+          const info = getMemberInfo(memberlist[a])
+          if (info.Online === 1) {
+            info.Minutes = info.Minutes + 1
+            update(memberlist[a], info)
+          }
+          a = a + 1
+        } while (a < memberlist.length)
       }
     } else {
       let a = 0
