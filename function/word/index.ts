@@ -3,6 +3,7 @@ import path from 'path'
 import * as api from '../../lib/api'
 import config from '../../config'
 import per from '../permission/permission'
+import logger from '../../lib/logger'
 
 try {
   fs.mkdirSync(path.join(api.Data, './word/user'))
@@ -75,7 +76,7 @@ const toswitch = (te:string, st:string, t:string, word:any, id:string, aite:stri
           break
         }
         case ('='): {
-          if ([noew['判断'][0]] === noew['判断'][2]) {
+          if (noew['判断'][0] === noew['判断'][2]) {
             a = noew['判断'][3]
           } else {
             a = noew['判断'][4]
@@ -263,6 +264,26 @@ const toswitch = (te:string, st:string, t:string, word:any, id:string, aite:stri
       word = word.replace(t, matc[noew['数字'][0] - 1])
       break
     }
+    case ('昵称'): {
+      const st1:any = st.match(/\[(.*)\]/)
+      st = `{"昵称":[${Number(st1[1])}]}`
+      noew = JSON.parse(st)
+      if (noew['昵称'][0] === 0) {
+        word = word.replace(t, config.app.nickname)
+      }
+      break
+    }
+    case ('换行'): {
+      const st1:any = st.match(/\[(.*)\]/)
+      st = `{"换行":[${Number(st1[1])}]}`
+      noew = JSON.parse(st)
+      let a:string = ''
+      for (let num = noew['换行'][0]; num > 0; num--) {
+        a = a + '\n'
+      }
+      word = word.replace(t, a)
+      break
+    }
     default: {
       break
     }
@@ -276,7 +297,7 @@ const makereply = (word:any, id:string, aite:string, msg:any, matc:any) => {
     let t = word.match(/(.*?】).*/)[1]
     t = t.match(/.*(【.*?】)$/)[1]
     let st = t.match(/【(.*)】/)[1]
-    const te = st.match(/(随机数字|判断|禁言|踢|解除禁言|艾特|添加|销毁|属性|延迟|发送名|发送id|数字)/)[1]
+    const te = st.match(/(随机数字|判断|禁言|踢|解除禁言|艾特|添加|销毁|属性|延迟|发送名|发送id|数字|昵称|换行)/)[1]
     st = st.replace(te, '"' + te + '"')
     st = '{' + st + '}'
     word = toswitch(te, st, t, word, id, aite, msg, matc)
@@ -285,7 +306,7 @@ const makereply = (word:any, id:string, aite:string, msg:any, matc:any) => {
     let t = word.match(/(.*?〗).*/)[1]
     t = t.match(/.*(〖.*?〗)$/)[1]
     let st = t.match(/〖(.*)〗/)[1]
-    const te = st.match(/(随机数字|判断|禁言|踢|解除禁言|艾特|添加|销毁|属性|延迟|发送名|发送id|数字)/)[1]
+    const te = st.match(/(随机数字|判断|禁言|踢|解除禁言|艾特|添加|销毁|属性|延迟|发送名|发送id|数字|昵称|换行)/)[1]
     st = st.replace(te, '"' + te + '"')
     st = '{' + st + '}'
     word = toswitch(te, st, t, word, id, aite, msg, matc)
@@ -316,11 +337,13 @@ api.Event.on('PublicMessage', msg => {
   const reply = api.method.sendPublicMessage
   const word = getjson('word', 'word')
   const wd2 = wd1.replace(/(\[\*.*\*\])/g, '【艾特】')
-  const wd3 = wd2.replace(/(\[@.*@\])/g, '【uid】')
+  let wd3 = wd2.replace(/(\[@.*@\])/g, '【uid】')
+  wd3 = wd3.replace(config.app.nickname, '【昵称】')
   const wd4:any = wd1.match(/.*\[\*(.*)\*\].*/) === null ? ['', ''] : wd1.match(/.*\[\*(.*)\*\].*/)
   const wd5 = wd1.replace(/(\d+)/g, '【数字】')
   try {
     if (word[wd1]) {
+      logger('Word').info(`${msg.username} 触发了词库的 ${wd1}`)
       const ran: number = word[wd1].length
       const rd: number = random(0, ran - 1)
       const a:any = makereply(word[wd1][rd], msg.uid, wd4[1], msg, over)
@@ -332,6 +355,7 @@ api.Event.on('PublicMessage', msg => {
         }
       }
     } else if (word[wd3]) {
+      logger('Word').info(`${msg.username} 触发了词库的 ${wd3}`)
       const ran: number = word[wd3].length
       const rd: number = random(0, ran - 1)
       const a:any = makereply(word[wd3][rd], msg.uid, wd4[1], msg, over)
@@ -343,6 +367,7 @@ api.Event.on('PublicMessage', msg => {
         }
       }
     } else if (word[wd5]) {
+      logger('Word').info(`${msg.username} 触发了词库的 ${wd5}`)
       const ran: number = word[wd5].length
       const rd: number = random(0, ran - 1)
       const a:any = makereply(word[wd5][rd], msg.uid, wd4[1], msg, over)
