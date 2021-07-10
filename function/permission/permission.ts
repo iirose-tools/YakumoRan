@@ -10,7 +10,7 @@ interface Group {
 }
 
 interface User {
-  group: String[],
+  group: string[],
   permission: Permission[]
 }
 
@@ -43,7 +43,7 @@ const api = {
      * @description 创建权限组
      * @param name 权限组名字
      */
-    create: (name: String) => {
+    create: (name: string) => {
       const file = path.join(conf.group, `${name}.json`)
 
       if (fs.existsSync(file)) throw new Error('权限组已存在')
@@ -57,7 +57,7 @@ const api = {
      * @description 删除权限组
      * @param name 权限组名字
      */
-    delete: (name: String) => {
+    delete: (name: string) => {
       const file = path.join(conf.group, `${name.toUpperCase()}.json`)
       if (!fs.existsSync(file)) throw new Error('权限组不存在')
 
@@ -73,7 +73,7 @@ const api = {
      * @description 获取权限组信息
      * @param name 权限组名字
      */
-    getGroup: (name: String): Group => {
+    getGroup: (name: string): Group => {
       const file = path.join(conf.group, `${name}.json`)
 
       if (!fs.existsSync(file)) throw new Error('权限组不存在')
@@ -86,7 +86,7 @@ const api = {
      * @param group 权限组名字
      * @param data 数据
      */
-    saveGroup: (group: String, data: Group) => {
+    saveGroup: (group: string, data: Group) => {
       const file = path.join(conf.group, `${group}.json`)
       return fs.writeFileSync(file, JSON.stringify(data))
     },
@@ -95,7 +95,7 @@ const api = {
      * @param group 权限组
      * @param permission 权限节点
      */
-    addPermission: (group: String, permission: String) => {
+    addPermission: (group: string, permission: string) => {
       const g = api.group.getGroup(group)
       if (g.permission.includes(permission)) throw new Error('权限已存在')
       g.permission.push(permission)
@@ -106,7 +106,7 @@ const api = {
      * @param group 权限组
      * @param permission 权限节点
      */
-    removePermission: (group: String, permission: String) => {
+    removePermission: (group: string, permission: string) => {
       const g = api.group.getGroup(group)
       if (!g.permission.includes(permission)) throw new Error('权限不存在')
       g.permission = g.permission.filter(e => {
@@ -120,7 +120,7 @@ const api = {
      * @param group 权限组
      * @param permission 权限节点
      */
-    hasPermission: (group: String, permission: String) => {
+    hasPermission: (group: string, permission: string) => {
       try {
         const g = api.group.getGroup(group)
         const rp = permission.split('.')
@@ -146,7 +146,7 @@ const api = {
      * @description 创建用户
      * @param uid uid
      */
-    create: (uid: String) => {
+    create: (uid: string) => {
       const file = path.join(conf.users, `${uid.toUpperCase()}.json`)
 
       if (fs.existsSync(file)) throw new Error('用户已存在')
@@ -161,7 +161,7 @@ const api = {
      * @description 删除用户
      * @param uid uid
      */
-    delete: (uid: String) => {
+    delete: (uid: string) => {
       const file = path.join(conf.users, `${uid.toUpperCase()}.json`)
       if (!fs.existsSync(file)) throw new Error('用户不存在')
 
@@ -179,7 +179,7 @@ const api = {
      * @param data 数据
      * @private
      */
-    saveUser: (user: String, data: User) => {
+    saveUser: (user: string, data: User) => {
       const file = path.join(conf.users, `${user.toUpperCase()}.json`)
       return fs.writeFileSync(file, JSON.stringify(data))
     },
@@ -187,7 +187,7 @@ const api = {
      * @description 获取用户信息
      * @param uid uid
      */
-    getUser: (uid: String): User => {
+    getUser: (uid: string): User => {
       const file = path.join(conf.users, `${uid.toUpperCase()}.json`)
 
       if (conf.master.toUpperCase() === uid.toUpperCase()) {
@@ -222,7 +222,7 @@ const api = {
      * @param user uid
      * @param permission 权限节点
      */
-    addPermission: (user: String, permission: String) => {
+    addPermission: (user: string, permission: string) => {
       const g = api.users.getUser(user)
       if (g.permission.includes(permission)) throw new Error('权限已存在')
       g.permission.push(permission)
@@ -233,7 +233,7 @@ const api = {
      * @param user uid
      * @param permission 权限节点
      */
-    removePermission: (user: String, permission: String) => {
+    removePermission: (user: string, permission: string) => {
       const g = api.users.getUser(user)
       if (!g.permission.includes(permission)) throw new Error('权限不存在')
       g.permission = g.permission.filter(e => {
@@ -247,7 +247,7 @@ const api = {
      * @param user uid
      * @param group 权限组名字
      */
-    addToGroup: (user: String, group: String) => {
+    addToGroup: (user: string, group: string) => {
       const g = api.users.getUser(user)
       if (g.group.includes(group)) throw new Error('权限组已存在')
       g.group.push(group)
@@ -257,9 +257,9 @@ const api = {
      * @description 查看拥有指定权限的人
      * @param permission 权限节点
      */
-    has: (permission: String): String[] => {
+    has: (permission: string): string[] => {
       const list = api.users.list()
-      const plist: String[] = []
+      const plist: string[] = []
       for (const user of list) {
         if (api.users.hasPermission(user, permission)) plist.push(user)
       }
@@ -270,7 +270,7 @@ const api = {
      * @param uid uid
      * @param permission 权限节点
      */
-    hasPermission: (uid: String, permission: String) => {
+    hasPermission: (uid: string, permission: string) => {
       const user = api.users.getUser(uid)
 
       // 先判断用户自己有没有这个权限
