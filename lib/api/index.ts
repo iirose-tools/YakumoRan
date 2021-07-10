@@ -3,6 +3,7 @@ import { mkdirSync } from 'fs'
 import logger from '../logger'
 import { Bot } from '../event'
 import { send } from '../websocket'
+import { isTest } from '../utils'
 import damaku from '../encoder/messages/damaku'
 import Like from '../encoder/system/Like'
 import payment from '../encoder/system/payment'
@@ -83,7 +84,8 @@ export const command = (regexp: RegExp, id: string, callback: (m: RegExpExecArra
     })
   }
 
-  setTimeout(bind, 1e3)
+  if (!isTest) setTimeout(bind, 1e3)
+  if (isTest) bind()
 
   logger('Command').debug(`${id} 命令注册完成`)
 }
