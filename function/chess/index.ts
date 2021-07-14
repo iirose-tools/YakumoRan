@@ -157,7 +157,7 @@ api.Event.on('PrivateMessage', event => {
 })
 
 // 抽取角色
-api.command(/^chess open$/, 'chess.reset', async (m, e, reply) => {
+api.command(/^chess open$/, 'chess.open', async (m, e, reply) => {
   if (!per.users.hasPermission(e.uid, 'chess.op') && !per.users.hasPermission(e.uid, 'permission.chess')) return reply(' [chess] : 您不是主持人', '66ccff')
   const theconfig = getjson('config', 'config')
   theconfig.王 = ['王', '三尺青锋弑了多少不归人', '作为决定胜负的棋子，保护好自己，不要轻易出动暴露自己，当然，不要忘了可以保护你的骑士', 6]
@@ -365,7 +365,7 @@ api.command(/^attack(.*)$/, 'chess.attack', async (m, e, reply) => {
 })
 
 // 选择攻击方
-api.command(/^请(白|黑)方攻击$/, 'chess.hava', async (m, e, reply) => {
+api.command(/^请(白|黑)方攻击$/, 'chess.canAttack', async (m, e, reply) => {
   if (!per.users.hasPermission(e.uid, 'chess.op') && !per.users.hasPermission(e.uid, 'permission.chess')) return reply(' [chess] : 您不是主持人', '66ccff')
   const attackgroup = getjson('user', 'config')
   let a:string = ''
@@ -386,7 +386,7 @@ api.command(/^chess i$/, 'chess.i', async (m, e, reply) => {
 })
 
 // 查看战况
-api.command(/^chess have$/, 'chess.on', async (m, e, reply) => {
+api.command(/^chess have$/, 'chess.hava', async (m, e, reply) => {
   const whitegroupconfig = getjson('user', 'whitegroup')
   const blackgroupconfig = getjson('user', 'blackgroup')
   const user = getjson('user', e.uid)
@@ -431,6 +431,8 @@ api.command(/^chess all$/, 'chess.all', async (m, e, reply) => {
 
 // 观战开始
 api.command(/^chess watch on$/, 'chess.watch.on', async (m, e, reply) => {
+  const attackgroup = getjson('user', e.uid)
+  if (attackgroup.way) return reply(`[Chess]  [*${e.username}*] 禁止参赛者操作....`, '66ccff')
   try {
     per.users.addPermission(e.uid, 'chess.watch')
     reply('[Chess] 观战权限添加成功', '666ccff')
@@ -441,6 +443,8 @@ api.command(/^chess watch on$/, 'chess.watch.on', async (m, e, reply) => {
 
 // 观战结束
 api.command(/^chess watch off$/, 'chess.watch.off', async (m, e, reply) => {
+  const attackgroup = getjson('user', e.uid)
+  if (attackgroup.way) return reply(`[Chess]  [*${e.username}*] 禁止参赛者操作....`, '66ccff')
   try {
     per.users.removePermission(e.uid, 'chess.watch')
     reply('[Chess] 观战权限移除成功', '666ccff')
