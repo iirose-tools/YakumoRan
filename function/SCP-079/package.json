@@ -12,10 +12,11 @@
     "已经实现的功能",
     "- 涩图检测",
     "- 快捷管理",
+    "- 拥有scp079.whitelist权限的用户发图，赌博，刷屏的时候，不会被SCP-079踢和禁言，但是不包括主人用指令执行禁言，封禁，踢",
+    "- 你可以通过.p user list scp079.whitelist 来检测哪些人在白名单里面，然后通过.p user rm <uid> scp079.whitelist 来删除某人的白名单权限",
     "计划实现的功能",
     "- 检测 广告/骂人 消息",
-    "拥有scp079.whitelist权限的用户发图，赌博，刷屏的时候，不会被SCP-079踢和禁言，但是不包括主人用指令执行禁言，封禁，踢",
-    "你可以通过.p user list scp079.whitelist 来检测哪些人在白名单里面，然后通过.p user rm <uid> scp079.whitelist 来删除某人的白名单权限",
+
     "本项目灵感来自 https://scp-079.org/"
   ],
   "commands": [{
