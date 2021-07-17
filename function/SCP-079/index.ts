@@ -83,7 +83,6 @@ Ran.Event.on('PublicMessage', async msg => {
 
 Ran.Event.on('PublicMessage', async msg => {
   if (msg.username === config.account.username) return
-
   // 管理命令
   if (msg.username === config.app.master) {
     const m = msg.message.trim()
