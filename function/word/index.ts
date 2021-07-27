@@ -57,6 +57,7 @@ const toswitch = (te:string, st:string, t:string, word:any, id:string, aite:stri
       word = word.replace(t, random(Number(noew['随机数字'][0]), Number(noew['随机数字'][1])))
       break
     }
+
     case ('判断'): {
       const st1:any = st.match(/\[(.*),(.*),(.*),(.*),(.*)\]/)
       st = `{"判断":["${st1[1]}","${st1[2]}","${st1[3]}","${st1[4]}","${st1[5]}"]}`
@@ -107,14 +108,44 @@ const toswitch = (te:string, st:string, t:string, word:any, id:string, aite:stri
           }
           break
         }
+
+        // 上方的判断为数字的判断
+        // 下方的判断为字符的判断
+
+        case ('=='): {
+          if (noew['判断'][0]) {
+            if (noew['判断'][2]) {
+              if (noew['判断'][0] === noew['判断'][2]) {
+                a = noew['判断'][3]
+              } else {
+                a = noew['判断'][4]
+              }
+            }
+          }
+          break
+        }
+        case ('<=>'): {
+          if (noew['判断'][0]) {
+            if (noew['判断'][2]) {
+              if (noew['判断'][0] !== noew['判断'][2]) {
+                a = noew['判断'][3]
+              } else {
+                a = noew['判断'][4]
+              }
+            }
+          }
+          break
+        }
       }
       word = word.replace(t, a)
       break
     }
+
     case ('艾特'): {
       word = word.replace(t, ' [*' + aite + '*] ')
       break
     }
+
     case ('添加'): {
       const st1:any = st.match(/\[(.*),(.*),(.*),(.*),(.*)\]/)
       st = `{"添加":["${st1[1]}","${st1[2]}",${Number(st1[3])},${Number(st1[4])},"${st1[5]}"]}`
@@ -134,20 +165,18 @@ const toswitch = (te:string, st:string, t:string, word:any, id:string, aite:stri
       use['属性'][noew['添加'][1]] = use['属性'][noew['添加'][1]] + noew['添加'][2]
       update(use, id, 'user')
       const tty:number = noew['添加'][3]
-      if (tty === 0) {
-        word = word.replace(t, '添加成功')
-      }
       if (tty === 1) {
         word = word.replace(t, String(noew['添加'][0]))
-      }
-      if (tty === 2) {
+      } else if (tty === 2) {
         word = word.replace(t, String(noew['添加'][1]))
-      }
-      if (tty === 3) {
+      } else if (tty === 3) {
         word = word.replace(t, String(noew['添加'][2]))
+      } else {
+        word = word.replace(t, '')
       }
       break
     }
+
     case ('销毁'): {
       const st1:any = st.match(/\[(.*),(.*),(.*),(.*),(.*)\]/)
       st = `{"销毁":["${st1[1]}","${st1[2]}",${Number(st1[3])},${Number(st1[4])},"${st1[5]}"]}`
@@ -183,23 +212,24 @@ const toswitch = (te:string, st:string, t:string, word:any, id:string, aite:stri
         } else if (wd6 === 0) {
           word = word.replace(t, -1)
         }
-      }
-      if (tty === 2) {
+      } else if (tty === 2) {
         if (wd6 === 1) {
           word = word.replace(t, String(noew['销毁'][1]))
         } else if (wd6 === 0) {
           word = word.replace(t, -1)
         }
-      }
-      if (tty === 3) {
+      } else if (tty === 3) {
         if (wd6 === 1) {
           word = word.replace(t, String(noew['销毁'][2]))
         } else if (wd6 === 0) {
           word = word.replace(t, -1)
         }
+      } else {
+        word = word.replace(t, '')
       }
       break
     }
+
     case ('属性'): {
       const st1:any = st.match(/\[(.*),(.*),(.*)\]/)
       st = `{"属性":["${st1[1]}","${st1[2]}","${st1[3]}"]}`
@@ -218,6 +248,7 @@ const toswitch = (te:string, st:string, t:string, word:any, id:string, aite:stri
       word = word.replace(t, use[noew['属性'][0]][noew['属性'][1]])
       break
     }
+
     case ('延迟'): {
       const st1:any = st.match(/\[(.*),(.*),(.*),(.*)\]/)
       st = `{"延迟":["${st1[1]}","${st1[2]}","${st1[3]}","${st1[4]}"]}`
@@ -231,6 +262,7 @@ const toswitch = (te:string, st:string, t:string, word:any, id:string, aite:stri
       }
       break
     }
+
     case ('发送名'): {
       const st1:any = st.match(/\[(.*)\]/)
       st = `{"发送名":[${Number(st1[1])}]}`
@@ -244,6 +276,7 @@ const toswitch = (te:string, st:string, t:string, word:any, id:string, aite:stri
       }
       break
     }
+
     case ('发送id'): {
       const st1:any = st.match(/\[(.*)\]/)
       st = `{"发送id":[${Number(st1[1])}]}`
@@ -257,6 +290,7 @@ const toswitch = (te:string, st:string, t:string, word:any, id:string, aite:stri
       }
       break
     }
+
     case ('数字'): {
       const st1:any = st.match(/\[(.*)\]/)
       st = `{"数字":[${Number(st1[1])}]}`
@@ -264,6 +298,7 @@ const toswitch = (te:string, st:string, t:string, word:any, id:string, aite:stri
       word = word.replace(t, matc[noew['数字'][0] - 1])
       break
     }
+
     case ('昵称'): {
       const st1:any = st.match(/\[(.*)\]/)
       st = `{"昵称":[${Number(st1[1])}]}`
@@ -273,6 +308,7 @@ const toswitch = (te:string, st:string, t:string, word:any, id:string, aite:stri
       }
       break
     }
+
     case ('换行'): {
       const st1:any = st.match(/\[(.*)\]/)
       st = `{"换行":[${Number(st1[1])}]}`
@@ -282,6 +318,58 @@ const toswitch = (te:string, st:string, t:string, word:any, id:string, aite:stri
         a = a + '\n'
       }
       word = word.replace(t, a)
+      break
+    }
+
+    case ('设定'): {
+      const st1:any = st.match(/\[(.*),(.*),(.*),(.*),(.*)\]/)
+      st = `{"设定":["${st1[1]}","${st1[2]}",${st1[3]},${Number(st1[4])},"${st1[5]}"]}`
+      let use:any
+      noew = JSON.parse(st)
+
+      if (st1[5] === '0' || st1[5] === '') {
+        use = getjson(id, 'user')
+      } else {
+        use = getjson(st1[5], 'user')
+      }
+
+      use[noew['设定'][0]][noew['设定'][1]] = noew['设定'][2]
+
+      const tty:number = noew['设定'][3]
+      if (tty === 1) {
+        word = word.replace(t, noew['设定'][0])
+      } else if (tty === 2) {
+        word = word.replace(t, noew['设定'][1])
+      } else if (tty === 3) {
+        word = word.replace(t, noew['设定'][2])
+      } else {
+        word = word.replace(t, '')
+      }
+      break
+    }
+    case ('取消'): {
+      const st1:any = st.match(/\[(.*),(.*),(.*),(.*)\]/)
+      st = `{"取消":["${st1[1]}","${st1[2]}",${Number(st1[4])},"${st1[5]}"]}`
+      let use:any
+      noew = JSON.parse(st)
+      if (st1[4] === '0' || st1[4] === '') {
+        use = getjson(id, 'user')
+      } else {
+        use = getjson(st1[5], 'user')
+      }
+
+      delete use[noew['取消'][0]][noew['取消'][1]]
+
+      const tty:number = noew['取消'][2]
+
+      if (tty === 1) {
+        word = word.replace(t, noew['取消'][0])
+      } else if (tty === 2) {
+        word = word.replace(t, noew['取消'][1])
+      } else {
+        word = word.replace(t, '')
+      }
+
       break
     }
     default: {
@@ -297,7 +385,7 @@ const makereply = (word:any, id:string, aite:string, msg:any, matc:any) => {
     let t = word.match(/(.*?】).*/)[1]
     t = t.match(/.*(【.*?】)$/)[1]
     let st = t.match(/【(.*)】/)[1]
-    const te = st.match(/(随机数字|判断|禁言|踢|解除禁言|艾特|添加|销毁|属性|延迟|发送名|发送id|数字|昵称|换行)/)[1]
+    const te = st.match(/(随机数字|判断|禁言|踢|解除禁言|艾特|添加|销毁|属性|延迟|发送名|发送id|数字|昵称|换行|取消|设定)/)[1]
     st = st.replace(te, '"' + te + '"')
     st = '{' + st + '}'
     word = toswitch(te, st, t, word, id, aite, msg, matc)
@@ -306,7 +394,7 @@ const makereply = (word:any, id:string, aite:string, msg:any, matc:any) => {
     let t = word.match(/(.*?〗).*/)[1]
     t = t.match(/.*(〖.*?〗)$/)[1]
     let st = t.match(/〖(.*)〗/)[1]
-    const te = st.match(/(随机数字|判断|禁言|踢|解除禁言|艾特|添加|销毁|属性|延迟|发送名|发送id|数字|昵称|换行)/)[1]
+    const te = st.match(/(随机数字|判断|禁言|踢|解除禁言|艾特|添加|销毁|属性|延迟|发送名|发送id|数字|昵称|换行|取消|设定)/)[1]
     st = st.replace(te, '"' + te + '"')
     st = '{' + st + '}'
     word = toswitch(te, st, t, word, id, aite, msg, matc)
