@@ -47,4 +47,8 @@ const init = async () => {
   await import('./lib/function')
 }
 
+process.on('uncaughtException', (err: any, origin: any) => {
+  logger('uncaughtException').error(err, origin)
+})
+
 init()

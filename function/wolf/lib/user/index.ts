@@ -22,7 +22,7 @@ const user = {
     const result: any = await got.get('https://api.peer.ink/api/v1/iirose/wolf/rank', {
       searchParams: { q }
     }).json()
-    return result.data
+    return result.result
   }
 }
 
