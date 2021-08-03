@@ -1263,6 +1263,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/locks@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.nlark.com/@types/locks/download/@types/locks-0.2.1.tgz#0f19bb260d67fd70501686381d702a2695f62965"
+  integrity sha1-Dxm7Jg1n/XBQFoY4HXAqJpX2KWU=
+
 "@types/md5@^2.3.0":
   version "2.3.0"
   resolved "https://registry.npm.taobao.org/@types/md5/download/@types/md5-2.3.0.tgz#3b6a623091160f4dc75be3173e25f2110dc3fa1f"
@@ -3991,6 +3996,11 @@ locate-path@^5.0.0:
   integrity sha1-Gvujlq/WdqbUJQTQpno6frn2KqA=
   dependencies:
     p-locate "^4.1.0"
+
+locks@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.nlark.com/locks/download/locks-0.2.2.tgz#259933d1327cbaf0fd3662f8fffde36809d84ced"
+  integrity sha1-JZkz0TJ8uvD9NmL4//3jaAnYTO0=
 
 lodash.debounce@^4.0.8:
   version "4.0.8"

@@ -51,14 +51,23 @@ WebSocket.on('connect', async () => {
 
 init()
 
+Bot.on('SelfMove', ({ id }) => {
+  moveTo(id)
+})
+
 export const moveTo = (roomId: string) => {
   logger('Core').info('正在切换房间...')
   try {
+    if (config.account.room === roomId) {
+      logger('Core').info('当前房间相同，无需更换')
+    }
     config.account.room = roomId
-    close()
-    init()
-    logger('Core').info('切换完成')
-    return true
+    send(`m${roomId}`)
+    WebSocket.once('message', msg => {
+      close()
+      init()
+      logger('Core').info('切换完成')
+    })
   } catch (error) {
     logger('Core').warn('切换失败', error)
     return false

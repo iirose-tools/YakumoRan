@@ -12,6 +12,7 @@ import GetUserListCallback from './GetUserListCallback'
 import UserProfileCallback from './UserProfileCallback'
 import BankCallback from './BankCallback'
 import MediaListCallback from './MediaListCallback'
+import SelfMove from './SelfMove'
 
 export default (msg: string) => {
   const status = []
@@ -30,6 +31,7 @@ export default (msg: string) => {
   status.push(UserProfileCallback(msg))
   status.push(BankCallback(msg))
   status.push(MediaListCallback(msg))
+  status.push(SelfMove(msg))
 
   status.filter(e => !!e)
 

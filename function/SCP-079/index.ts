@@ -1,12 +1,14 @@
 import config from '../../config'
 import * as Ran from '../../lib/api'
 import logger from '../../lib/logger'
+import per from '../permission/permission'
 import { getImg, getRealUrl, isPorn } from './utils'
 
 const limit: any = {}
 
 Ran.Event.on('PublicMessage', async msg => {
   if (msg.username === config.account.username) return
+  if (per.users.hasPermission(msg.uid, 'scp079.whitelist')) return
   // 刷屏检测
   if (!limit[msg.uid]) {
     limit[msg.uid] = {
@@ -41,6 +43,7 @@ Ran.Event.on('PublicMessage', async msg => {
 
 Ran.Event.on('PublicMessage', async msg => {
   if (msg.username === config.account.username) return
+  if (per.users.hasPermission(msg.uid, 'scp079.whitelist')) return
   // 赌博检测
   const gamblingRegex = /(压|押)(完|\d+)/gm
   if (gamblingRegex.test(msg.message) && !config.function.scp079.allowGambling) {
@@ -52,6 +55,7 @@ Ran.Event.on('PublicMessage', async msg => {
 
 Ran.Event.on('PublicMessage', async msg => {
   if (msg.username === config.account.username) return
+  if (per.users.hasPermission(msg.uid, 'scp079.whitelist')) return
   // 图片检测
   const imgs = getImg(msg.message)
   if (imgs) {

@@ -1,7 +1,9 @@
 import { decode } from 'html-entities'
 import { Bot } from '../event'
+import * as api from '../api'
+import config from '../../config'
 
-export interface PrivateMessage {
+interface data {
   timestamp: Number,
   uid: string,
   username: string,
@@ -11,12 +13,56 @@ export interface PrivateMessage {
   messageId: Number
 }
 
+export class PrivateMessage {
+  public timestamp: Number
+  public uid: string
+  public username: string
+  public avatar: string
+  public message: string
+  public color: string
+  public messageId: Number
+
+  constructor (data: data) {
+    this.timestamp = data.timestamp
+    this.uid = data.uid
+    this.username = data.username
+    this.avatar = data.avatar
+    this.message = data.message
+    this.color = data.color
+    this.messageId = data.messageId
+  }
+
+  /**
+   * @description 发送私聊消息
+   * @param msg 消息内容
+   */
+  pm (msg: string) {
+    api.method.sendPrivateMessage(this.uid, msg, config.app.color)
+  }
+
+  /**
+   * @description 回复消息
+   * @param msg 消息内容
+   */
+  reply (msg: string) {
+    api.method.sendPublicMessage(`${this.message} (_hr) ${this.username}_${Math.round(new Date().getTime() / 1e3)} (hr_) ${msg}`, config.app.color)
+  }
+
+  /**
+   * @description 点赞
+   * @param msg 点赞消息
+   */
+  like (msg: string) {
+    api.method.like(this.uid, msg)
+  }
+}
+
 export default (message: string) => {
   if (message.substr(0, 1) === '"') {
     const tmp = message.substr(1).split('>')
     if (tmp.length === 11) {
       if (/^\d+$/.test(tmp[0])) {
-        const msg = {
+        const msg = new PrivateMessage({
           timestamp: Number(tmp[0]),
           uid: tmp[1],
           username: decode(tmp[2]),
@@ -24,8 +70,7 @@ export default (message: string) => {
           message: decode(tmp[4]),
           color: tmp[5],
           messageId: Number(tmp[10])
-        }
-
+        })
         Bot.emit('PrivateMessage', msg)
         return true
       }
