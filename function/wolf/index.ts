@@ -4,12 +4,7 @@ import * as Ran from '../../lib/api'
 import Game from './lib/game'
 import { RoleList } from './lib/role'
 import user from './lib/user'
-
-const isAdmin = (uid: string): boolean => {
-  if (!process.env.ADMIN) return false
-  const adminList = process.env.ADMIN.split(',')
-  return adminList.includes(uid)
-}
+import permission from '../permission/permission'
 
 Ran.Event.once('login', () => {
   if (existsSync(path.join(Ran.Data, 'wolf', 'info.json'))) {
@@ -90,7 +85,7 @@ Ran.command(/^\.wolf start$/, 'wolf.start', (match, event, reply) => {
 
 Ran.command(/^\.wolf stop$/, 'wolf.stop', (match, event, reply) => {
   if (!game) return reply('[Wolf] 你还没有创建游戏')
-  if (game.users[0].uid !== event.uid && !isAdmin(event.uid)) return reply('[Wolf] 这个游戏不是你创建的')
+  if (game.users[0].uid !== event.uid && !permission.users.hasPermission(event.uid, 'wolf.admin.forceStop')) return reply('[Wolf] 这个游戏不是你创建的')
 
   game.flag.isEnd = true
   game.onEnd()
