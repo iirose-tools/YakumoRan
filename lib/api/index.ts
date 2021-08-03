@@ -97,9 +97,9 @@ export const method = {
    * @param color 颜色
    * @returns {Promise}
    */
-  sendPublicMessage: (message: string, color: string) => {
+  sendPublicMessage: (message: string, color?: string) => {
     logger('Bot').debug(`发送了群聊消息: ${message}`)
-    const data = PublicMessage(message, color)
+    const data = PublicMessage(message, color || config.app.color)
     return send(data)
   },
   /**
@@ -108,9 +108,9 @@ export const method = {
    * @param color 颜色
    * @returns {Promise}
    */
-  sendPrivateMessage: (uid: string, message: string, color: string) => {
+  sendPrivateMessage: (uid: string, message: string, color?: string) => {
     logger('Bot').debug(`向 ${uid} 发送了私聊消息: ${message}`)
-    const data = PrivateMessage(uid, message, color)
+    const data = PrivateMessage(uid, message, color || config.app.color)
     return send(data)
   },
   /**

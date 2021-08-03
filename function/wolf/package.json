@@ -1,0 +1,37 @@
+{
+  "name": "狼人杀",
+  "id": "wolf",
+  "main": "index",
+  "author": {
+    "name": "风间苏苏Official",
+    "github": "TheresaQWQ",
+    "iirose": "风间苏苏"
+  },
+  "intro": [
+    "狼人杀 | 苏苏鲨（雾）",
+    "一个不那么普通的狼人杀",
+    "移植自Telegram机器人 @werewolfbot"
+  ],
+  "commands": [{
+    "cmd": ".wolf create",
+    "helper": "开始一局狼人杀"
+  }, {
+    "cmd": ".wolf join",
+    "helper": "加入游戏"
+  }, {
+    "cmd": ".wolf left",
+    "helper": "离开游戏"
+  }, {
+    "cmd": ".wolf start",
+    "helper": "开始游戏（仅限创建者）"
+  }, {
+    "cmd": ".wolf list",
+    "helper": "查看游戏内玩家列表"
+  }, {
+    "cmd": ".wolf rolelist",
+    "helper": "查看角色列表"
+  }, {
+    "cmd": ".wolf role <role>",
+    "helper": "查看指定角色的信息"
+  }]
+}
