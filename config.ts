@@ -18,6 +18,11 @@ const defaultConfig = {
     pixiv: {
       disable: false
     },
+    wolf: {
+      day: 300e3,
+      night: 5e3,
+      vote: 60e3
+    },
     scp079: {
       nsfw_rate: 0.8,
       allowGambling: true,
