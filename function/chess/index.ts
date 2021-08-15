@@ -1,506 +1,324 @@
-import fs from 'fs'
-import path from 'path'
 import * as api from '../../lib/api'
 import per from '../permission/permission'
 
-try {
-  fs.mkdirSync(path.join(api.Data, './chess/user'))
-  fs.mkdirSync(path.join(api.Data, './chess/config'))
-  fs.mkdirSync(path.join(api.Data, './chess/list'))
-} catch (error) {
-}
+// 初始化配置信息
+let config:any = {}
+const usedata:any = {}
+let now:string = ''
+let round:number = 0
+let group:any = { white: [], black: [] }
+let list:any = { white: [], black: [] }
+let alive = 0
+let uidList:any = { mainUid: [], watchUid: [], white: [], black: [] }
 
 // 苏苏的随机数生成姬
 const random = (n: number, m: number): number => { return Math.floor(Math.random() * (m - n + 1) + n) }
 
-// 获取json
-const getjson = (name:string, list:string) => {
-  const wordPath = path.join(api.Data, `./chess/${name}/${list}.json`)
-  if (!fs.existsSync(wordPath)) {
-    fs.writeFileSync(wordPath, '{}')
-  }
-  return JSON.parse(fs.readFileSync(wordPath).toString())
-}
-
-// 更新json文件
-const update = (list:any, tyf:string, file:string) => {
-  try {
-    fs.writeFileSync(path.join(api.Data, `./chess/${list}/${tyf}.json`), JSON.stringify(file, null, 3))
-  } catch (error) {
+// 从数组中删除指定元素
+const delElement = (arr:any, element: string) => {
+  if (arr.indexOf(element)) {
+    const num = arr.indexOf(element)
+    arr.splice(num, 1)
   }
 }
 
-// 判断error
-const isError = (element: any, index: any, array: any) => {
-  return (element === null)
+const duel = (a:any, b:any) => {
+  let atkDamage = 0
+  let dfsdamage = 0
+
+  // 奇数兵加强
+  if ((round % 2) === 1) {
+    if (usedata[b].attack === 1) {
+      dfsdamage = 7
+    }
+  }
+
+  // 兵杀王
+  if (usedata[b].attack === 6) {
+    if (usedata[a].attack === 1) {
+      atkDamage = 7
+    }
+  }
+
+  // 骑士保王
+  if (list[usedata[b].camp].indexOf('骑士') !== -1) {
+    if (usedata[b].attack === 6) {
+      dfsdamage = 8
+    }
+  }
+
+  // 双方相同，则攻击力保持一致
+  if (usedata[a].attack === usedata[b].attack) {
+    atkDamage = 10
+    dfsdamage = 10
+  }
+  // 返回最后演算结果
+  return [atkDamage, dfsdamage]
 }
 
-// 决斗
-const duel = (attack:any, defense:any) => {
-  const config = getjson('config', 'config')
-  let defenseattack: number = defense.attack
-  let attackattack: number = attack.attack
-  if (config.time === 0) {
-    switch (defense.attack) {
-      case 1 : {
-        defenseattack = 7
-        break
-      }
-      case 6 : {
-        const b = getjson('user', `${defense.way}group`)
-        for (let i = 0; i < b.list.length; i++) {
-          if (b.list[i] === '骑士') {
-            defenseattack = 8
-          }
-        }
-        break
-      }
-    }
-    config.time = 1
-  } else {
-    switch (defense.attack) {
-      case 6 : {
-        const b = getjson('user', `${defense.way}group`)
-        for (let i = 0; i < b.list.length; i++) {
-          if (b.list[i] === '骑士') {
-            defenseattack = 8
-          }
-        }
-        break
-      }
-    }
-    config.time = 0
-  }
-  if (attack.attack === defense.attack && attack.attack === 6) {
-    attackattack = 6
-    defenseattack = 6
-  }
-  if (attack.attack === defense.attack && attack.attack === 1) {
-    attackattack = 1
-    defenseattack = 1
-  }
-  if (attack.attack === 1 && defense.attack === 6) {
-    attackattack = 7
-  }
-  const white = getjson('user', 'whitegroup')
-  const black = getjson('user', 'blackgroup')
-  const whitenum = white.list.length
-  const blacknum = black.list.length
-  if (whitenum === blacknum && whitenum === 1 && attack.attack === defense.attack) {
-    attackattack = 10
-    defenseattack = 0
-  }
-  update('config', 'config', config)
-  return [attackattack, defenseattack]
-}
+// chess clear
+api.command(/^chess restart$/, 'chess.restart', async (m, e, reply) => {
+  if (!per.users.hasPermission(e.uid, 'chess.op') && !per.users.hasPermission(e.uid, 'permission.chess')) return reply(` [ Chess ] ： [*${e.username}*] 您不是主持人`)
+  config = { 白王: { type: 'white', identity: '王', firstlines: '三尺青锋弑了多少不归人', sercondLines: '作为决定胜负的棋子，保护好自己，不要轻易出动暴露自己，当然，不要忘了可以保护你的骑士', attack: '6' }, 白后: { type: 'white', identity: '后', firstLines: '带血的蔷薇便是最后的救赎吧', sercondLines: '理论上可以用来试探出对方的王，但请注意有时候的兵同样受保护，作为可以横扫棋局的棋子，尽好自己的责任', attack: '5' }, 白车: { type: 'white', identity: '车', firstLines: '和你一起把这乱局搅得翻天覆地', secondLines: '地位较高的棋子，可以与后打好配合，当然，也可以舍身去试探对方的棋子', attack: '4' }, 白象: { type: 'white', identity: '象', firstLines: '大梦终需醒，我倚剑笑苍天', sercondLines: '配角的位置，为何不能也大放光彩呢？', attack: '3' }, 白骑士: { type: 'white', identity: '骑士', firstLines: '君载着黑骏马，威风凛凛寻她', sercondLines: '作为最后一道防线，保护好你的王，还有，保护好自己，所以就少出动吧', attack: '2' }, 白兵: { type: 'white', identity: '兵', firstLines: '游走的狂徒，随时打出舍命一击', sercondLines: '价值堪比王，至于隐匿和伺机而动，就不必我多提示了吧', attack: '1' }, 黑王: { type: 'black', identity: '王', firstLines: '三尺青锋弑了多少不归人', sercondLines: '作为决定胜负的棋子，保护好自己，不要轻易出动暴露自己，当然，不要忘了可以保护你的骑士', attack: '6' }, 黑后: { type: 'black', identity: '后', firstLines: '带血的蔷薇便是最后的救赎吧', sercondLines: '理论上可以用来试探出对方的王，但请注意有时候的兵同样受保护，作为可以横扫棋局的棋子，尽好自己的责任', attack: '5' }, 黑车: { type: 'black', identity: '车', firstLines: '和你一起把这乱局搅得翻天覆地', sercondLines: '地位较高的棋子，可以与后打好配合，当然，也可以舍身去试探对方的棋子', attack: '4' }, 黑象: { type: 'black', identity: '象', firstLines: '大梦终需醒，我倚剑笑苍天', sercondLines: '配角的位置，为何不能也大放光彩呢？', attack: '3' }, 黑骑士: { type: 'black', identity: '骑士', firstLines: '君载着黑骏马，威风凛凛寻她', sercondLines: '作为最后一道防线，保护好你的王，还有，保护好自己，所以就少出动吧', attack: '2' }, 黑兵: { type: 'black', identity: '兵', firstLines: '游走的狂徒，随时打出舍命一击', sercondLines: '价值堪比王，至于隐匿和伺机而动，就不必我多提示了吧', attack: '1' } }
+  config.havelist = ['白王', '白后', '白车', '白象', '白骑士', '白兵', '黑王', '黑后', '黑车', '黑象', '黑骑士', '黑兵']
 
-// 删除阵亡数据
-const killon = (identity:string, list:string) => {
-  const group = getjson('user', `${list}group`)
-  for (let i = 0; i < group.list.length; i++) {
-    if (group.list[i] === identity) {
-      group.list.splice(i, 1)
-      group.user.splice(i, 1)
-    }
-  }
-  update('user', `${list}group`, group)
-}
-
-const uidMap = new Map()
-
-// 组内私聊
-api.Event.on('PrivateMessage', event => {
-  const groupconfig = getjson('config', 'config')
-
-  const white: string[] = groupconfig.white
-  const black: string[] = groupconfig.black
-
-  if (!white || !black) return
-
-  if (white.includes(` [*${event.username}*] `)) {
-    const admin = per.users.has('chess.op')
-    const watch = per.users.has('chess.watch')
-
-    white.forEach(username => {
-      const uid = uidMap.get(username)
-      if (uid === event.uid) return
-      api.method.sendPrivateMessage(uid, `[组内私聊] ${event.username} >> ${event.message}`, event.color)
-    })
-
-    watch.forEach(uid => {
-      api.method.sendPrivateMessage(String(uid).toLowerCase(), `[白方组内私聊] ${event.username} >> ${event.message}`, 'fff')
-    })
-
-    admin.forEach(uid => {
-      api.method.sendPrivateMessage(String(uid).toLowerCase(), `[白方组内私聊] ${event.username} >> ${event.message}`, 'fff')
-    })
-  }
-
-  if (black.includes(` [*${event.username}*] `)) {
-    const admin = per.users.has('chess.op')
-    const watch = per.users.has('chess.watch')
-
-    black.forEach(username => {
-      const uid = uidMap.get(username)
-      if (uid === event.uid) return
-      api.method.sendPrivateMessage(uid, `[组内私聊] ${event.username} >> ${event.message}`, event.color)
-    })
-
-    watch.forEach(uid => {
-      api.method.sendPrivateMessage(String(uid).toLowerCase(), `[黑方组内私聊] ${event.username} >> ${event.message}`, '000')
-    })
-
-    admin.forEach(uid => {
-      api.method.sendPrivateMessage(String(uid).toLowerCase(), `[黑方组内私聊] ${event.username} >> ${event.message}`, '000')
-    })
-  }
-})
-
-// 抽取角色
-api.command(/^chess open$/, 'chess.open', async (m, e, reply) => {
-  if (!per.users.hasPermission(e.uid, 'chess.op') && !per.users.hasPermission(e.uid, 'permission.chess')) return reply(' [chess] : 您不是主持人', '66ccff')
-  const theconfig = getjson('config', 'config')
-  theconfig.王 = ['王', '三尺青锋弑了多少不归人', '作为决定胜负的棋子，保护好自己，不要轻易出动暴露自己，当然，不要忘了可以保护你的骑士', 6]
-  theconfig.后 = ['后', '带血的蔷薇便是最后的救赎吧', '理论上可以用来试探出对方的王，但请注意有时候的兵同样受保护，作为可以横扫棋局的棋子，尽好自己的责任', 5]
-  theconfig.车 = ['车', '和你一起把这乱局搅得翻天覆地', '地位较高的棋子，可以与后打好配合，当然，也可以舍身去试探对方的棋子', 4]
-  theconfig.象 = ['象', '大梦终需醒，我倚剑笑苍天', '配角的位置，为何不能也大放光彩呢？', 3]
-  theconfig.骑士 = ['骑士', '君载着黑骏马，威风凛凛寻她', '作为最后一道防线，保护好你的王，还有，保护好自己，所以就少出动吧', 2]
-  theconfig.兵 = ['兵', '游走的狂徒，随时打出舍命一击', '价值堪比王，至于隐匿和伺机而动，就不必我多提示了吧', 1]
-  theconfig.nowlist = { 白王: { type: 'white', identity: '王' }, 白后: { type: 'white', identity: '后' }, 白车: { type: 'white', identity: '车' }, 白象: { type: 'white', identity: '象' }, 白骑士: { type: 'white', identity: '骑士' }, 白兵: { type: 'white', identity: '兵' }, 黑王: { type: 'black', identity: '王' }, 黑后: { type: 'black', identity: '后' }, 黑车: { type: 'black', identity: '车' }, 黑象: { type: 'black', identity: '象' }, 黑骑士: { type: 'black', identity: '骑士' }, 黑兵: { type: 'black', identity: '兵' } }
-  theconfig.havelist = ['白王', '白后', '白车', '白象', '白骑士', '白兵', '黑王', '黑后', '黑车', '黑象', '黑骑士', '黑兵']
-  theconfig.time = 0
-  theconfig.white = []
-  theconfig.black = []
-
-  try {
-    const folderexists = fs.existsSync(path.join(api.Data, './chess/user/'))
-    if (folderexists === true) {
-      const dirList = fs.readdirSync(path.join(api.Data, './chess/user/'))
-      dirList.forEach(function (fileName: any) {
-        fs.unlinkSync(path.join(api.Data, './chess/user/') + fileName)
-      })
-    }
-  } catch (error) {
-  }
-  const watch = per.users.has('chess.watch')
-  watch.forEach(uid => {
-    try {
-      per.users.removePermission(String(uid), 'chess.watch')
-    } catch (error) {
-      reply(`[Chess] 观战权限添加失败: ${error.message}`, '666ccff')
-    }
+  now = ''
+  round = 0
+  group = { white: [], black: [] }
+  list = { white: [], black: [] }
+  alive = 0
+  uidList.mainUid.forEach(function (e:any) { // 清除主持人
+    per.users.removePermission(e, 'chess.op')
   })
-  update('config', 'config', theconfig)
-  reply('重置成功', '66ccff')
+  uidList = { mainUid: [], watchUid: [], white: [], black: [] }
+  reply(' [ Chess ] : 游戏初始化成功 ! ')
 })
 
-// 随机角色
-api.command(/^check$/, 'chess.get', async (m, e, reply) => {
-  const configconfig = getjson('config', 'config')
-  const userconfig = getjson('user', e.uid)
-  uidMap.set(` [*${e.username}*] `, e.uid)
-  if (configconfig.havelist.every(isError) === true) {
-    delete configconfig.havelist
-    update('user', 'config', configconfig)
-  }
-  if (configconfig.havelist == null) {
-    api.method.sendPrivateMessage(e.uid, '卡池已空', '66ccff')
-    api.method.sendPublicMessage('所有角色领取完毕', '66ccff')
-  } else if (userconfig.identity) {
-    let a:string = ''
-    if (userconfig.way === 'white') { a = '白' }
-    if (userconfig.way === 'black') { a = '黑' }
-    api.method.sendPrivateMessage(e.uid, `您已有身份，身份为：【${a + '·' + userconfig.identity}】`, '66ccff')
-  } else {
-    const sequence:number = random(0, configconfig.havelist.length - 1)
-    const num = configconfig.havelist[sequence]
-    userconfig.identity = configconfig.nowlist[num].identity
-    userconfig.way = configconfig.nowlist[num].type
-    userconfig.attack = configconfig[userconfig.identity][3]
-    configconfig.havelist.splice(sequence, 1)
-    if (configconfig.havelist.every(isError) === true) {
-      delete configconfig.havelist
-      update('user', 'config', configconfig)
-    }
-    const groupconfig = getjson('user', `${userconfig.way}group`)
-    if (groupconfig.user == null) {
-      groupconfig.user = []
-    }
-    if (groupconfig.list == null) {
-      groupconfig.list = []
-    }
-    groupconfig.user.push(` [*${e.username}*] `)
-    groupconfig.list.push(userconfig.identity)
-    if (configconfig[userconfig.way] == null) {
-      configconfig[userconfig.way] = []
-    }
-    configconfig[userconfig.way].push(` [*${e.username}*] `)
-    update('config', 'config', configconfig)
-    update('user', e.uid, userconfig)
-    update('user', `${userconfig.way}group`, groupconfig)
-    const idconfig = getjson('user', 'config')
-    if (idconfig.id === undefined) {
-      idconfig.id = {}
-    }
-    idconfig.id[e.username] = e.uid
-    update('user', 'config', idconfig)
-    let a = ''
-    if (userconfig.way === 'white') { a = '白' }
-    if (userconfig.way === 'black') { a = '黑' }
-    api.method.sendPublicMessage(` [*${e.username}*]   :  已加入阵营：【${a}】`, '66ccff')
-    api.method.sendPrivateMessage(e.uid, `您的身份为：${a + userconfig.identity + '\n\n'}【${userconfig.identity}】 ${'\nTip:  ' + configconfig[userconfig.identity][1] + '\n'}请务必不要以任何形式向敌人透露出自己的具体身份哦~`, '66ccff')
-  }
-})
-
-// 查看阵营列表
-api.command(/^chess group$/, 'chess.group', async (m, e, reply) => {
-  const whitegroupconfig = getjson('user', 'whitegroup')
-  const blackgroupconfig = getjson('user', 'blackgroup')
+// 抽取身份
+api.command(/^chess get$/, 'chess.get', async (m, e, reply) => {
+  if (group.white.includes(e.username) || group.black.includes(e.username)) return reply(` [ Chess ] :  [*${e.username}*] 您已有身份`)
   try {
-    const white = whitegroupconfig.user.join('\n')
-    reply(`  【白色方阵】  ：${'\n\n' + white}`, '66ccff')
-    const black = blackgroupconfig.user.join('\n')
-    reply(`  【黑色方阵】  ：${'\n\n' + black}`, '66ccff')
+    const sequence = random(0, config.havelist.length - 1) // 生成一个随机数，范围在剩余人数-1与0之间
+    const role = config.havelist[sequence] // 获取抽取的角色的名字
+
+    delElement(config.havelist, role) // 删除已抽取的角色名
+    usedata[e.username] = { camp: '', position: '', attack: 0, survive: 0 } // 告知默认的结构
+    usedata[e.username].camp = config[role].type // 阵营
+    usedata[e.username].position = config[role].identity // 兵种
+    usedata[e.username].attack = config[role].attack // 攻击力
+
+    let way:string
+    if (config[role].type === 'white') {
+      way = '白'
+      group.white.push(e.username) // 白方名单列表增加
+      list.white.push(config[role].identity) // 白方兵种列表增加
+      uidList.white.push(e.uid)// 添加到白队的id表内
+    } else {
+      way = '黑'
+      group.black.push(e.username) // 黑方名单列表增加
+      list.black.push(config[role].identity) // 黑方兵种列表增加
+      uidList.black.push(e.uid)// 添加到黑队的id表内
+    }
+
+    api.method.sendPublicMessage(` [Chess] ： [*${e.username}*] 已成功获得身份，您的阵营是：【${way}】`)
+    api.method.sendPrivateMessage(e.uid, ` [ Chess ] ： [*${e.username}*] 已成功获得身份，您的身份是：【${role}】\n\n${config[role].firstLines}\n${config[role].sercondLines}`)
+    api.method.sendPrivateMessage(e.uid, ' [ Chess ] ： 机器人私聊内发送信息可与队友一起讨论...!')
   } catch (error) {
+    console.log(error)
+    if (JSON.stringify(usedata) === '{}') {
+      reply(' [ Chess ] ： 未初始化，请发送chess restart初始化游戏')
+    } else {
+      reply(' [ Chess ] ： 已无名额...请等待游戏结束')
+    }
   }
 })
 
 // 攻击
-api.command(/^attack(.*)$/, 'chess.attack', async (m, e, reply) => {
-  const attackgroup = getjson('user', 'config')
-  const m1: any = m[1].match(/\*(.*)\*/)
+api.command(/^attack\s\s\[\*(.*)\*]\s\s$/, 'chess.attack', async (m, e, reply) => {
+  // 判断是否能够攻击
+  if (usedata[m[1]].camp === usedata[e.username].camp) return reply(` [ Chess ] ：  [*${e.username}*] 您攻击的对象为自己阵营`)
+  if (!usedata[m[1]]) return reply(` [ Chess ] ：  [*${e.username}*] 您攻击的对象不存在`)
+  if (!usedata[e.username]) return reply(` [ Chess ] ：  [*${e.username}*] 您不是参赛者`)
+  if (usedata[m[1]].survive === 1) return reply(` [ Chess ] ：  [*${e.username}*] 您攻击的对象已阵亡`)
+  if (usedata[e.username].survive === 1) return reply(` [ Chess ] ：  [*${e.username}*] 您已阵亡`)
+  if (now !== usedata[e.username].camp) return reply(` [ Chess ] ：  [*${e.username}*] 未到您的阵容攻击`)
+  if (alive === 1) return reply(` [ Chess ] ：  [*${e.username}*] 本局游戏已经结束，请让裁判发送初始化指令：chess restart`)
 
-  const id = uidMap.get(` [*${m1[1]}*] `)
-  const attackconfig = getjson('user', e.uid)
+  let results = []
 
-  if (attackgroup.over === 1) return reply('本局对战已结束', '66ccff')
-  if (attackgroup.attack !== attackconfig.way) return reply('未到您的阵容攻击', '66ccff')
-  if (attackconfig.alive === 1) return reply('您已阵亡，无法攻击', '66ccff')
+  round = round + 1 // 回合数计算
+  results = duel(e.username, m[1]) // 发送数据，坐等返回规则运算后的攻击力
 
-  if (id) {
-    const defenseconfig = getjson('user', id)
+  if (usedata[e.username].attack === 6) { reply(` [ Chess ] ： [*${e.username}*] 暴露了自己的身份：【王】`) }
 
-    if (defenseconfig === {}) return reply(` [*${e.username}*] 您攻击的目标不正确`, '66ccff')
-    if (attackconfig.way === defenseconfig.way) return reply(` [*${e.username}*] 唔...无法攻击相同阵容`, '66ccff')
-    if (defenseconfig.alive === 1) return reply('您攻击的对象已阵亡，无法攻击', '66ccff')
-    if (attackconfig.attack === 6) api.method.sendPublicMessage(`【 [*${e.username}*] 】为王`, '66ccff')
+  if (results[0] > results[1]) { // 如果攻击比防御大,则防御死
+    delElement(list[usedata[m[1]].camp], m[1])
+    delElement(group[usedata[m[1]].camp], m[1])
+    reply(` [ Chess ] ： [*${e.username}*] 获得胜利!`)
+    reply('游戏还未结束!请加油准备下一回合的战斗!')
+  }
+  if (results[0] < results[1]) { // 如果攻击比防御小,则攻击死
+    delElement(list[usedata[e.username].camp], e.username)
+    delElement(group[usedata[e.username].camp], e.username)
+    reply(` [ Chess ] ： [*${m[1]}*] 获得胜利!`)
+    reply('游戏还未结束!请加油准备下一回合的战斗!')
+  }
+  if (results[0] === results[1]) { // 如果攻击比防御一样大，则一起死
+    delElement(list[usedata[m[1]].camp], m[1])
+    delElement(group[usedata[m[1]].camp], m[1])
+    delElement(list[usedata[e.username].camp], e.username)
+    delElement(group[usedata[e.username].camp], e.username)
+    reply(` [ Chess ] ： [*${e.username}*]  [*${m[1]}*] 均失败!`)
+    reply('游戏还未结束!请加油准备下一回合的战斗!')
+  }
 
-    const out:any = duel(attackconfig, defenseconfig)
-    let a:string = ''
-    let b:string = ''
-
-    if (out[0] > out[1]) {
-      killon(defenseconfig.identity, defenseconfig.way)
-
-      // 删除失败者数据
-      defenseconfig.alive = 1
-      reply(`【 [*${e.username}*] 】  获得胜利！`, '66ccff')
-    } else if (out[0] === out[1]) {
-      killon(defenseconfig.identity, defenseconfig.way)
-      killon(attackconfig.identity, attackconfig.way)
-      if (attackconfig.way === 'white') { a = '白' }
-      if (attackconfig.way === 'black') { a = '黑' }
-      if (defenseconfig.way === 'white') { b = '白' }
-      if (defenseconfig.way === 'black') { b = '黑' }
-      attackgroup.fire = a
-      attackgroup.fire2 = b
-
-      // 删除失败者数据
-      defenseconfig.alive = 1
-      attackconfig.alive = 1
-      reply(`【 [*${e.username}*] 】  【 [*${m1[1]}*] 】 均失败！`, '66ccff')
-    } else if (out[0] < out[1]) {
-      killon(attackconfig.identity, attackconfig.way)
-
-      // 删除失败者数据
-      attackconfig.alive = 1
-      reply(`【 [*${m1[1]}*] 】  获得胜利！`, '66ccff')
-    }
-    delete attackgroup.attack
-    const white = getjson('user', 'whitegroup')
-    const black = getjson('user', 'blackgroup')
-    let whiteking:number = 0
-    let blackking:number = 0
-    for (let i = 0; i < white.list.length; i++) {
-      if (white.list[i] === '王') {
-        whiteking = 1
+  // 判断对局是否结束
+  // 一方没有王
+  if (list.white.indexOf('王') === -1) {
+    alive = 1
+    reply(' [ Chess ] ： 本局游戏已结束，【黑】阵营胜利')
+  } else if (list.black.indexOf('王') === -1) {
+    alive = 1
+    reply(' [ Chess ] ： 本局游戏已结束，【白】阵营胜利')
+  } else if (list.white.indexOf('王') === list.black.indexOf('王') && list.black.indexOf('王') === -1) {
+    if (list.white.lenght === 0) {
+      alive = 1
+      reply(' [ Chess ] ： 本局游戏已结束，【黑】方阵营胜利')
+    } else if (list.black.length === 0) {
+      alive = 1
+      reply(' [ Chess ] ： 本局游戏已结束，【白】方阵营胜利')
+    } else if (list.black.length === list.white.lenght && list.white.lenght === 0) {
+      alive = 1
+      let out:string = ''
+      if (usedata[e.username].camp === 'white') {
+        out = '白'
       }
-    }
-    for (let i = 0; i < black.list.length; i++) {
-      if (black.list[i] === '王') {
-        blackking = 1
+      if (usedata[e.username].camp === 'black') {
+        out = '黑'
       }
+      reply(` [ Chess ] ： 本局游戏已结束，【${out}】方阵营胜利`)
     }
-    const whitenum = white.list.length
-    const blacknum = black.list.length
+  }
+  now = ''
+})
 
-    if (whiteking === 1 && blackking === 1) {
-      attackgroup.over = 0
-      reply('本轮攻击结束，请继续下一回合', '66ccff')
-    } else if (whiteking === 0 && blackking === 1) {
-      attackgroup.over = 1
-      reply(`【游戏结束】${'\n\n'}白色阵营失败，黑色阵营获得胜利`, '66ccff')
-    } else if (blackking === 0 && whiteking === 1) {
-      attackgroup.over = 1
-      reply(`【游戏结束】${'\n\n'}黑色阵营失败，白色阵营获得胜利`, '66ccff')
-    } else if (blackking === 0 && whiteking === 0) {
-      if (blacknum > 0 && whitenum > 0) {
-        attackgroup.over = 0
-        reply('本轮攻击结束，请继续下一回合', '66ccff')
-      } else if (blacknum <= 0 && whitenum > 0) {
-        attackgroup.over = 1
-        reply(`【游戏结束】${'\n\n'}黑色阵营失败，白色阵营获得胜利`, '66ccff')
-      } else if (blacknum > 0 && whitenum <= 0) {
-        attackgroup.over = 1
-        reply(`【游戏结束】${'\n\n'}白色阵营失败，黑色阵营获得胜利`, '66ccff')
-      } else if (blacknum === 0 && whitenum === 0) {
-        attackgroup.over = 1
-        reply(`【游戏结束】${'\n\n' + b}色阵营失败，${a}色阵营获得胜利`, '66ccff')
-      }
-    }
-    update('user', id, defenseconfig)
-    update('user', e.uid, attackconfig)
-    update('user', 'config', attackgroup)
+// 选择哪方攻击
+api.command(/^请(白|黑)方攻击$/, 'chess.to', async (m, e, reply) => {
+  if (!per.users.hasPermission(e.uid, 'chess.op') && !per.users.hasPermission(e.uid, 'permission.chess')) return reply(` [ Chess ] ： [*${e.username}*] 您不是主持人`)
+  if (m[1] === '白') {
+    now = 'white'
+    reply(' [ Chess ] ： 请【白】方准备攻击，在攻击之前，请先于机器人私聊处与队友讨论一下如何攻击吧!')
+  }
+  if (m[1] === '黑') {
+    now = 'black'
+    reply(' [ Chess ] ： 请【黑】方准备攻击，在攻击之前，请先于机器人私聊处与队友讨论一下如何攻击吧!')
   }
 })
 
-// 选择攻击方
-api.command(/^请(白|黑)方攻击$/, 'chess.canAttack', async (m, e, reply) => {
-  if (!per.users.hasPermission(e.uid, 'chess.op') && !per.users.hasPermission(e.uid, 'permission.chess')) return reply(' [chess] : 您不是主持人', '66ccff')
-  const attackgroup = getjson('user', 'config')
-  let a:string = ''
-  if (m[1] === '白') { a = 'white' }
-  if (m[1] === '黑') { a = 'black' }
-  attackgroup.attack = a
-  update('user', 'config', attackgroup)
+// 主持人获取权限
+api.command(/^chess open$/, 'chess.open', async (m, e, reply) => {
+  if (uidList.mainUid.includes(e.uid)) return
+  per.users.addPermission(e.uid, 'chess.op')
+  uidList.mainUid.push(e.uid)
+  reply(` [ Chess ] ： [*${e.username}*]您已成为主持人，本局游戏开始!`)
 })
 
-api.command(/^chess i$/, 'chess.i', async (m, e, reply) => {
-  const user = getjson('user', e.uid)
-  if (user.identity) {
-    let a
-    if (user.way === 'white') { a = '白' }
-    if (user.way === 'black') { a = '黑' }
-    api.method.sendPrivateMessage(e.uid, `您的角色为: 【${a + user.identity}】`, '66ccff')
+// 私聊与队友交流
+api.Event.on('PrivateMessage', event => {
+  try {
+  if (usedata[event.username].camp === 'white') {
+    uidList.white.forEach(function (id:any) {
+      if (id === event.uid) return
+      api.method.sendPrivateMessage(id, ` [白方组内私聊]  [*${event.username}*]  >>  ${event.message} `)
+    })
+  } else if (usedata[event.username].camp === 'black') {
+    uidList.black.forEach(function (id:any) {
+      if (id === event.uid) return
+      api.method.sendPrivateMessage(id, ` [黑方组内私聊]  [*${event.username}*]  >>  ${event.message} `)
+    })
+  } else if (uidList.watchUid.includes(event.uid)) {
+    uidList.white.forEach(function (id:any) {
+      api.method.sendPrivateMessage(id, ` [白方组内私聊]  [*${event.username}*]  >>  ${event.message} `)
+    })
+    uidList.black.forEach(function (id:any) {
+      api.method.sendPrivateMessage(id, ` [黑方组内私聊]  [*${event.username}*]  >>  ${event.message} `)
+    })
+  } else if (uidList.mainUid.includes(event.uid)) {
+    uidList.white.forEach(function (id:any) {
+      api.method.sendPrivateMessage(id, ` [白方组内私聊]  [*${event.username}*]  >>  ${event.message} `)
+    })
+    uidList.black.forEach(function (id:any) {
+      api.method.sendPrivateMessage(id, ` [黑方组内私聊]  [*${event.username}*]  >>  ${event.message} `)
+    })
+  }
+} catch (error) {
+
+}
+})
+
+// 查看本方阵营
+api.command(/^chess list player$/, 'chess.list.player', async (m, e, reply) => {
+  if (usedata[e.username].camp === 'white' || usedata[e.username].camp === 'black') {
+    let msg = '【白方阵营】：'
+    group[usedata[e.username].camp].forEach(function (e:any) {
+      msg = msg + ` [*${e}*]\n`
+    })
+    reply(` [ Chess ] \n ${msg}`)
   }
 })
 
-// 查看战况
-api.command(/^chess have$/, 'chess.hava', async (m, e, reply) => {
-  const whitegroupconfig = getjson('user', 'whitegroup')
-  const blackgroupconfig = getjson('user', 'blackgroup')
-  const user = getjson('user', e.uid)
-  let whiteUnits:string = ''
-  let blackUnits:string = ''
-  try {
-    if (user.way === 'white') {
-      for (let i = 0; i < whitegroupconfig.list.length; i++) {
-        whiteUnits = whiteUnits + `${'\n\n' + whitegroupconfig.list[i]} : ${whitegroupconfig.user[i]}`
-      }
-      api.method.sendPrivateMessage(e.uid, `  【白色方阵】  ：${'\n\n' + whiteUnits}`, '66ccff')
-    }
-    if (user.way === 'black') {
-      for (let i = 0; i < blackgroupconfig.list.length; i++) {
-        blackUnits = blackUnits + `${'\n\n' + blackgroupconfig.list[i]} : ${blackgroupconfig.user[i]}`
-      }
-      api.method.sendPrivateMessage(e.uid, `  【黑色方阵】  ：${'\n\n' + blackUnits}`, '66ccff')
-    }
-  } catch (error) {}
+// 查看本方棋子
+api.command(/^chess list check$/, 'chess.list.check', async (m, e, reply) => {
+  if (usedata[e.username].camp === 'white' || usedata[e.username].camp === 'black') {
+    let msg = '【白方阵营】：'
+    let i = -1
+    group[usedata[e.username].camp].forEach(function (e:any) {
+      i = i + 1
+      msg = msg + ` [*${e}*]  >>  ${list[usedata[e.username].camp][i]}\n`
+    })
+    api.method.sendPrivateMessage(e.uid, ` [ Chess ] \n ${msg}`)
+  }
 })
 
-// 查看战况
-api.command(/^chess all$/, 'chess.all', async (m, e, reply) => {
-  if (!per.users.hasPermission(e.uid, 'chess.op') && !per.users.hasPermission(e.uid, 'permission.chess')) return reply(' [chess] : 您不是主持人', '66ccff')
-  const whitegroupconfig = getjson('user', 'whitegroup')
-  const blackgroupconfig = getjson('user', 'blackgroup')
-  let whiteUnits:string = ''
-  let blackUnits:string = ''
-  try {
-    for (let i = 0; i < whitegroupconfig.list.length; i++) {
-      whiteUnits = whiteUnits + `${'\n' + whitegroupconfig.list[i]} : ${whitegroupconfig.user[i]}`
-    }
-    api.method.sendPrivateMessage(e.uid, `  【白色方阵】  ：${'\n' + whiteUnits}`, '66ccff')
-  } catch (error) {}
-  try {
-    for (let i = 0; i < blackgroupconfig.list.length; i++) {
-      blackUnits = blackUnits + `${'\n' + blackgroupconfig.list[i]} : ${blackgroupconfig.user[i]}`
-    }
-    api.method.sendPrivateMessage(e.uid, `  【黑色方阵】  ：${'\n' + blackUnits}`, '66ccff')
-  } catch (error) {}
+// 查看双方在场人员
+api.command(/^chess all player$/, 'chess.all.player', async (m, e, reply) => {
+  let msg = ' [ Chess ] \n 【白方阵营】\n'
+
+  group.white.forEach(function (whitename:any) {
+    msg = msg + ` [*${whitename}*] \n`
+  })
+
+  msg = msg + '\n\n\n 【黑方阵营】\n'
+
+  group.black.forEach(function (blackname:any) {
+    msg = msg + ` [*${blackname}*] \n`
+  })
+
+  reply(msg)
 })
 
-// 观战开始
+// 查看双方在场棋子
+api.command(/^chess all check$/, 'chess.all.check', async (m, e, reply) => {
+  if (!per.users.hasPermission(e.uid, 'chess.op') && !per.users.hasPermission(e.uid, 'permission.chess')) return reply(` [ Chess ] ： [*${e.username}*] 您不是主持人`)
+
+  let i1 = -1
+  let i2 = -1
+  let msg = ' [ Chess ] \n 【白方阵营】\n'
+
+  group.white.forEach(function (whitename:any) {
+    i1 = i1 + 1
+    msg = msg + ` [*${whitename}*]  >>  ${list.white[i1]}\n`
+  })
+
+  msg = msg + '\n\n\n 【黑方阵营】\n'
+
+  group.black.forEach(function (blackname:any) {
+    i2 = i2 + 1
+    msg = msg + ` [*${blackname}*] ${list.black[i2]}\n`
+  })
+
+  api.method.sendPrivateMessage(e.uid, msg)
+})
+
+// 查看规则
+api.command(/^chess help$/, 'chess.help', async (m, e, reply) => {
+  api.method.sendPublicMessage('请查看私聊，帮助已送至')
+  api.method.sendPrivateMessage(e.uid, '游戏流程：\n\n游戏开始时，游玩者发送check抽取身份，随后，将可以在主持人的引导下，攻击对方，当满足条件时则胜利\n\n\n攻击规则：\n王＞后＞车＞象＞骑士＞兵\n\n1.兵奇数回合受到保护\n2.兵＞王\n3.骑士存在时，王受到保护\n4.受保护者攻击时失去保护效果\n5.双王互换则直到双方其中一方没有棋子为止\n6.一方存在王，另一方没有时则存在的一方胜利\n7.当a到和你一样的兵种时，无视规则一起死亡\n8.当最后场上两方各只剩一个棋子时，且棋子相同，则率先攻击的获胜\n\n\n其他：\n观战者可以发送chess watch on来观战，发送chess watch off来禁用观战')
+})
+
+// 观战开
 api.command(/^chess watch on$/, 'chess.watch.on', async (m, e, reply) => {
-  const attackgroup = getjson('user', e.uid)
-  if (attackgroup.way) return reply(`[Chess]  [*${e.username}*] 禁止参赛者操作....`, '66ccff')
-  try {
-    per.users.addPermission(e.uid, 'chess.watch')
-    reply('[Chess] 观战权限添加成功', '666ccff')
-  } catch (error) {
-    reply(`[Chess] 观战权限添加失败: ${error.message}`, '666ccff')
-  }
+  if (uidList.watchUid.includes(e.uid)) return reply(` [ Chess ] ：  [*${e.username}*]   您已处于观战状态中...`)
+  if (uidList.black.includes(e.uid)) return reply(` [ Chess ] ：  [*${e.username}*]   参赛者禁止修改观战状态！`)
+  uidList.watchUid.push(e.uid)
+  reply(` [ Chess ] ：  [*${e.username}*] 您已成功开始观战`)
 })
 
-// 观战结束
+// 观战关
 api.command(/^chess watch off$/, 'chess.watch.off', async (m, e, reply) => {
-  const attackgroup = getjson('user', e.uid)
-  if (attackgroup.way) return reply(`[Chess]  [*${e.username}*] 禁止参赛者操作....`, '66ccff')
-  try {
-    per.users.removePermission(e.uid, 'chess.watch')
-    reply('[Chess] 观战权限移除成功', '666ccff')
-  } catch (error) {
-    reply(`[Chess] 观战权限移除失败: ${error.message}`, '666ccff')
-  }
+  if (uidList.white.includes(e.uid)) return reply(` [ Chess ] ：  [*${e.username}*]   参赛者禁止修改观战状态！`)
+  if (uidList.black.includes(e.uid)) return reply(` [ Chess ] ：  [*${e.username}*]   参赛者禁止修改观战状态！`)
+  if (!uidList.watchUid.includes(e.uid)) return reply(` [ Chess ] ：  [*${e.username}*]   您未处于观战状态中...`)
+  delElement(uidList.watchUid, e.uid)
+  reply(` [ Chess ] ：  [*${e.username}*] 您已离开观战状态`)
 })
-
-/*
-// 记录进入房间的人
-api.Event.on('JoinRoom', (msg) => {
-  const haveUser = getjson('list', 'list')
-  if (haveUser.playerIdList == null) {
-    haveUser.playerIdList = []
-  }
-  if (haveUser.playerNameList == null) {
-    haveUser.playerNameList = []
-  }
-  if (haveUser.playerIdList.length > 30) return
-  for (let i = 0; i < haveUser.playerIdList.length; i++) {
-    if (haveUser.playerIdList[i] === msg.uid) {
-      return // 已记录
-    }
-  }
-  haveUser.playerIdList.push(msg.uid)
-  haveUser.playerNameList.push(msg.username)
-  update('list', 'list', haveUser)
-  // 未记录
-})
-
-// 清除记录的用户
-api.command(/^chess list clear$/, 'chess.list.clear', async (m, e, reply) => {
-  const listconfig = getjson('list', 'list')
-  listconfig.playerIdList = []
-  listconfig.playerNameList = []
-  update('list', 'list', listconfig)
-})
-
-// 查看入围列表
-api.command(/^chess list$/, 'chess.name', async (m, e, reply) => {
-  const haveUser = getjson('list', 'list')
-  if (!per.users.hasPermission(e.uid, 'chess.op') && !per.users.hasPermission(e.uid, 'permission.chess')) return reply(' [chess] : 您不是主持人', '66ccff')
-  let NameUnits = ''
-  if (haveUser.playerIdList == null) {
-    haveUser.playerIdList = []
-  }
-  if (haveUser.playerNameList == null) {
-    haveUser.playerNameList = []
-  }
-  try {
-    for (let i = 0; i < haveUser.playerIdList.length; i++) {
-      NameUnits = NameUnits + `${'\n' + (i + 1) + '.   [*' + haveUser.playerNameList[i]}*]   :   [@${haveUser.playerIdList[i]}@] `
-    }
-    api.method.sendPrivateMessage(e.uid, `  【已记录人员】  ：${'\n' + NameUnits}`, '66ccff')
-  } catch (error) {}
-})
-*/
-
-// 观战位，id使用苏苏的内个
