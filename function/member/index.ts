@@ -43,12 +43,13 @@ const getnowtime = () => {
 const minutes00 = () => {
   const targetDate = getnowtime()
   const minutesleft = 61 - targetDate.getMinutes()
-  setTimeout(autocheckhour, minutesleft * 1000)
+  setTimeout(autocheckhour, minutesleft * 1)
 }
 
 // 每小时检测
 const autocheckhour = () => {
-  setInterval(checkhour, 3600000) // 每小时检查是否到了23点和0点
+  setInterval(checkhour, 3600)
+  // setInterval(checkhour, 3600000) // 每小时检查是否到了23点和0点
 }
 
 const checkhour = () => {
@@ -61,11 +62,11 @@ const checkhour = () => {
         const hour = targetDate.getHours()
         if (hour === 23) {
           const option = getOptionInfo()
-          time2300(option.employer)
+          time2300(option.employer, option.salaryperhour)
         }
         if (hour === 0) {
           const option = getOptionInfo()
-          autopaysal(option.employer)
+          autopaysal(option.employer, option.salaryperhour)
         }
       }
     }
@@ -90,7 +91,7 @@ const resetminutes = () => {
 }
 
 // 23:00 会发生的事情
-const time2300 = (employer:string) => {
+const time2300 = (employer:string, saleryperhour:number) => {
   try {
     const memberlist = checkMemberList()
     let a = 0
@@ -100,10 +101,13 @@ const time2300 = (employer:string) => {
       const info = getMemberInfo(memberlist[a])
       const hour = info.Minutes / 60 >> 0
       const minutes = info.Minutes % 60
-      const mustpay = hour * 0.5
-      let predict = mustpay + 0.5
-      if (hour === 22) { predict = predict + 0.5 }
+      let mustpay = hour * saleryperhour
+      let predict = mustpay + saleryperhour
+      predict = Number(predict.toFixed(2))
+      mustpay = Number(mustpay.toFixed(2))
+      if (hour === 22) { predict = predict + saleryperhour }
       allmustpay = allmustpay + predict
+      allmustpay = Number(allmustpay.toFixed(2))
       msg = msg.concat(`${a}. [@${memberlist[a]}@] \n目前挂机时间: ${hour}小时 ${minutes}分钟\n目前应付工资：${mustpay}钞\n预计应付工资：${predict}钞\n---\n`)
       a = a + 1
     } while (a < memberlist.length)
@@ -112,14 +116,15 @@ const time2300 = (employer:string) => {
       const thisrobot = res
       if (Number(thisrobot.money.hold) <= allmustpay) {
         msg = msg.concat(`-------------------------------------\n预计所有应付工资：${allmustpay}钞\n`)
-        msg = msg.concat(`机器人拥有的钞：${thisrobot.money.hold}钞\n还需要：${allmustpay - Number(thisrobot.money.hold)}钞\n为了避免失败工资付款失败，请给机器人打：${allmustpay + 1 - Number(thisrobot.money.hold)}钞`)
+        msg = msg.concat(`机器人拥有的钞：${thisrobot.money.hold}钞\n还需要：${(allmustpay - Number(thisrobot.money.hold)).toFixed(2)}钞\n为了避免失败工资付款失败，请给机器人打：${(allmustpay + 1 - Number(thisrobot.money.hold)).toFixed(2)}钞`)
         Ran.method.sendPrivateMessage(employer, msg, config.app.color)
       }
     })
   } catch (error) {}
 }
 
-const autopaysal = (employer:string) => {
+// 0:00
+const autopaysal = (employer:string, saleryperhour:number) => {
   try {
     const memberlist = checkMemberList()
     let allmustpay : number = 0
@@ -128,20 +133,22 @@ const autopaysal = (employer:string) => {
       const info = getMemberInfo(memberlist[a])
       let hour = info.Minutes / 60 >> 0
       if (hour === 23) { hour = hour + 1 }
-      const mustpay = hour * 0.5
+      let mustpay = hour * saleryperhour
+      mustpay = Number(mustpay.toFixed(2))
       allmustpay = allmustpay + mustpay
+      allmustpay = Number(allmustpay.toFixed(2))
       a = a + 1
     } while (a < memberlist.length)
     const promise = Ran.method.utils.getUserProfile(config.account.username)
     promise.then((res) => {
       const thisrobot = res
-      if (Number(thisrobot.money.hold) <= allmustpay) return Ran.method.sendPrivateMessage(employer, `员工自动记时系统\n凌晨 00:00 a.m.\n-------------------------------------\n钞不足：机器人拥有${thisrobot.money.hold}钞\n今天需要发出的工资：${allmustpay}\n请自行发放工资`, config.app.color)
-      proceedpaysal(employer)
+      if (Number(thisrobot.money.hold) <= allmustpay) return Ran.method.sendPrivateMessage(employer, `员工自动记时系统\n凌晨 00:00 a.m.\n-------------------------------------\n钞不足：机器人拥有${thisrobot.money.hold}钞\n今天需要发出的工资：${allmustpay.toFixed(2)}\n请自行发放工资`, config.app.color)
+      proceedpaysal(employer, saleryperhour)
     })
   } catch (error) {}
 }
 
-const proceedpaysal = (employer:string) => {
+const proceedpaysal = (employer:string, saleryperhour:number) => {
   try {
     const memberlist = checkMemberList()
     let msg : string = '员工自动记时系统\n凌晨 00:00 a.m.\n-------------------------------------\n'
@@ -151,15 +158,17 @@ const proceedpaysal = (employer:string) => {
       const info = getMemberInfo(memberlist[a])
       let hour = info.Minutes / 60 >> 0
       if (hour === 23) { hour = hour + 1 }
-      const mustpay = hour * 0.5
+      let mustpay = hour * saleryperhour
+      mustpay = Number(mustpay.toFixed(2))
       allmustpay = allmustpay + mustpay
+      allmustpay = Number(allmustpay.toFixed(2))
       msg = msg.concat(`${a}. [@${memberlist[a]}@] \n挂机时长: ${hour}小时\n工资：${mustpay}钞\n---\n`)
       if (hour !== 0) {
         Ran.method.payment(memberlist[a].toLocaleLowerCase(), mustpay, ` [_${config.account.room}_]  ： 工资: ${mustpay}钞\n挂机时长: ${hour}小时`)
       }
       a = a + 1
     } while (a < memberlist.length)
-    msg = msg.concat(`-------------------------------------\n工资已发放，总计：${allmustpay}钞\n`)
+    msg = msg.concat(`-------------------------------------\n工资已发放，总计：${allmustpay.toFixed(2)}钞\n`)
     Ran.method.sendPrivateMessage(employer, msg, config.app.color)
   } catch (error) {}
 }
@@ -420,7 +429,7 @@ Ran.command(/^\.设置自发工资 (.*) (.*)$/, 'permission.member.setautopay', 
   try {
     if (filter(m[1]).length === 13) {
       if (!isNaN(+m[2])) {
-        if (+m[2] <= 1 && +m[2] >= 0.1) return setautopayoption(filter(m[1]).toString(), +m[2])
+        if (+m[2] <= 1 && +m[2] >= 0.1) return setautopayoption(filter(m[1]).toString(), +m[2]) 
         else return reply('工资必须大于"0.09" 或者小于"1.1"')
       } else return reply('工资必须是数字')
     } else return reply('雇主UID错误')
