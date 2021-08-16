@@ -43,7 +43,7 @@ const getnowtime = () => {
 const minutes00 = () => {
   const targetDate = getnowtime()
   const minutesleft = 61 - targetDate.getMinutes()
-  setTimeout(autocheckhour, minutesleft * 1000)
+  setTimeout(autocheckhour, minutesleft * 60000)
 }
 
 // 每小时检测
