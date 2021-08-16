@@ -21,23 +21,27 @@ api.command(/^live start$/, 'live.start', (m, e, reply) => {
   const webNet: string = 'nms.bstluo.top'
   const timeIma: number = new Date().getTime()
   const timeMirai: number = new Date().getTime() + 86400
+  const bstLiveWeb: string = 'http://player.bstluo.top/index.html?'
   let liveNetIirose: string = ''
   let liveNetObs: string = ''
+  let liveNetWeb: string = ''
   let liveNetPassworld: string = ''
   let obsPassword: string = ''
-  data[e.uid] = { a: '', b: '', c: '' }
+  data[e.uid] = { a: '', b: '', c: '', d: '' }
 
   // 主程序
   obsPassword = md5(`/live/${timeIma}${livePassword}-${timeMirai}-${livePassword}`)
   liveNetIirose = `https://${webNet}/live/${timeIma}${livePassword}.flv?sign=${timeMirai}-${obsPassword}`
   liveNetObs = `rtmp://${webNet}:1015/live`
   liveNetPassworld = `${timeIma}${livePassword}?sign=${timeMirai}-${obsPassword}`
+  liveNetWeb = `${bstLiveWeb}${liveNetIirose}`
   data[e.uid].a = liveNetObs
   data[e.uid].b = liveNetPassworld
-  data[e.uid].c = liveNetIirose
+  data[e.uid].c = liveNetWeb
+  data[e.uid].d = liveNetIirose
 
   // iirose输出
-  api.method.sendPrivateMessage(e.uid, `[BST Live]\n\n您的推流地址为：\n\n${liveNetObs}\n\n您的推流密钥为：\n\n${liveNetPassworld}\n\n下面是您的直播链接\n(长按解析复制直播链接，在房间@+链接就可打开直播)\n(推流码有效期为24h，过期请重新申请)`)
+  api.method.sendPrivateMessage(e.uid, `[BST Live]\n\n您的推流地址为：\n\n${liveNetObs}\n\n您的推流密钥为：\n\n${liveNetPassworld}\n\n您的直播间网址为；\n\n${liveNetWeb}\n(此链接为您直播观看网址)\n\n下面是您的直播链接\n(长按解析复制直播链接，在房间@+链接就可打开直播)\n(推流码有效期为24h，过期请重新申请)`)
   api.method.sendPrivateMessage(e.uid, liveNetIirose)
 })
 
