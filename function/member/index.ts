@@ -43,13 +43,12 @@ const getnowtime = () => {
 const minutes00 = () => {
   const targetDate = getnowtime()
   const minutesleft = 61 - targetDate.getMinutes()
-  setTimeout(autocheckhour, minutesleft * 1)
+  setTimeout(autocheckhour, minutesleft * 1000)
 }
 
 // 每小时检测
 const autocheckhour = () => {
-  setInterval(checkhour, 3600)
-  // setInterval(checkhour, 3600000) // 每小时检查是否到了23点和0点
+  setInterval(checkhour, 3600000) // 每小时检查是否到了23点和0点
 }
 
 const checkhour = () => {
@@ -429,7 +428,7 @@ Ran.command(/^\.设置自发工资 (.*) (.*)$/, 'permission.member.setautopay', 
   try {
     if (filter(m[1]).length === 13) {
       if (!isNaN(+m[2])) {
-        if (+m[2] <= 1 && +m[2] >= 0.1) return setautopayoption(filter(m[1]).toString(), +m[2])
+        if (+m[2] <= 1 && +m[2] >= 0.1) return setautopayoption(filter(m[1]).toString(), +m[2]) 
         else return reply('工资必须大于"0.09" 或者小于"1.1"')
       } else return reply('工资必须是数字')
     } else return reply('雇主UID错误')
