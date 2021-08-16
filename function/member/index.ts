@@ -9,8 +9,12 @@ const init = () => {
     fs.mkdirSync(path.join(Ran.Data, './member/memberworktime'))
   } catch (error) {}
   try {
+    fs.mkdirSync(path.join(Ran.Data, './member/option'))
+  } catch (error) {}
+  try {
     setInterval(updateminutes, 60000) // 1分钟更新一次Member在线时间（分钟）
     setInterval(updateMemberStatus, 900000) // 15分钟更新一次用户在线状态
+    minutes00()
   } catch (error) {}
 }
 
@@ -24,6 +28,140 @@ const filter = (input: string) => {
   output = output.replace(/\\/g, '')
   output = output.replace(/\./g, '')
   return output
+}
+
+// 获取目前的日期和时间
+const getnowtime = () => {
+  const timezone = 8 // 目标时区时间，东八区   东时区正数 西市区负数
+  const offsetGMT = new Date().getTimezoneOffset() // 本地时间和格林威治的时间差，单位为分钟
+  const nowDate = new Date().getTime() // 本地时间距 1970 年 1 月 1 日午夜（GMT 时间）之间的毫秒数
+  const targetDate = new Date(nowDate + offsetGMT * 60 * 1000 + timezone * 60 * 60 * 1000)
+  return targetDate
+}
+
+// 等待到整点+1分钟才执行
+const minutes00 = () => {
+  const targetDate = getnowtime()
+  const minutesleft = 61 - targetDate.getMinutes()
+  setTimeout(autocheckhour, minutesleft * 1000)
+}
+
+// 每小时检测
+const autocheckhour = () => {
+  setInterval(checkhour, 3600000) // 每小时检查是否到了23点和0点
+}
+
+const checkhour = () => {
+  try {
+    const file = path.join(Ran.Data, './member/option/option.json')
+    if (fs.existsSync(file)) {
+      const option = getOptionInfo()
+      if (option.autopay === 1) {
+        const targetDate = getnowtime()
+        const hour = targetDate.getHours()
+        if (hour === 23) {
+          const option = getOptionInfo()
+          time2300(option.employer)
+        }
+        if (hour === 0) {
+          const option = getOptionInfo()
+          autopaysal(option.employer)
+        }
+      }
+    }
+    resetminutes()
+  } catch (error) {}
+}
+
+// 0点重置所有人的minutes
+const resetminutes = () => {
+  const memberlist = checkMemberList()
+  const targetDate = getnowtime()
+  const hour = targetDate.getHours()
+  if (hour === 0) {
+    let a = 0
+    do {
+      const info = getMemberInfo(memberlist[a])
+      info.Minutes = 0
+      update(memberlist[a], info)
+      a = a + 1
+    } while (a < memberlist.length)
+  }
+}
+
+// 23:00 会发生的事情
+const time2300 = (employer:string) => {
+  try {
+    const memberlist = checkMemberList()
+    let a = 0
+    let msg : string = '员工自动记时系统\n晚上 11:00 p.m.\n-------------------------------------\n'
+    let allmustpay : number = 0
+    do {
+      const info = getMemberInfo(memberlist[a])
+      const hour = info.Minutes / 60 >> 0
+      const minutes = info.Minutes % 60
+      const mustpay = hour * 0.5
+      let predict = mustpay + 0.5
+      if (hour === 22) { predict = predict + 0.5 }
+      allmustpay = allmustpay + predict
+      msg = msg.concat(`${a}. [@${memberlist[a]}@] \n目前挂机时间: ${hour}小时 ${minutes}分钟\n目前应付工资：${mustpay}钞\n预计应付工资：${predict}钞\n---\n`)
+      a = a + 1
+    } while (a < memberlist.length)
+    const promise = Ran.method.utils.getUserProfile(config.account.username)
+    promise.then((res) => {
+      const thisrobot = res
+      if (Number(thisrobot.money.hold) <= allmustpay) {
+        msg = msg.concat(`-------------------------------------\n预计所有应付工资：${allmustpay}钞\n`)
+        msg = msg.concat(`机器人拥有的钞：${thisrobot.money.hold}钞\n还需要：${allmustpay - Number(thisrobot.money.hold)}钞\n为了避免失败工资付款失败，请给机器人打：${allmustpay + 1 - Number(thisrobot.money.hold)}钞`)
+        Ran.method.sendPrivateMessage(employer, msg, config.app.color)
+      }
+    })
+  } catch (error) {}
+}
+
+const autopaysal = (employer:string) => {
+  try {
+    const memberlist = checkMemberList()
+    let allmustpay : number = 0
+    let a = 0
+    do {
+      const info = getMemberInfo(memberlist[a])
+      let hour = info.Minutes / 60 >> 0
+      if (hour === 23) { hour = hour + 1 }
+      const mustpay = hour * 0.5
+      allmustpay = allmustpay + mustpay
+      a = a + 1
+    } while (a < memberlist.length)
+    const promise = Ran.method.utils.getUserProfile(config.account.username)
+    promise.then((res) => {
+      const thisrobot = res
+      if (Number(thisrobot.money.hold) <= allmustpay) return Ran.method.sendPrivateMessage(employer, `员工自动记时系统\n凌晨 00:00 a.m.\n-------------------------------------\n钞不足：机器人拥有${thisrobot.money.hold}钞\n今天需要发出的工资：${allmustpay}\n请自行发放工资`, config.app.color)
+      proceedpaysal(employer)
+    })
+  } catch (error) {}
+}
+
+const proceedpaysal = (employer:string) => {
+  try {
+    const memberlist = checkMemberList()
+    let msg : string = '员工自动记时系统\n凌晨 00:00 a.m.\n-------------------------------------\n'
+    let a = 0
+    let allmustpay = 0
+    do {
+      const info = getMemberInfo(memberlist[a])
+      let hour = info.Minutes / 60 >> 0
+      if (hour === 23) { hour = hour + 1 }
+      const mustpay = hour * 0.5
+      allmustpay = allmustpay + mustpay
+      msg = msg.concat(`${a}. [@${memberlist[a]}@] \n挂机时长: ${hour}小时\n工资：${mustpay}钞\n---\n`)
+      if (hour !== 0) {
+        Ran.method.payment(memberlist[a].toLocaleLowerCase(), mustpay, ` [_${config.account.room}_]  ： 工资: ${mustpay}钞\n挂机时长: ${hour}小时`)
+      }
+      a = a + 1
+    } while (a < memberlist.length)
+    msg = msg.concat(`-------------------------------------\n工资已发放，总计：${allmustpay}钞\n`)
+    Ran.method.sendPrivateMessage(employer, msg, config.app.color)
+  } catch (error) {}
 }
 
 // 更新用户在线状态
@@ -88,47 +226,15 @@ const onJoin = (uid: string) => {
 const updateminutes = () => {
   try {
     const memberlist = checkMemberList()
-    // 目标时区时间，东八区   东时区正数 西市区负数
-    const timezone = 8
-    // 本地时间和格林威治的时间差，单位为分钟
-    const offsetGMT = new Date().getTimezoneOffset()
-    // 本地时间距 1970 年 1 月 1 日午夜（GMT 时间）之间的毫秒数
-    const nowDate = new Date().getTime()
-    const targetDate = new Date(nowDate + offsetGMT * 60 * 1000 + timezone * 60 * 60 * 1000)
-    const hour = targetDate.getHours()
-    const minuses = targetDate.getMinutes()
-    // 东八区（UTC/GMT+08:00), 每天02:00 - 02:05 之间将会把Member的挂机时长清零
-    if (hour === 2) {
-      if (minuses < 5) {
-        let a = 0
-        do {
-          const info = getMemberInfo(memberlist[a])
-          info.Minutes = 0
-          update(memberlist[a], info)
-          a = a + 1
-        } while (a < memberlist.length)
-      } else {
-        let a = 0
-        do {
-          const info = getMemberInfo(memberlist[a])
-          if (info.Online === 1) {
-            info.Minutes = info.Minutes + 1
-            update(memberlist[a], info)
-          }
-          a = a + 1
-        } while (a < memberlist.length)
+    let a = 0
+    do {
+      const info = getMemberInfo(memberlist[a])
+      if (info.Online === 1) {
+        info.Minutes = info.Minutes + 1
+        update(memberlist[a], info)
       }
-    } else {
-      let a = 0
-      do {
-        const info = getMemberInfo(memberlist[a])
-        if (info.Online === 1) {
-          info.Minutes = info.Minutes + 1
-          update(memberlist[a], info)
-        }
-        a = a + 1
-      } while (a < memberlist.length)
-    }
+      a = a + 1
+    } while (a < memberlist.length)
   } catch (error) {}
 }
 
@@ -159,6 +265,15 @@ const getMemberInfo = (uid:string) => {
     throw new Error('File Not Exists')
   }
 }
+// 获取option信息
+const getOptionInfo = () => {
+  const file = path.join(Ran.Data, './member/option/option.json')
+  if (fs.existsSync(file)) {
+    return JSON.parse(fs.readFileSync(file).toString())
+  } else {
+    throw new Error('File Not Exists')
+  }
+}
 
 // 删除Member
 const deleteMember = (uid: String) => {
@@ -168,7 +283,7 @@ const deleteMember = (uid: String) => {
   fs.unlinkSync(file)
 }
 
-// 获取员工在线时长
+// 结算
 const settle = () => {
   const memberlist = checkMemberList()
   let a = 0
@@ -181,6 +296,58 @@ const settle = () => {
     a = a + 1
   } while (a < memberlist.length)
   Ran.method.sendPublicMessage(msg, config.app.color)
+}
+
+// 设置option
+const setautopayoption = (uid: string, salaryperhour:number) => {
+  let msg : string = ''
+  const file = path.join(Ran.Data, './member/option/option.json')
+  try {
+    if (!fs.existsSync(file)) {
+      fs.writeFileSync(file, '{"autopay":0,"employer":0,"salaryperhour":0}')
+    }
+    const option = getOptionInfo()
+    option.autopay = 0
+    option.employer = uid
+    option.salaryperhour = salaryperhour
+    fs.writeFileSync(file, JSON.stringify(option, null, 3))
+    msg = msg.concat(`[自动发工资设置成功] 自动发工资：未开启， 雇主： [@${option.employer}@] ， 每小时工资：${option.salaryperhour}`)
+    Ran.method.sendPublicMessage(msg, config.app.color)
+  } catch (error) {
+    Ran.method.sendPublicMessage(`[Member] 错误: ${error.message}`, config.app.color)
+  }
+}
+
+// 开启自动付工资系统
+const openautopay = () => {
+  let msg : string = ''
+  const file = path.join(Ran.Data, './member/option/option.json')
+  try {
+    if (!fs.existsSync(file)) return Ran.method.sendPublicMessage("未设置，请运行: .设置自发工资 '雇主UID' '工资'", config.app.color)
+    const option = getOptionInfo()
+    option.autopay = 1
+    fs.writeFileSync(file, JSON.stringify(option, null, 3))
+    msg = msg.concat(`[自动发工资设置成功] 自动发工资：开启成功， 雇主： [@${option.employer}@] ， 每小时工资：${option.salaryperhour}`)
+    Ran.method.sendPublicMessage(msg, config.app.color)
+  } catch (error) {
+    Ran.method.sendPublicMessage(`[Member] 错误: ${error.message}`, config.app.color)
+  }
+}
+
+// 关闭自动付工资系统
+const stopautopay = () => {
+  let msg : string = ''
+  const file = path.join(Ran.Data, './member/option/option.json')
+  try {
+    if (!fs.existsSync(file)) return Ran.method.sendPublicMessage("未设置，请运行: .设置自发工资 '雇主UID' '工资'", config.app.color)
+    const option = getOptionInfo()
+    option.autopay = 0
+    fs.writeFileSync(file, JSON.stringify(option, null, 3))
+    msg = msg.concat('[自动发工资设置成功] 自动发工资：已关闭')
+    Ran.method.sendPublicMessage(msg, config.app.color)
+  } catch (error) {
+    Ran.method.sendPublicMessage(`[Member] 错误: ${error.message}`, config.app.color)
+  }
 }
 
 Ran.command(/^\.增加员工(.*)$/, 'permission.member.add', (m, e, reply) => {
@@ -242,6 +409,47 @@ Ran.command(/^\.删除员工(.*)$/, 'permission.member.del', (m, e, reply) => {
     }
   } else {
     reply('错误的UID')
+  }
+})
+
+Ran.command(/^\.设置自发工资 (.*) (.*)$/, 'permission.member.setautopay', (m, e, reply) => {
+  if (!per.users.hasPermission(e.uid, 'member.op') && !per.users.hasPermission(e.uid, 'permission.member')) {
+    reply(` [*${e.username}*]   :  没有权限`, config.app.color)
+    return null
+  }
+  try {
+    if (filter(m[1]).length === 13) {
+      if (!isNaN(+m[2])) {
+        if (+m[2] <= 1 && +m[2] >= 0.1) return setautopayoption(filter(m[1]).toString(), +m[2]) 
+        else return reply('工资必须大于"0.09" 或者小于"1.1"')
+      } else return reply('工资必须是数字')
+    } else return reply('雇主UID错误')
+  } catch (error) {
+    reply(`[Member] 开启自动发工资失败: ${error.message}`)
+  }
+})
+
+Ran.command(/^\.开自发工资$/, 'permission.member.openautopay', (m, e, reply) => {
+  if (!per.users.hasPermission(e.uid, 'member.op') && !per.users.hasPermission(e.uid, 'permission.member')) {
+    reply(` [*${e.username}*]   :  没有权限`, config.app.color)
+    return null
+  }
+  try {
+    openautopay()
+  } catch (error) {
+    reply(`[Member] 开启自动发工资失败: ${error.message}`)
+  }
+})
+
+Ran.command(/^\.关自发工资$/, 'permission.member.stopautopay', (m, e, reply) => {
+  if (!per.users.hasPermission(e.uid, 'member.op') && !per.users.hasPermission(e.uid, 'permission.member')) {
+    reply(` [*${e.username}*]   :  没有权限`, config.app.color)
+    return null
+  }
+  try {
+    stopautopay()
+  } catch (error) {
+    reply(`[Member] 开启自动发工资失败: ${error.message}`)
   }
 })
 
