@@ -43,11 +43,13 @@ const getnowtime = () => {
 const minutes00 = () => {
   const targetDate = getnowtime()
   const minutesleft = 61 - targetDate.getMinutes()
+  checkhour()
   setTimeout(autocheckhour, minutesleft * 60000)
 }
 
 // 每小时检测
 const autocheckhour = () => {
+  checkhour()
   setInterval(checkhour, 3600000) // 每小时检查是否到了23点和0点
 }
 
