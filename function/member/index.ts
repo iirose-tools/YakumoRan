@@ -3,6 +3,7 @@ import config from '../../config'
 import path from 'path'
 import * as Ran from '../../lib/api'
 import per from '../permission/permission'
+import logger from '../../lib/logger'
 
 const init = () => {
   try {
@@ -17,7 +18,8 @@ const init = () => {
     setInterval(() => autoMemberOperation.updateminutes(), 60000) // 1分钟更新一次Member在线时间（分钟）
     setInterval(() => autoMemberOperation.updateMemberStatus(), 900000) // 15分钟更新一次用户在线状态
     autopayOperation.startAutoPayOperation() // 开启AutoPay自动检测，其中包括了0点自动将member的在线时间清零
-  } catch (error) {
+  } catch (error:any) {
+    logger('Member').error(error)
   }
   try {
     const memberCommand = new MemberCommand()
@@ -490,8 +492,12 @@ class AutoMemberEvent extends AutoMemberOperation {
       this.onLeave(msg.uid)
     })
     Ran.Event.on('login', () => {
-      const autoMemberOperation = new AutoMemberOperation()
-      autoMemberOperation.updateMemberStatus()
+      try {
+        const autoMemberOperation = new AutoMemberOperation()
+        autoMemberOperation.updateMemberStatus()
+      } catch (error:any) {
+        logger('Member').error(error)
+      }
     })
   }
 }
