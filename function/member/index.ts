@@ -263,7 +263,6 @@ class AutopayOperation extends bottom {
   //  每小时执行
   runEveryHour () {
     this.checkhour()
-    setInterval(() => this.checkhour(), 3000)
     setInterval(() => this.checkhour(), 3600000)
   }
 
