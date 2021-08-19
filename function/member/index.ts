@@ -223,6 +223,9 @@ Ran.command(/^\.设置工资(.*)(\d+)$/, 'member.set', (m, e, reply) => {
   if (!per.users.hasPermission(e.uid, 'member.set') && !per.users.hasPermission(e.uid, 'permission.member.set')) return reply('[!] 权限不足', 'CB3837')
   const uid = utils.filter(m[1])
   const money = Number(m[2])
+
+  if (money < 0.1 || money > 2.5) return reply('[!] 工资必须大于 0.1 且小于 2.5', 'CB3837')
+
   try {
     reply(member.set(uid, money))
   } catch (error) {
