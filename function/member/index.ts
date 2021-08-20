@@ -154,6 +154,7 @@ const actions = {
     }
 
     time.clear()
+    actions.update()
   },
   // 更新在线状态
   update: async () => {
@@ -240,8 +241,11 @@ Ran.command(/^\.查询员工$/, 'member.query', (m, e, reply) => {
 
   for (const uid of Object.keys(member.users)) {
     const online = time.users[uid] ? time.users[uid].Time : 0
+    const t = time.users[uid] ? new Date().getTime() - time.users[uid].lastOnline : 0
 
-    msg.push(` [@${uid}@]  . ${online / 1e3 / 60 / 60}小时`)
+    const onlineTime = Math.round((online + t) / 1e3 / 60 / 60 * 10) / 10
+
+    msg.push(` [@${uid}@]  . ${onlineTime}小时`)
   }
 
   reply(msg.join('\n'))
@@ -251,6 +255,7 @@ Ran.command(/^\.结算$/, 'member.payment', async (m, e, reply) => {
   if (!per.users.hasPermission(e.uid, 'member.payment') && !per.users.hasPermission(e.uid, 'permission.member.payment')) return reply('[!] 权限不足', 'CB3837')
   let total = 0
   for (const uid of Object.keys(time.users)) {
+    time.onOffline(uid)
     const t = time.users[uid]
     const hours = t.Time / 1e3 / 60 / 60
     const money = member.users[uid] * hours
