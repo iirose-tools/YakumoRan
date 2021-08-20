@@ -188,7 +188,7 @@ export const method = {
     getUserProfile: (username: string): Promise<UserProfileCallback> => {
       return new Promise((resolve, reject) => {
         Bot.once('UserProfileCallback', resolve)
-        send(UserProfile(username))
+        send(UserProfile(username.toLowerCase()))
       })
     },
     /**

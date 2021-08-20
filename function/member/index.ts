@@ -1,264 +1,272 @@
 import fs from 'fs'
-import config from '../../config'
 import path from 'path'
 import * as Ran from '../../lib/api'
 import per from '../permission/permission'
-
-const init = () => {
-  try {
-    fs.mkdirSync(path.join(Ran.Data, './member/memberworktime'))
-  } catch (error) {}
-  try {
-    setInterval(updateminutes, 60000) // 1分钟更新一次Member在线时间（分钟）
-    setInterval(updateMemberStatus, 900000) // 15分钟更新一次用户在线状态
-  } catch (error) {}
-}
-
-const filter = (input: string) => {
-  let output = input
-  output = output.replace(/\[/g, '')
-  output = output.replace(/\]/g, '')
-  output = output.replace(/@/g, '')
-  output = output.replace(/\s+/g, '')
-  output = output.replace(/\//g, '')
-  output = output.replace(/\\/g, '')
-  output = output.replace(/\./g, '')
-  return output
-}
-
-// 更新用户在线状态
-const updateMemberStatus = () => {
-  try {
-    const uid = checkMemberList()
-    if (uid.length > 0) {
-      const promise = Ran.method.utils.getUserList()
-      promise.then((res) => {
-        const allonlineuser = res
-        let a = 0
-        do {
-          let b = 0
-          do {
-            if (uid[a] === allonlineuser[b].uid.toLocaleUpperCase()) {
-              if (allonlineuser[b].room === config.account.room) {
-                onJoin(allonlineuser[b].uid)
-              } else {
-                onLeave(allonlineuser[b].uid)
-              }
-              b = allonlineuser.length
-            } else {
-              onLeave(uid[a])
-              b = b + 1
-            }
-          } while (b < allonlineuser.length)
-          a = a + 1
-        } while (a < uid.length)
-      })
-    }
-  } catch (error) {}
-}
-
-// 登记Member
-const addMember = (Uid: string) => {
-  const uid = Uid.toUpperCase()
-  const Member = path.join(Ran.Data, `./member/memberworktime/${uid}.json`)
-  if (!fs.existsSync(Member)) {
-    fs.writeFileSync(Member, '{"Minutes":0,"Online":0}')
-  } else {
-    throw new Error('员工已经存在')
-  }
-}
-
-// 当Member离开
-const onLeave = (uid: string) => {
-  try {
-    const info = getMemberInfo(uid)
-    info.Online = 0
-    update(uid, info)
-  } catch (error) {}
-}
-// 当Member加入
-const onJoin = (uid: string) => {
-  try {
-    const info = getMemberInfo(uid)
-    info.Online = 1
-    update(uid, info)
-  } catch (error) {}
-}
-// 更新Member在线时间累计
-const updateminutes = () => {
-  try {
-    const memberlist = checkMemberList()
-    // 目标时区时间，东八区   东时区正数 西市区负数
-    const timezone = 8
-    // 本地时间和格林威治的时间差，单位为分钟
-    const offsetGMT = new Date().getTimezoneOffset()
-    // 本地时间距 1970 年 1 月 1 日午夜（GMT 时间）之间的毫秒数
-    const nowDate = new Date().getTime()
-    const targetDate = new Date(nowDate + offsetGMT * 60 * 1000 + timezone * 60 * 60 * 1000)
-    const hour = targetDate.getHours()
-    const minuses = targetDate.getMinutes()
-    // 东八区（UTC/GMT+08:00), 每天02:00 - 02:05 之间将会把Member的挂机时长清零
-    if (hour === 2) {
-      if (minuses < 5) {
-        let a = 0
-        do {
-          const info = getMemberInfo(memberlist[a])
-          info.Minutes = 0
-          update(memberlist[a], info)
-          a = a + 1
-        } while (a < memberlist.length)
-      } else {
-        let a = 0
-        do {
-          const info = getMemberInfo(memberlist[a])
-          if (info.Online === 1) {
-            info.Minutes = info.Minutes + 1
-            update(memberlist[a], info)
-          }
-          a = a + 1
-        } while (a < memberlist.length)
-      }
-    } else {
-      let a = 0
-      do {
-        const info = getMemberInfo(memberlist[a])
-        if (info.Online === 1) {
-          info.Minutes = info.Minutes + 1
-          update(memberlist[a], info)
-        }
-        a = a + 1
-      } while (a < memberlist.length)
-    }
-  } catch (error) {}
-}
-
-// 更新json文件
-const update = (uid:string, data:any) => {
-  const file = path.join(Ran.Data, `./member/memberworktime/${uid}.json`)
-  try {
-    fs.writeFileSync(file, JSON.stringify(data, null, 3))
-  } catch (error) {
-    Ran.method.sendPublicMessage(`[Member] 错误: ${error.message}`, config.app.color)
-  }
-}
-// 获取Member的UID
-const checkMemberList = () => {
-  const file = path.join(Ran.Data, './member/memberworktime')
-  if (fs.readdirSync(file).length !== 0) {
-    return fs.readdirSync(file).map(e => e.replace('.json', ''))
-  } else {
-    throw new Error('没有员工')
-  }
-}
-// 获取Member的信息
-const getMemberInfo = (uid:string) => {
-  const file = path.join(Ran.Data, `./member/memberworktime/${uid}.json`)
-  if (fs.existsSync(file)) {
-    return JSON.parse(fs.readFileSync(file).toString())
-  } else {
-    throw new Error('File Not Exists')
-  }
-}
-
-// 删除Member
-const deleteMember = (uid: String) => {
-  const file = path.join(Ran.Data, `./member/memberworktime/${uid}.json`)
-  if (!fs.existsSync(file)) throw new Error('用户不存在')
-
-  fs.unlinkSync(file)
-}
-
-// 获取员工在线时长
-const settle = () => {
-  const memberlist = checkMemberList()
-  let a = 0
-  let msg : string = ''
-  do {
-    const info = getMemberInfo(memberlist[a])
-    const hour = info.Minutes / 60 >> 0
-    const minutes = info.Minutes % 60
-    msg = msg.concat(`${a}. [@${memberlist[a]}@] : ${hour}小时 ${minutes}分钟\n`)
-    a = a + 1
-  } while (a < memberlist.length)
-  Ran.method.sendPublicMessage(msg, config.app.color)
-}
-
-Ran.command(/^\.增加员工(.*)$/, 'permission.member.add', (m, e, reply) => {
-  if (!per.users.hasPermission(e.uid, 'member.op') && !per.users.hasPermission(e.uid, 'permission.member')) {
-    reply(` [*${e.username}*]   :  没有权限`, config.app.color)
-    return null
-  }
-  if (filter(m[1]).length === 13) {
-    try {
-      addMember(filter(m[1]).toString())
-      reply('[Member] 添加员工成功')
-    } catch (error) {
-      reply(`[Member] 添加员工失败: ${error.message}`)
-    }
-  } else {
-    reply('错误的UID')
-  }
-})
-
-Ran.command(/^\.查询员工$/, 'permission.member.check', (m, e, reply) => {
-  if (!per.users.hasPermission(e.uid, 'member.op') && !per.users.hasPermission(e.uid, 'permission.member')) {
-    reply(` [*${e.username}*]   :  没有权限`, config.app.color)
-    return null
-  }
-  try {
-    reply([
-      ...checkMemberList().map((v, i) => {
-        return `${i}. [@${v}@] `
-      })
-    ].join('\n'), config.app.color)
-  } catch (error) {
-    reply(`[Member] 查询员工失败: ${error.message}`)
-  }
-})
-
-Ran.command(/^\.结算$/, 'permission.member.settle', (m, e, reply) => {
-  if (!per.users.hasPermission(e.uid, 'member.op') && !per.users.hasPermission(e.uid, 'permission.member')) {
-    reply(` [*${e.username}*]   :  没有权限`, config.app.color)
-    return null
-  }
-  try {
-    settle()
-  } catch (error) {
-    reply(`[Member] 结算失败: ${error.message}`)
-  }
-})
-
-Ran.command(/^\.删除员工(.*)$/, 'permission.member.del', (m, e, reply) => {
-  if (!per.users.hasPermission(e.uid, 'member.op') && !per.users.hasPermission(e.uid, 'permission.member')) {
-    reply(` [*${e.username}*]   :  没有权限`, config.app.color)
-    return null
-  }
-  if (filter(m[1]).length === 13) {
-    try {
-      deleteMember(filter(m[1]).toString())
-      reply('[Member] 删除员工成功')
-    } catch (error) {
-      reply(`[Member] 删除员工失败: ${error.message}`)
-    }
-  } else {
-    reply('错误的UID')
-  }
-})
-
-Ran.Event.on('JoinRoom', (msg) => {
-  onJoin(msg.uid)
-})
-
-Ran.Event.on('LeaveRoom', (msg) => {
-  onLeave(msg.uid)
-})
-
-Ran.Event.on('SwitchRoom', (msg) => {
-  onLeave(msg.uid)
-})
+import logger from '../../lib/logger'
+import config from '../../config'
 
 Ran.Event.on('login', () => {
-  updateMemberStatus()
+  logger('member').info('正在初始化')
+
+  try { fs.mkdirSync(path.join(Ran.Data, '/member')) } catch (error) { }
+  if (!fs.existsSync(path.join(Ran.Data, '/member/users.json'))) fs.writeFileSync(path.join(Ran.Data, '/member/users.json'), '{}')
+  if (!fs.existsSync(path.join(Ran.Data, '/member/time.json'))) fs.writeFileSync(path.join(Ran.Data, '/member/time.json'), '{}')
+
+  member.load()
+  time.load()
+
+  actions.update()
+
+  setInterval(() => actions.update(), 10 * 60 * 1e3)
+
+  logger('member').info('初始化完成')
 })
 
-init()
+interface Time {
+  // 上一次上线的时间
+  lastOnline: number,
+  // 上一次发工资到现在的在线时长
+  Time: number,
+  // 在线状态
+  online: boolean
+}
+
+// 工具类
+const utils = {
+  filter: (input: string): string => {
+    let output = input
+
+    output = output.replace(/\[/g, '')
+    output = output.replace(/\]/g, '')
+    output = output.replace(/@/g, '')
+    output = output.replace(/\s+/g, '')
+    output = output.replace(/\//g, '')
+    output = output.replace(/\\/g, '')
+    output = output.replace(/\./g, '')
+
+    return output
+  }
+}
+
+// 用户管理
+const member: {
+  users: {
+    [index: string]: number
+  },
+  path: string,
+  write(): void,
+  load(): void,
+  set(uid: string, money: number): string,
+  add(uid: string, money: number): string,
+  remove(uid: string): string
+} = {
+  path: path.join(Ran.Data, '/member/users.json'),
+  users: {},
+  // 写入数据
+  write: () => fs.writeFileSync(member.path, JSON.stringify(member.users)),
+  // 读取数据
+  load: () => (member.users = JSON.parse(fs.readFileSync(member.path).toString())),
+  // 添加员工
+  add: (uid: string, money: number) => {
+    const realUid = utils.filter(uid)
+    if (member.users[realUid]) return '已经添加过这个员工了'
+    member.users[realUid] = money
+    member.write()
+    return '添加成功'
+  },
+  // 删除员工
+  remove: (uid: string) => {
+    const realUid = utils.filter(uid)
+    if (member.users[realUid] === undefined) return '你还没有添加这个员工'
+    delete member.users[realUid]
+    member.write()
+    return '删除成功'
+  },
+  // 设置金额
+  set: (uid: string, money: number) => {
+    const realUid = utils.filter(uid)
+    if (member.users[realUid] === undefined) return '你还没有添加这个员工'
+    member.users[realUid] = money
+    member.write()
+    return '设置成功'
+  }
+}
+
+// 记录时间
+const time: {
+  users: {
+    [index: string]: Time
+  },
+  path: string,
+  write(): void,
+  load(): void,
+  clear(): void,
+  onOnline(uid: string): void
+  onOffline(uid: string): void
+} = {
+  path: path.join(Ran.Data, '/member/time.json'),
+  users: {},
+  // 写入数据
+  write: () => fs.writeFileSync(time.path, JSON.stringify(time.users)),
+  // 读取数据
+  load: () => (time.users = JSON.parse(fs.readFileSync(time.path).toString())),
+  // 清空数据
+  clear: () => {
+    time.users = {}
+    time.write()
+  },
+  onOnline: (uid: string) => {
+    if (time.users[uid] && time.users[uid].online) return
+    if (!time.users[uid]) {
+      time.users[uid] = {
+        online: true,
+        lastOnline: new Date().getTime(),
+        Time: 0
+      }
+    } else {
+      time.users[uid].lastOnline = new Date().getTime()
+      time.users[uid].online = true
+    }
+
+    time.write()
+  },
+  onOffline: (uid: string) => {
+    if (time.users[uid]) {
+      const t: number = new Date().getTime() - time.users[uid].lastOnline
+      time.users[uid].Time += t
+      time.users[uid].online = false
+
+      time.write()
+    }
+  }
+}
+
+// 一些操作
+const actions = {
+  // 发工资
+  payment: () => {
+    for (const uid of Object.keys(time.users)) {
+      const t = time.users[uid]
+      const hours = t.Time / 1e3 / 60 / 60
+      const money = member.users[uid] * hours
+      logger('Member').info(`正在向 ${uid} 发工资...(在线时长: ${hours}小时, 工资: ${money})`)
+      Ran.method.payment(uid, money, `在线时长: ${hours}小时\n工资: ${money}`)
+    }
+
+    time.clear()
+    actions.update()
+  },
+  // 更新在线状态
+  update: async () => {
+    if (member.users === {}) {
+      logger('member').info('没有员工，跳过数据更新')
+      return
+    }
+
+    const list = await Ran.method.utils.getUserList()
+
+    const mark: {
+      [index: string]: boolean
+    } = {}
+
+    for (const uid of Object.keys(member.users)) {
+      mark[uid] = false
+    }
+
+    for (const user of list) {
+      if (member.users[user.uid]) {
+        mark[user.uid] = true
+        time.onOnline(user.uid)
+      }
+    }
+
+    Object.keys(mark).forEach(uid => {
+      if (!mark[uid]) time.onOffline(uid)
+    })
+  }
+}
+
+Ran.Event.on('JoinRoom', msg => {
+  if (member.users[msg.uid]) time.onOnline(msg.uid)
+})
+
+Ran.Event.on('SwitchRoom', msg => {
+  if (member.users[msg.uid]) time.onOffline(msg.uid)
+})
+
+Ran.Event.on('LeaveRoom', msg => {
+  if (member.users[msg.uid]) time.onOffline(msg.uid)
+})
+
+Ran.command(/^\.增加员工(.*)$/, 'member.add', (m, e, reply) => {
+  if (!per.users.hasPermission(e.uid, 'member.add') && !per.users.hasPermission(e.uid, 'permission.member.add')) return reply('[!] 权限不足', 'CB3837')
+  const uid = utils.filter(m[1])
+  try {
+    reply(member.add(uid, 1))
+  } catch (error) {
+    logger('member').error('fs error', error)
+    reply('[!] 文件写入失败，数据将会在下次重启后丢失', 'CB3837')
+  }
+})
+
+Ran.command(/^\.删除员工(.*)$/, 'member.remove', (m, e, reply) => {
+  if (!per.users.hasPermission(e.uid, 'member.remove') && !per.users.hasPermission(e.uid, 'permission.member.remove')) return reply('[!] 权限不足', 'CB3837')
+  const uid = utils.filter(m[1])
+  try {
+    reply(member.remove(uid))
+  } catch (error) {
+    logger('member').error('fs error', error)
+    reply('[!] 文件写入失败，数据将会在下次重启后丢失', 'CB3837')
+  }
+})
+
+Ran.command(/^\.设置工资 (\S+) (.*)$/, 'member.set', (m, e, reply) => {
+  if (!per.users.hasPermission(e.uid, 'member.set') && !per.users.hasPermission(e.uid, 'permission.member.set')) return reply('[!] 权限不足', 'CB3837')
+  const uid = utils.filter(m[2])
+  const money = Number(m[1].trim())
+
+  if (money < 0.1 || money > 2.5) return reply('[!] 工资必须大于 0.1 且小于 2.5', 'CB3837')
+
+  try {
+    reply(member.set(uid, money))
+  } catch (error) {
+    logger('member').error('fs error', error)
+    reply('[!] 文件写入失败，数据将会在下次重启后丢失', 'CB3837')
+  }
+})
+
+Ran.command(/^\.查询员工$/, 'member.query', (m, e, reply) => {
+  if (!per.users.hasPermission(e.uid, 'member.query') && !per.users.hasPermission(e.uid, 'permission.member.query')) return reply('[!] 权限不足', 'CB3837')
+  const msg = []
+
+  for (const uid of Object.keys(member.users)) {
+    const online = time.users[uid] ? time.users[uid].Time : 0
+    const t = time.users[uid] ? new Date().getTime() - time.users[uid].lastOnline : 0
+
+    const onlineTime = Math.round((online + t) / 1e3 / 60 / 60 * 10) / 10
+
+    msg.push(` [@${uid}@]  . ${onlineTime}小时`)
+  }
+
+  reply(msg.join('\n'))
+})
+
+Ran.command(/^\.结算$/, 'member.payment', async (m, e, reply) => {
+  if (!per.users.hasPermission(e.uid, 'member.payment') && !per.users.hasPermission(e.uid, 'permission.member.payment')) return reply('[!] 权限不足', 'CB3837')
+  let total = 0
+  for (const uid of Object.keys(time.users)) {
+    time.onOffline(uid)
+    const t = time.users[uid]
+    const hours = t.Time / 1e3 / 60 / 60
+    const money = member.users[uid] * hours
+    total += money
+  }
+
+  const selfInfo = await Ran.method.utils.getUserProfile(config.account.username)
+
+  if (Number(selfInfo.money.hold) < total) {
+    reply('[!] 机器人余额不足', 'CB3837')
+  } else {
+    actions.payment()
+  }
+})
