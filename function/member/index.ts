@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import cron from 'node-cron'
 import * as Ran from '../../lib/api'
 import per from '../permission/permission'
 import logger from '../../lib/logger'
@@ -145,16 +146,25 @@ const time: {
 const actions = {
   // 发工资
   payment: () => {
+    const msg = []
+
     for (const uid of Object.keys(time.users)) {
       const t = time.users[uid]
-      const hours = t.Time / 1e3 / 60 / 60
+      const h = (t.Time + (t.online ? (new Date().getTime() - t.lastOnline) : 0)) / 1e3 / 60 / 60
+      const hours = Math.round(h * 100) / 100
       const money = member.users[uid] * hours
       logger('Member').info(`正在向 ${uid} 发工资...(在线时长: ${hours}小时, 工资: ${money})`)
       Ran.method.payment(uid, money, `在线时长: ${hours}小时\n工资: ${money}`)
+
+      msg.push(`  [@${uid}@]  在线 ${hours} 小时，工资 ${money}`)
     }
 
     time.clear()
     actions.update()
+
+    Array(new Set([...per.users.has('member.payment'), ...per.users.has('permission.member.payment')])).forEach((uid: any) => {
+      Ran.method.sendPrivateMessage(uid, '[!] 机器人余额不足', 'CB3837')
+    })
   },
   // 更新在线状态
   update: async () => {
@@ -251,13 +261,29 @@ Ran.command(/^\.查询员工$/, 'member.query', (m, e, reply) => {
   reply(msg.join('\n'))
 })
 
-Ran.command(/^\.结算$/, 'member.payment', async (m, e, reply) => {
-  if (!per.users.hasPermission(e.uid, 'member.payment') && !per.users.hasPermission(e.uid, 'permission.member.payment')) return reply('[!] 权限不足', 'CB3837')
+Ran.command(/^\.结算$/, 'member.calc', async (m, e, reply) => {
+  if (!per.users.hasPermission(e.uid, 'member.calc') && !per.users.hasPermission(e.uid, 'permission.member.calc')) return reply('[!] 权限不足', 'CB3837')
+
+  const msg = []
+
+  for (const uid of Object.keys(time.users)) {
+    const t = time.users[uid]
+    const h = (t.Time + (t.online ? (new Date().getTime() - t.lastOnline) : 0)) / 1e3 / 60 / 60
+    const hours = Math.round(h * 100) / 100
+    const money = member.users[uid] * hours
+
+    msg.push(`  [@${uid}@]   ${money} 钞 (${hours} 小时)`)
+  }
+
+  reply(msg.join('\n'))
+})
+
+Ran.command(/^\.发工资$/, 'member.payment', async (m, e, reply) => {
   let total = 0
   for (const uid of Object.keys(time.users)) {
-    time.onOffline(uid)
     const t = time.users[uid]
-    const hours = t.Time / 1e3 / 60 / 60
+    const h = (t.Time + (t.online ? (new Date().getTime() - t.lastOnline) : 0)) / 1e3 / 60 / 60
+    const hours = Math.round(h * 100) / 100
     const money = member.users[uid] * hours
     total += money
   }
@@ -265,7 +291,30 @@ Ran.command(/^\.结算$/, 'member.payment', async (m, e, reply) => {
   const selfInfo = await Ran.method.utils.getUserProfile(config.account.username)
 
   if (Number(selfInfo.money.hold) < total) {
-    reply('[!] 机器人余额不足', 'CB3837')
+    Array(new Set([...per.users.has('member.payment'), ...per.users.has('permission.member.payment')])).forEach((uid: any) => {
+      Ran.method.sendPrivateMessage(uid, '[!] 机器人余额不足', 'CB3837')
+    })
+  } else {
+    actions.payment()
+  }
+})
+
+cron.schedule('30 22 * * *', async () => {
+  let total = 0
+  for (const uid of Object.keys(time.users)) {
+    const t = time.users[uid]
+    const h = (t.Time + (t.online ? (new Date().getTime() - t.lastOnline) : 0)) / 1e3 / 60 / 60
+    const hours = Math.round(h * 100) / 100
+    const money = member.users[uid] * hours
+    total += money
+  }
+
+  const selfInfo = await Ran.method.utils.getUserProfile(config.account.username)
+
+  if (Number(selfInfo.money.hold) < total) {
+    Array(new Set([...per.users.has('member.payment'), ...per.users.has('permission.member.payment')])).forEach((uid: any) => {
+      Ran.method.sendPrivateMessage(uid, '[!] 机器人余额不足', 'CB3837')
+    })
   } else {
     actions.payment()
   }
