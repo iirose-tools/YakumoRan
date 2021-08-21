@@ -68,11 +68,13 @@ export class autopayAction {
     if (!autopay.option.autopayOption) return Member.resetminutes()
 
     if (autopay.option.autopayOption.autopay === true) {
-      if (new Date().getHours() === 23) {
-        this.predictBeforePay(autopay.option.autopayOption.employer, autopay.option.autopayOption.salaryperhour)
-      }
-      if (new Date().getHours() === 0) {
-        this.autopaysal(autopay.option.autopayOption.employer, autopay.option.autopayOption.salaryperhour)
+      switch (new Date().getHours()) {
+        case 23:
+          this.predictBeforePay(autopay.option.autopayOption.employer, autopay.option.autopayOption.salaryperhour)
+          break
+        case 0:
+          this.autopaysal(autopay.option.autopayOption.employer, autopay.option.autopayOption.salaryperhour)
+          break
       }
     } else {
       Member.resetminutes()

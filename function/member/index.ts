@@ -19,14 +19,12 @@ Ran.Event.on('login', () => {
   try { fs.mkdirSync(path.join(Ran.Data, '/member')) } catch (error) { }
   if (!fs.existsSync(path.join(Ran.Data, '/member/members.json'))) fs.writeFileSync(path.join(Ran.Data, '/member/members.json'), '{}')
   if (!fs.existsSync(path.join(Ran.Data, '/member/option.json'))) fs.writeFileSync(path.join(Ran.Data, '/member/option.json'), '{}')
-
   Member.load()
   autopay.load()
   event.Room()
   command.memberCommand()
   command.autopayOptionCommand()
   Actions.update()
-  Member.addminutes()
   autopayAction.startAutopayOperation()
   setInterval(() => Member.addminutes(), 1 * 60 * 1e3)
   setInterval(() => Actions.update(), 15 * 60 * 1e3)
