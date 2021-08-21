@@ -96,7 +96,7 @@ export class Member {
     }
 
     /**
-     * 重置minutes
+     * 重置分钟
      */
     static resetminutes () {
       if (Object.keys(this.users).length === 0) {

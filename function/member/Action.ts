@@ -5,7 +5,10 @@ import logger from '../../lib/logger'
 import config from '../../config'
 import { autopay } from './Autopay'
 
-// 一些操作
+/**
+ * 一些操作
+ * @class
+ */
 export class Actions {
 /**
  * 更新在线状态
@@ -45,9 +48,9 @@ export class Actions {
  * @class
  */
 export class autopayAction {
-/**
- * 开始
- */
+  /**
+   * 开始
+   */
   static startAutopayOperation () {
     this.checkhour()
     setTimeout(() =>
@@ -76,7 +79,10 @@ export class autopayAction {
     }
   }
 
-  static async predictBeforePay (employer:string, salaryperhour:number) {
+  /**
+   * 预测工资，如果不够钱，则发信息给雇主
+   */
+  private static async predictBeforePay (employer:string, salaryperhour:number) {
     if (Object.keys(Member.users).length === 0) {
       logger('member').info('没有员工，跳过数据更新')
       return
@@ -101,7 +107,10 @@ export class autopayAction {
     }
   }
 
-  static async autopaysal (employer:string, salaryperhour:number) {
+  /**
+   * 自动付款主要函数
+   */
+  private static async autopaysal (employer:string, salaryperhour:number) {
     if (Object.keys(Member.users).length === 0) {
       logger('member').info('没有员工，跳过数据更新')
       return
@@ -132,13 +141,19 @@ export class autopayAction {
     }
   }
 
-  static payButNotEnoughMoney (msg: string, moneyhold: number, allmustpay:number, employer:string) {
+  /**
+   * 如果自动付款的钱不够，则发信息给雇主
+   */
+  private static payButNotEnoughMoney (msg: string, moneyhold: number, allmustpay:number, employer:string) {
     msg = msg.concat(`-------------------------------------\n钞不足：机器人拥有${moneyhold}钞\n今天需要发出的工资：${allmustpay.toFixed(2)}\n请自行发放工资`)
     Member.resetminutes()
     Ran.method.sendPrivateMessage(employer, msg, config.app.color)
   }
 
-  static proceedPayment (msg: string, allmustpay:number, employer:string, mustpay:number[], worktime:number[], uid:string[]) {
+  /**
+   * 如果自动付款的钱足够，则发工资，然后发信息给雇主
+   */
+  private static proceedPayment (msg: string, allmustpay:number, employer:string, mustpay:number[], worktime:number[], uid:string[]) {
     let index : number = 0
     do {
       if (worktime[index] !== 0) {
