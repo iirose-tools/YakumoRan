@@ -1,321 +1,160 @@
 import fs from 'fs'
 import path from 'path'
-import cron from 'node-cron'
 import * as Ran from '../../lib/api'
 import per from '../permission/permission'
 import logger from '../../lib/logger'
-import config from '../../config'
 
+import { Member } from './Member'
+import { utils } from './utils'
+import { Actions, autopayAction } from './Action'
+import { autopay } from './Autopay'
+
+// 初始化
 Ran.Event.on('login', () => {
   logger('member').info('正在初始化')
 
   try { fs.mkdirSync(path.join(Ran.Data, '/member')) } catch (error) { }
-  if (!fs.existsSync(path.join(Ran.Data, '/member/users.json'))) fs.writeFileSync(path.join(Ran.Data, '/member/users.json'), '{}')
-  if (!fs.existsSync(path.join(Ran.Data, '/member/time.json'))) fs.writeFileSync(path.join(Ran.Data, '/member/time.json'), '{}')
+  if (!fs.existsSync(path.join(Ran.Data, '/member/members.json'))) fs.writeFileSync(path.join(Ran.Data, '/member/members.json'), '{}')
+  if (!fs.existsSync(path.join(Ran.Data, '/member/option.json'))) fs.writeFileSync(path.join(Ran.Data, '/member/option.json'), '{}')
 
-  member.load()
-  time.load()
+  Member.load()
+  autopay.load()
+  Actions.update()
+  autopayAction.startAutopayOperation()
 
-  actions.update()
+  setInterval(() => Member.addminutes(), 1 * 60 * 1e3)
+  setInterval(() => Actions.update(), 15 * 60 * 1e3)
 
-  setInterval(() => actions.update(), 10 * 60 * 1e3)
+  if (fs.existsSync(path.join(Ran.Data, '/member/users.json'))) {
+    logger('member').info('发现老版本数据...')
+    try {
+      const oldData = JSON.parse(fs.readFileSync(path.join(Ran.Data, '/member/users.json')).toString())
+      for (const uid of Object.keys(oldData)) {
+        Member.add(uid)
+        autopay.set(uid, oldData[uid])
+      }
+
+      fs.copyFileSync(path.join(Ran.Data, '/member/users.json'), path.join(Ran.Data, '/member/users.old.json'))
+      fs.copyFileSync(path.join(Ran.Data, '/member/time.json'), path.join(Ran.Data, '/member/time.old.json'))
+
+      fs.unlinkSync(path.join(Ran.Data, '/member/users.json'))
+      fs.unlinkSync(path.join(Ran.Data, '/member/time.json'))
+
+      logger('member').info('数据导入完成!')
+    } catch (error) {
+      logger('member').error('数据导入失败', error)
+    }
+  }
 
   logger('member').info('初始化完成')
 })
 
-interface Time {
-  // 上一次上线的时间
-  lastOnline: number,
-  // 上一次发工资到现在的在线时长
-  Time: number,
-  // 在线状态
-  online: boolean
-}
-
-// 工具类
-const utils = {
-  filter: (input: string): string => {
-    let output = input
-
-    output = output.replace(/\[/g, '')
-    output = output.replace(/\]/g, '')
-    output = output.replace(/@/g, '')
-    output = output.replace(/\s+/g, '')
-    output = output.replace(/\//g, '')
-    output = output.replace(/\\/g, '')
-    output = output.replace(/\./g, '')
-
-    return output
-  }
-}
-
-// 用户管理
-const member: {
-  users: {
-    [index: string]: number
-  },
-  path: string,
-  write(): void,
-  load(): void,
-  set(uid: string, money: number): string,
-  add(uid: string, money: number): string,
-  remove(uid: string): string
-} = {
-  path: path.join(Ran.Data, '/member/users.json'),
-  users: {},
-  // 写入数据
-  write: () => fs.writeFileSync(member.path, JSON.stringify(member.users)),
-  // 读取数据
-  load: () => (member.users = JSON.parse(fs.readFileSync(member.path).toString())),
-  // 添加员工
-  add: (uid: string, money: number) => {
-    const realUid = utils.filter(uid)
-    if (member.users[realUid]) return '已经添加过这个员工了'
-    member.users[realUid] = money
-    member.write()
-    return '添加成功'
-  },
-  // 删除员工
-  remove: (uid: string) => {
-    const realUid = utils.filter(uid)
-    if (member.users[realUid] === undefined) return '你还没有添加这个员工'
-    delete member.users[realUid]
-    member.write()
-    return '删除成功'
-  },
-  // 设置金额
-  set: (uid: string, money: number) => {
-    const realUid = utils.filter(uid)
-    if (member.users[realUid] === undefined) return '你还没有添加这个员工'
-    member.users[realUid] = money
-    member.write()
-    return '设置成功'
-  }
-}
-
-// 记录时间
-const time: {
-  users: {
-    [index: string]: Time
-  },
-  path: string,
-  write(): void,
-  load(): void,
-  clear(): void,
-  onOnline(uid: string): void
-  onOffline(uid: string): void
-} = {
-  path: path.join(Ran.Data, '/member/time.json'),
-  users: {},
-  // 写入数据
-  write: () => fs.writeFileSync(time.path, JSON.stringify(time.users)),
-  // 读取数据
-  load: () => (time.users = JSON.parse(fs.readFileSync(time.path).toString())),
-  // 清空数据
-  clear: () => {
-    time.users = {}
-    time.write()
-  },
-  onOnline: (uid: string) => {
-    if (time.users[uid] && time.users[uid].online) return
-    if (!time.users[uid]) {
-      time.users[uid] = {
-        online: true,
-        lastOnline: new Date().getTime(),
-        Time: 0
-      }
-    } else {
-      time.users[uid].lastOnline = new Date().getTime()
-      time.users[uid].online = true
-    }
-
-    time.write()
-  },
-  onOffline: (uid: string) => {
-    if (time.users[uid]) {
-      const t: number = new Date().getTime() - time.users[uid].lastOnline
-      time.users[uid].Time += t
-      time.users[uid].online = false
-
-      time.write()
-    }
-  }
-}
-
-// 一些操作
-const actions = {
-  // 发工资
-  payment: () => {
-    const msg = []
-
-    for (const uid of Object.keys(time.users)) {
-      const t = time.users[uid]
-      const h = (t.Time + (t.online ? (new Date().getTime() - t.lastOnline) : 0)) / 1e3 / 60 / 60
-      const hours = Math.round(h * 100) / 100
-      const money = member.users[uid] * hours
-      logger('Member').info(`正在向 ${uid} 发工资...(在线时长: ${hours}小时, 工资: ${money})`)
-      Ran.method.payment(uid, money, `在线时长: ${hours}小时\n工资: ${money}`)
-
-      msg.push(`  [@${uid}@]  在线 ${hours} 小时，工资 ${money}`)
-    }
-
-    time.clear()
-    actions.update()
-
-    Array(new Set([...per.users.has('member.payment'), ...per.users.has('permission.member.payment')])).forEach((uid: any) => {
-      Ran.method.sendPrivateMessage(uid, '[!] 机器人余额不足', 'CB3837')
-    })
-  },
-  // 更新在线状态
-  update: async () => {
-    if (member.users === {}) {
-      logger('member').info('没有员工，跳过数据更新')
-      return
-    }
-
-    const list = await Ran.method.utils.getUserList()
-
-    const mark: {
-      [index: string]: boolean
-    } = {}
-
-    for (const uid of Object.keys(member.users)) {
-      mark[uid] = false
-    }
-
-    for (const user of list) {
-      if (member.users[user.uid]) {
-        mark[user.uid] = true
-        time.onOnline(user.uid)
-      }
-    }
-
-    Object.keys(mark).forEach(uid => {
-      if (!mark[uid]) time.onOffline(uid)
-    })
-  }
-}
-
 Ran.Event.on('JoinRoom', msg => {
-  if (member.users[msg.uid]) time.onOnline(msg.uid)
+  if (Member.users[msg.uid.toLocaleLowerCase()]) Member.onOnline(msg.uid)
 })
 
 Ran.Event.on('SwitchRoom', msg => {
-  if (member.users[msg.uid]) time.onOffline(msg.uid)
+  if (Member.users[msg.uid.toLocaleLowerCase()]) Member.onOffline(msg.uid)
 })
 
 Ran.Event.on('LeaveRoom', msg => {
-  if (member.users[msg.uid]) time.onOffline(msg.uid)
+  if (Member.users[msg.uid.toLocaleLowerCase()]) Member.onOffline(msg.uid)
 })
 
 Ran.command(/^\.增加员工(.*)$/, 'member.add', (m, e, reply) => {
   if (!per.users.hasPermission(e.uid, 'member.add') && !per.users.hasPermission(e.uid, 'permission.member.add')) return reply('[!] 权限不足', 'CB3837')
-  const uid = utils.filter(m[1])
   try {
-    reply(member.add(uid, 1))
+    const uid = utils.filter(m[1])
+    if (utils.UidLengthControl(uid) === false) return reply('[Member] 添加员工失败，UID错误')
+    reply(Member.add(uid))
   } catch (error) {
     logger('member').error('fs error', error)
-    reply('[!] 文件写入失败，数据将会在下次重启后丢失', 'CB3837')
   }
 })
 
 Ran.command(/^\.删除员工(.*)$/, 'member.remove', (m, e, reply) => {
   if (!per.users.hasPermission(e.uid, 'member.remove') && !per.users.hasPermission(e.uid, 'permission.member.remove')) return reply('[!] 权限不足', 'CB3837')
-  const uid = utils.filter(m[1])
   try {
-    reply(member.remove(uid))
+    const uid = utils.filter(m[1])
+    if (utils.UidLengthControl(uid) === false) return reply('[Member] 删除员工失败，UID错误')
+    reply(Member.remove(uid))
   } catch (error) {
     logger('member').error('fs error', error)
-    reply('[!] 文件写入失败，数据将会在下次重启后丢失', 'CB3837')
-  }
-})
-
-Ran.command(/^\.设置工资 (\S+) (.*)$/, 'member.set', (m, e, reply) => {
-  if (!per.users.hasPermission(e.uid, 'member.set') && !per.users.hasPermission(e.uid, 'permission.member.set')) return reply('[!] 权限不足', 'CB3837')
-  const uid = utils.filter(m[2])
-  const money = Number(m[1].trim())
-
-  if (money < 0.1 || money > 2.5) return reply('[!] 工资必须大于 0.1 且小于 2.5', 'CB3837')
-
-  try {
-    reply(member.set(uid, money))
-  } catch (error) {
-    logger('member').error('fs error', error)
-    reply('[!] 文件写入失败，数据将会在下次重启后丢失', 'CB3837')
+    reply('[!] 文件写入失败，数据将会在下次重启后丢失', 'FF4D4F')
   }
 })
 
 Ran.command(/^\.查询员工$/, 'member.query', (m, e, reply) => {
   if (!per.users.hasPermission(e.uid, 'member.query') && !per.users.hasPermission(e.uid, 'permission.member.query')) return reply('[!] 权限不足', 'CB3837')
   const msg = []
-
-  for (const uid of Object.keys(member.users)) {
-    const online = time.users[uid] ? time.users[uid].Time : 0
-    const t = time.users[uid] ? new Date().getTime() - time.users[uid].lastOnline : 0
-
-    const onlineTime = Math.round((online + t) / 1e3 / 60 / 60 * 10) / 10
-
-    msg.push(` [@${uid}@]  . ${onlineTime}小时`)
+  let a = 1
+  for (const uid of Object.keys(Member.users)) {
+    msg.push(`${a}. [@${uid}@] `)
+    a = a + 1
   }
-
-  reply(msg.join('\n'))
+  if (msg.length === 0) {
+    reply('[Member] 没有员工')
+  } else {
+    reply(msg.join('\n'))
+  }
 })
 
-Ran.command(/^\.结算$/, 'member.calc', async (m, e, reply) => {
-  if (!per.users.hasPermission(e.uid, 'member.calc') && !per.users.hasPermission(e.uid, 'permission.member.calc')) return reply('[!] 权限不足', 'CB3837')
-
+Ran.command(/^\.结算$/, 'member.payment', async (m, e, reply) => {
+  if (!per.users.hasPermission(e.uid, 'member.query') && !per.users.hasPermission(e.uid, 'permission.member.query')) return reply('[!] 权限不足', 'CB3837')
   const msg = []
-
-  for (const uid of Object.keys(time.users)) {
-    const t = time.users[uid]
-    const h = (t.Time + (t.online ? (new Date().getTime() - t.lastOnline) : 0)) / 1e3 / 60 / 60
-    const hours = Math.round(h * 100) / 100
-    const money = member.users[uid] * hours
-
-    msg.push(`  [@${uid}@]   ${money} 钞 (${hours} 小时)`)
+  let a = 1
+  for (const uid of Object.keys(Member.users)) {
+    const time = utils.calHourNMinutes(Member.users[uid].Minutes)
+    msg.push(`${a}. [@${uid}@]  : ${time[0]}小时 ${time[1]}分钟`)
+    a = a + 1
   }
-
-  reply(msg.join('\n'))
-})
-
-Ran.command(/^\.发工资$/, 'member.payment', async (m, e, reply) => {
-  let total = 0
-  for (const uid of Object.keys(time.users)) {
-    const t = time.users[uid]
-    const h = (t.Time + (t.online ? (new Date().getTime() - t.lastOnline) : 0)) / 1e3 / 60 / 60
-    const hours = Math.round(h * 100) / 100
-    const money = member.users[uid] * hours
-    total += money
-  }
-
-  const selfInfo = await Ran.method.utils.getUserProfile(config.account.username)
-
-  if (Number(selfInfo.money.hold) < total) {
-    Array(new Set([...per.users.has('member.payment'), ...per.users.has('permission.member.payment')])).forEach((uid: any) => {
-      Ran.method.sendPrivateMessage(uid, '[!] 机器人余额不足', 'CB3837')
-    })
+  if (msg.length === 0) {
+    reply('[Member] 没有员工')
   } else {
-    actions.payment()
+    reply(msg.join('\n'))
   }
 })
 
-cron.schedule('30 22 * * *', async () => {
-  let total = 0
-  for (const uid of Object.keys(time.users)) {
-    const t = time.users[uid]
-    const h = (t.Time + (t.online ? (new Date().getTime() - t.lastOnline) : 0)) / 1e3 / 60 / 60
-    const hours = Math.round(h * 100) / 100
-    const money = member.users[uid] * hours
-    total += money
+Ran.command(/^\.设置自发工资 (.*) (.*)$/, 'member.setautopay', (m, e, reply) => {
+  if (!per.users.hasPermission(e.uid, 'member.op') && !per.users.hasPermission(e.uid, 'permission.member')) {
+    reply(` [*${e.username}*]   :  没有权限`)
+    return null
   }
+  try {
+    const uid: string = utils.filter(m[1])
+    if (isNaN(+m[2])) return reply('[Member] 自动付工资设置失败，工资必须是数字')
+    const sal: number = +m[2]
+    if (utils.UidLengthControl(uid) === false) return reply('[Member] 自动付工资设置失败，UID错误')
+    if (utils.saleryControl(sal) === false) return reply('工资必须大于"0.09" 或者小于"3.1"')
+    reply(autopay.set(uid, +sal))
+  } catch (error) {
+    reply('[!] 设置失败', '#FF4D4F')
+    logger('member').error('fs error', error)
+  }
+})
 
-  const selfInfo = await Ran.method.utils.getUserProfile(config.account.username)
+Ran.command(/^\.开自发工资$/, 'member.openautopay', (m, e, reply) => {
+  if (!per.users.hasPermission(e.uid, 'member.op') && !per.users.hasPermission(e.uid, 'permission.member')) {
+    reply(` [*${e.username}*]   :  没有权限`)
+    return null
+  }
+  try {
+    reply(autopay.open())
+  } catch (error) {
+    reply('[!] 设置失败', '#FF4D4F')
+    logger('member').error('fs error', error)
+  }
+})
 
-  if (Number(selfInfo.money.hold) < total) {
-    Array(new Set([...per.users.has('member.payment'), ...per.users.has('permission.member.payment')])).forEach((uid: any) => {
-      Ran.method.sendPrivateMessage(uid, '[!] 机器人余额不足', 'CB3837')
-    })
-  } else {
-    actions.payment()
+Ran.command(/^\.关自发工资$/, 'member.stopautopay', (m, e, reply) => {
+  if (!per.users.hasPermission(e.uid, 'member.op') && !per.users.hasPermission(e.uid, 'permission.member')) {
+    reply(` [*${e.username}*]   :  没有权限`)
+    return null
+  }
+  try {
+    reply(autopay.close())
+  } catch (error) {
+    reply('[!] 设置失败', '#FF4D4F')
+    logger('member').error('fs error', error)
   }
 })
