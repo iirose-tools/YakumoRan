@@ -84,7 +84,6 @@ export class Member {
    */
   static addminutes () {
     if (Object.keys(this.users).length === 0) {
-      logger('member').info('没有员工，跳过数据更新')
       return
     }
     for (const uid of Object.keys(this.users)) {
@@ -105,10 +104,8 @@ export class Member {
     }
     if (new Date().getHours() === 0) {
       for (const uid of Object.keys(this.users)) {
-        if (Actions.checkOnline(uid)) {
-          this.users[uid].Minutes = 0
-          this.write()
-        }
+        this.users[uid].Minutes = 0
+        this.write()
       }
     }
   }
