@@ -93,7 +93,7 @@ Ran.command(/^\.wolf stop$/, 'wolf.stop', (match, event, reply) => {
   reply('[Wolf] 游戏已被创建者强制结束')
 })
 
-Ran.command(/^\.wolf players$/, 'wolf.list', (match, event, reply) => {
+Ran.command(/^\.wolf list$/, 'wolf.list', (match, event, reply) => {
   if (!game) return reply('[Wolf] 你还没有创建游戏')
 
   if (game.Roles.length > 0) {
