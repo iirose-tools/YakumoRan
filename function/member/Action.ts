@@ -6,13 +6,13 @@ import config from '../../config'
 import { autopay } from './Autopay'
 
 /**
- * 一些操作
+ * @description 一些操作
  * @class
  */
 export class Actions {
-/**
- * 更新在线状态
- */
+  /**
+   * @description 更新在线状态
+   */
   static async update () {
     if (Member.users === {}) {
       logger('member').info('没有员工，跳过数据更新')
@@ -35,7 +35,8 @@ export class Actions {
   }
 
   /**
-   * 检查online的值
+   * @description 检查online的值
+   * @param {string} uid uid
    */
   static checkOnline (uid: string) {
     uid = uid.toLocaleLowerCase()
@@ -44,12 +45,12 @@ export class Actions {
 }
 
 /**
- * 自动付工资的操作
+ * @description 自动付工资的操作
  * @class
  */
 export class autopayAction {
   /**
-   * 开始
+   * @description 开始
    */
   static startAutopayOperation () {
     this.checkhour()
@@ -62,7 +63,7 @@ export class autopayAction {
   }
 
   /**
-   * 检查时间（小时）
+   * @description 检查时间（小时）
    */
   private static checkhour () {
     if (!autopay.option.autopayOption) return Member.resetminutes()
@@ -82,60 +83,78 @@ export class autopayAction {
   }
 
   /**
-   * 预测工资，如果不够钱，则发信息给雇主
+   * @description 计算工资，如果不够钱，则发信息给雇主
+   * @param {string} employer 雇主
+   * @param {number} salaryPerHour 每小时工资
    */
-  private static async predictBeforePay (employer:string, salaryperhour:number) {
+  private static async predictBeforePay (employer: string, salaryPerHour: number) {
     if (Object.keys(Member.users).length === 0) {
       logger('member').info('没有员工，跳过数据更新')
       return
     }
+
     let msg : string = '员工自动记时系统\n晚上 11:00 p.m.\n-------------------------------------\n'
     let index : number = 1
     let allmustpay : number = 0
+
     for (const uid of Object.keys(Member.users)) {
       const worktime = utils.calHourNMinutes(Member.users[uid].Minutes)
-      const paynow : number = Number((worktime[0] * salaryperhour).toFixed(2))
-      let predict = Number((paynow + salaryperhour).toFixed(2))
-      if (worktime[0] === 22) predict = Number((predict + salaryperhour).toFixed(2))
+      const paynow : number = Number((worktime[0] * salaryPerHour).toFixed(2))
+      let predict = Number((paynow + salaryPerHour).toFixed(2))
+
+      if (worktime[0] === 22) predict = Number((predict + salaryPerHour).toFixed(2))
+
       allmustpay = Number((allmustpay + predict).toFixed(2))
       msg = msg.concat(`${index}. [@${uid}@] \n目前挂机时间: ${worktime[0]}小时 ${worktime[1]}分钟\n目前应付工资：${paynow}钞\n预计应付工资：${predict}钞\n---\n`)
       index++
     }
+
     const list = await Ran.method.utils.getUserProfile(config.account.username)
+
     if (Number(list.money.hold) <= allmustpay) {
       msg = msg.concat(`-------------------------------------\n预计所有应付工资：${allmustpay}钞\n`)
       msg = msg.concat(`机器人拥有的钞：${list.money.hold}钞\n还需要：${(allmustpay - Number(list.money.hold)).toFixed(2)}钞\n为了避免失败工资付款失败，请给机器人打：${(allmustpay + 1 - Number(list.money.hold)).toFixed(2)}钞`)
-      Ran.method.sendPrivateMessage(employer, msg, config.app.color)
+
+      Ran.method.sendPrivateMessage(employer, msg)
     }
   }
 
   /**
-   * 自动付款主要函数
+   * @description 自动付款主要函数
+   * @param {string} employer 雇主
+   * @param {number} salaryPerHour 每小时工资
    */
-  private static async autopaysal (employer:string, salaryperhour:number) {
-    if (Object.keys(Member.users).length === 0) {
-      logger('member').info('没有员工，跳过数据更新')
-      return
-    }
+  private static async autopaysal (employer: string, salaryPerHour: number) {
+    if (Object.keys(Member.users).length === 0) return logger('member').info('没有员工，跳过数据更新')
+
     let allmustpay : number = 0
     let index : number = 1
     let msg : string = '员工自动记时系统\n凌晨 00:00 a.m.\n-------------------------------------\n'
+
     const transuid : string[] = new Array(Object.keys(Member.users).length)
     const transsal : number[] = new Array(Object.keys(Member.users).length)
     const transhour : number[] = new Array(Object.keys(Member.users).length)
+
     for (const uid of Object.keys(Member.users)) {
       const worktime = utils.calHourNMinutes(Member.users[uid].Minutes)
+
       if (worktime[0] === 23) worktime[0] = worktime[0] + 1
-      const paynow = Number((worktime[0] * salaryperhour).toFixed(2))
+
+      const paynow = Number((worktime[0] * salaryPerHour).toFixed(2))
+
       allmustpay = Number((allmustpay + paynow).toFixed(2))
       msg = msg.concat(`${index}. [@${uid}@] \n挂机时长: ${worktime[0]}小时\n工资：${paynow}钞\n---\n`)
       console.log(uid)
+
       transuid[index - 1] = uid
       transsal[index - 1] = paynow
       transhour[index - 1] = worktime[0]
+
       index++
     }
+
     const list = await Ran.method.utils.getUserProfile(config.account.username)
+
     if (Number(list.money.hold) <= allmustpay) {
       this.payButNotEnoughMoney(msg, Number(list.money.hold), allmustpay, employer)
     } else {
@@ -144,16 +163,20 @@ export class autopayAction {
   }
 
   /**
-   * 如果自动付款的钱不够，则发信息给雇主
+   * @description 如果自动付款的钱不够，则发信息给雇主
+   * @param {string} msg
+   * @param {number} moneyhold
+   * @param {number} allmustpay
+   * @param {string} employer
    */
   private static payButNotEnoughMoney (msg: string, moneyhold: number, allmustpay:number, employer:string) {
     msg = msg.concat(`-------------------------------------\n钞不足：机器人拥有${moneyhold}钞\n今天需要发出的工资：${allmustpay.toFixed(2)}\n请自行发放工资`)
     Member.resetminutes()
-    Ran.method.sendPrivateMessage(employer, msg, config.app.color)
+    Ran.method.sendPrivateMessage(employer, msg)
   }
 
   /**
-   * 如果自动付款的钱足够，则发工资，然后发信息给雇主
+   * @description 如果自动付款的钱足够，则发工资，然后发信息给雇主
    */
   private static proceedPayment (msg: string, allmustpay:number, employer:string, mustpay:number[], worktime:number[], uid:string[]) {
     let index : number = 0
@@ -165,6 +188,6 @@ export class autopayAction {
     } while (index < uid.length)
     msg = msg.concat(`-------------------------------------\n工资已发放，总计：${allmustpay.toFixed(2)}钞\n`)
     Member.resetminutes()
-    Ran.method.sendPrivateMessage(employer, msg, config.app.color)
+    Ran.method.sendPrivateMessage(employer, msg)
   }
 }
