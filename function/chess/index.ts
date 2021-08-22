@@ -206,34 +206,34 @@ api.command(/^chess open$/, 'chess.open', async (m, e, reply) => {
 // 私聊与队友交流
 api.Event.on('PrivateMessage', event => {
   try {
-  if (usedata[event.username].camp === 'white') {
-    uidList.white.forEach(function (id:any) {
-      if (id === event.uid) return
-      api.method.sendPrivateMessage(id, ` [白方组内私聊]  [*${event.username}*]  >>  ${event.message} `)
-    })
-  } else if (usedata[event.username].camp === 'black') {
-    uidList.black.forEach(function (id:any) {
-      if (id === event.uid) return
-      api.method.sendPrivateMessage(id, ` [黑方组内私聊]  [*${event.username}*]  >>  ${event.message} `)
-    })
-  } else if (uidList.watchUid.includes(event.uid)) {
-    uidList.white.forEach(function (id:any) {
-      api.method.sendPrivateMessage(id, ` [白方组内私聊]  [*${event.username}*]  >>  ${event.message} `)
-    })
-    uidList.black.forEach(function (id:any) {
-      api.method.sendPrivateMessage(id, ` [黑方组内私聊]  [*${event.username}*]  >>  ${event.message} `)
-    })
-  } else if (uidList.mainUid.includes(event.uid)) {
-    uidList.white.forEach(function (id:any) {
-      api.method.sendPrivateMessage(id, ` [白方组内私聊]  [*${event.username}*]  >>  ${event.message} `)
-    })
-    uidList.black.forEach(function (id:any) {
-      api.method.sendPrivateMessage(id, ` [黑方组内私聊]  [*${event.username}*]  >>  ${event.message} `)
-    })
-  }
-} catch (error) {
+    if (usedata[event.username].camp === 'white') {
+      uidList.white.forEach(function (id:any) {
+        if (id === event.uid) return
+        api.method.sendPrivateMessage(id, ` [白方组内私聊]  [*${event.username}*]  >>  ${event.message} `)
+      })
+    } else if (usedata[event.username].camp === 'black') {
+      uidList.black.forEach(function (id:any) {
+        if (id === event.uid) return
+        api.method.sendPrivateMessage(id, ` [黑方组内私聊]  [*${event.username}*]  >>  ${event.message} `)
+      })
+    } else if (uidList.watchUid.includes(event.uid)) {
+      uidList.white.forEach(function (id:any) {
+        api.method.sendPrivateMessage(id, ` [白方组内私聊]  [*${event.username}*]  >>  ${event.message} `)
+      })
+      uidList.black.forEach(function (id:any) {
+        api.method.sendPrivateMessage(id, ` [黑方组内私聊]  [*${event.username}*]  >>  ${event.message} `)
+      })
+    } else if (uidList.mainUid.includes(event.uid)) {
+      uidList.white.forEach(function (id:any) {
+        api.method.sendPrivateMessage(id, ` [白方组内私聊]  [*${event.username}*]  >>  ${event.message} `)
+      })
+      uidList.black.forEach(function (id:any) {
+        api.method.sendPrivateMessage(id, ` [黑方组内私聊]  [*${event.username}*]  >>  ${event.message} `)
+      })
+    }
+  } catch (error) {
 
-}
+  }
 })
 
 // 查看本方阵营
