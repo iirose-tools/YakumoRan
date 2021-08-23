@@ -62,7 +62,7 @@ Ran.Event.on('LeaveRoom', msg => {
 })
 
 Ran.command(/^\.增加员工(.*)$/, 'member.add', (m, e, reply) => {
-  if (!per.users.hasPermission(e.uid, 'member.add') && !per.users.hasPermission(e.uid, 'permission.member.add')) return reply('[!] 权限不足', 'CB3837')
+  if (!per.users.hasPermission(e.uid, 'member.op') && !per.users.hasPermission(e.uid, 'permission.member.add')) return reply('[!] 权限不足', 'CB3837')
   try {
     const uid = utils.filter(m[1])
     if (utils.UidLengthControl(uid) === false) return reply('[Member] 添加员工失败，UID错误')
@@ -73,7 +73,7 @@ Ran.command(/^\.增加员工(.*)$/, 'member.add', (m, e, reply) => {
 })
 
 Ran.command(/^\.删除员工(.*)$/, 'member.remove', (m, e, reply) => {
-  if (!per.users.hasPermission(e.uid, 'member.remove') && !per.users.hasPermission(e.uid, 'permission.member.remove')) return reply('[!] 权限不足', 'CB3837')
+  if (!per.users.hasPermission(e.uid, 'member.op') && !per.users.hasPermission(e.uid, 'permission.member.remove')) return reply('[!] 权限不足', 'CB3837')
   try {
     const uid = utils.filter(m[1])
     if (utils.UidLengthControl(uid) === false) return reply('[Member] 删除员工失败，UID错误')
@@ -85,7 +85,7 @@ Ran.command(/^\.删除员工(.*)$/, 'member.remove', (m, e, reply) => {
 })
 
 Ran.command(/^\.查询员工$/, 'member.query', (m, e, reply) => {
-  if (!per.users.hasPermission(e.uid, 'member.query') && !per.users.hasPermission(e.uid, 'permission.member.query')) return reply('[!] 权限不足', 'CB3837')
+  if (!per.users.hasPermission(e.uid, 'member.op') && !per.users.hasPermission(e.uid, 'permission.member.query')) return reply('[!] 权限不足', 'CB3837')
   const msg = []
   let a = 1
   for (const uid of Object.keys(Member.users)) {
@@ -100,7 +100,7 @@ Ran.command(/^\.查询员工$/, 'member.query', (m, e, reply) => {
 })
 
 Ran.command(/^\.结算$/, 'member.payment', async (m, e, reply) => {
-  if (!per.users.hasPermission(e.uid, 'member.query') && !per.users.hasPermission(e.uid, 'permission.member.query')) return reply('[!] 权限不足', 'CB3837')
+  if (!per.users.hasPermission(e.uid, 'member.op') && !per.users.hasPermission(e.uid, 'permission.member.query')) return reply('[!] 权限不足', 'CB3837')
   const msg = []
   let a = 1
   for (const uid of Object.keys(Member.users)) {

@@ -88,10 +88,7 @@ export class autopayAction {
    * @param {number} salaryPerHour 每小时工资
    */
   private static async predictBeforePay (employer: string, salaryPerHour: number) {
-    if (Object.keys(Member.users).length === 0) {
-      logger('member').info('没有员工，跳过数据更新')
-      return
-    }
+    if (Object.keys(Member.users).length === 0) return
 
     let msg : string = '员工自动记时系统\n晚上 11:00 p.m.\n-------------------------------------\n'
     let index : number = 1
@@ -125,7 +122,7 @@ export class autopayAction {
    * @param {number} salaryPerHour 每小时工资
    */
   private static async autopaysal (employer: string, salaryPerHour: number) {
-    if (Object.keys(Member.users).length === 0) return logger('member').info('没有员工，跳过数据更新')
+    if (Object.keys(Member.users).length === 0) return
 
     let allmustpay : number = 0
     let index : number = 1
