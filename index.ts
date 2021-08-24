@@ -49,6 +49,7 @@ const init = async () => {
 
 process.on('uncaughtException', (err: any, origin: any) => {
   logger('uncaughtException').error(err, origin)
+  process.exit(127)
 })
 
 init()
