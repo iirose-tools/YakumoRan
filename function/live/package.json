@@ -1,0 +1,36 @@
+{
+  "name": "live",
+  "id": "live",
+  "main": "",
+  "author": {
+    "name": "零れる",
+    "github": "BST-PL",
+    "iirose": "零れる"
+  },
+  "intro": [
+    "iirose直播姬",
+    "直播权限申请请私聊机器人发送：live apply"
+  ],
+  "commands": [
+    {
+      "cmd": "live start",
+      "helper": "获取BSTlive推流平台推流码"
+    },
+    {
+      "cmd": "live can <id>",
+      "helper": "直播授权"
+    },
+    {
+      "cmd": "live list",
+      "helper": "查看直播申请列表"
+    },
+    {
+      "cmd": "live date",
+      "helper": "私聊发送，查看自己推流码信息"
+    },
+    {
+      "cmd": "live apply",
+      "helper": "私聊发送，申请直播权限"
+    }
+  ]
+}
