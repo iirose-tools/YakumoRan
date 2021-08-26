@@ -96,9 +96,11 @@ export class Member {
    */
   static resetminutes () {
     if (Object.keys(this.users).length === 0) return
-    for (const uid of Object.keys(this.users)) {
-      this.users[uid].Minutes = 0
-      this.write()
+    if (new Date().getHours() === 0) {
+      for (const uid of Object.keys(this.users)) {
+        this.users[uid].Minutes = 0
+        this.write()
+      }
     }
   }
 }
