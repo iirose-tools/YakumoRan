@@ -1,7 +1,6 @@
 import * as Ran from '../../lib/api'
 import { utils } from './utils'
 import { Member } from './Member'
-import logger from '../../lib/logger'
 import config from '../../config'
 import { autopay } from './Autopay'
 
@@ -14,10 +13,7 @@ export class Actions {
    * @description 更新在线状态
    */
   static async update () {
-    if (Member.users === {}) {
-      logger('member').info('没有员工，跳过数据更新')
-      return
-    }
+    if (Member.users === {}) return
     let index: number = 0
     const list = await Ran.method.utils.getUserList()
     for (const uid of Object.keys(Member.users)) {
