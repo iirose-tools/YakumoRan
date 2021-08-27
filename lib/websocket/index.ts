@@ -89,11 +89,11 @@ export const send = (data: string): Promise<Error | null> => {
       deflatedArray[0] = 1
       deflatedArray.set(deflatedData, 1)
       socket.send(deflatedArray, (err: any) => {
-        if (err) return resolve(err)
-        resolve(null)
+        if (err) logger('WS').error(err)
       })
     } catch (error) {
-      reject(error)
+      logger('WS').error(error)
     }
+    resolve(null)
   })
 }
