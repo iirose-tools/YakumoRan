@@ -3,7 +3,6 @@ import path from 'path'
 import fs from 'fs'
 import { utils } from './utils'
 import { Actions } from './Action'
-import logger from '../../lib/logger'
 
 /**
  * @description Member
@@ -83,10 +82,7 @@ export class Member {
    * @description 增加分钟
    */
   static addminutes () {
-    if (Object.keys(this.users).length === 0) {
-      logger('member').info('没有员工，跳过数据更新')
-      return
-    }
+    if (Object.keys(this.users).length === 0) return
     for (const uid of Object.keys(this.users)) {
       if (Actions.checkOnline(uid)) {
         this.users[uid].Minutes = this.users[uid].Minutes + 1
@@ -99,16 +95,11 @@ export class Member {
    * @description 重置分钟
    */
   static resetminutes () {
-    if (Object.keys(this.users).length === 0) {
-      logger('member').info('没有员工，跳过数据更新')
-      return
-    }
+    if (Object.keys(this.users).length === 0) return
     if (new Date().getHours() === 0) {
       for (const uid of Object.keys(this.users)) {
-        if (Actions.checkOnline(uid)) {
-          this.users[uid].Minutes = 0
-          this.write()
-        }
+        this.users[uid].Minutes = 0
+        this.write()
       }
     }
   }

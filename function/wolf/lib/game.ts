@@ -267,13 +267,13 @@ export default class Game {
     if (this.flag.start) return false
 
     const id = this.getGIDByUid(uid)
-    if (!id) return false
+    if (id === -1) return false
 
-    Ran.method.sendPublicMessage(`[Wolf] ${this.users[id] ? this.users[id].username : 'Unknown'} 无法抵御良心的煎熬，逃离了这场暴民的盛会。`)
+    Ran.method.sendPublicMessage(`[Wolf] ${this.users[id].username} 无法抵御良心的煎熬，逃离了这场暴民的盛会。`)
     this.users.splice(id, 1)
 
     if (id === 0) {
-      Ran.method.sendPublicMessage(`[Wolf] 创建者已离开游戏，新的创建者是 ${this.users[0] ? this.users[0].username : 'Unknown'}`)
+      Ran.method.sendPublicMessage(`[Wolf] 创建者已离开游戏，新的创建者是 ${this.users[0].username}`)
     }
 
     this.save()
