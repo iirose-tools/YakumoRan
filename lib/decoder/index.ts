@@ -33,8 +33,7 @@ export default (msg: string) => {
   status.push(MediaListCallback(msg))
   status.push(SelfMove(msg))
 
-  status.filter(e => !!e)
+  const len = status.filter(e => !!e).length
 
-  if (status.length > 0) return true
-  return false
+  return len > 0
 }

@@ -59,21 +59,30 @@ export class PrivateMessage {
 
 export default (message: string) => {
   if (message.substr(0, 1) === '"') {
-    const tmp = message.substr(1).split('>')
-    if (tmp.length === 11) {
-      if (/^\d+$/.test(tmp[0])) {
-        const msg = new PrivateMessage({
-          timestamp: Number(tmp[0]),
-          uid: tmp[1],
-          username: decode(tmp[2]),
-          avatar: tmp[3],
-          message: decode(tmp[4]),
-          color: tmp[5],
-          messageId: Number(tmp[10])
-        })
-        Bot.emit('PrivateMessage', msg)
-        return true
+    let flag = false
+
+    const item = message.substr(1).split('<')
+
+    for (const msg of item) {
+      const tmp = msg.split('>')
+
+      if (tmp.length === 11) {
+        if (/^\d+$/.test(tmp[0])) {
+          const msg = new PrivateMessage({
+            timestamp: Number(tmp[0]),
+            uid: tmp[1],
+            username: decode(tmp[2]),
+            avatar: tmp[3],
+            message: decode(tmp[4]),
+            color: tmp[5],
+            messageId: Number(tmp[10])
+          })
+          Bot.emit('PrivateMessage', msg)
+          flag = true
+        }
       }
     }
+
+    return flag
   }
 }

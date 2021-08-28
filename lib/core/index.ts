@@ -55,6 +55,10 @@ Bot.on('SelfMove', ({ id }) => {
   moveTo(id)
 })
 
+Bot.on('PrivateMessage', event => {
+  logger('pm').info(event.username, event.message)
+})
+
 export const moveTo = (roomId: string) => {
   logger('Core').info('正在切换房间...')
   try {
