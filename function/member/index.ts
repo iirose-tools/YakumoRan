@@ -9,24 +9,8 @@ import { utils } from './utils'
 import { Actions, autopayAction } from './Action'
 import { autopay } from './Autopay'
 
-const start = () => {
-  logger('member').info('正在初始化')
-  try { fs.mkdirSync(path.join(Ran.Data, '/member')) } catch (error) { }
-  if (!fs.existsSync(path.join(Ran.Data, '/member/members.json'))) fs.writeFileSync(path.join(Ran.Data, '/member/members.json'), '{}')
-  if (!fs.existsSync(path.join(Ran.Data, '/member/option.json'))) fs.writeFileSync(path.join(Ran.Data, '/member/option.json'), '{}')
-  try {
-    Member.load()
-    autopay.load()
-    Actions.update()
-    autopayAction.startAutopayOperation()
-    command.memberCommand()
-    command.autopayOptionCommand()
-    event.room()
-    setInterval(() => Member.addminutes(), 1 * 60 * 1e3)
-    setInterval(() => Actions.update(), 15 * 60 * 1e3)
-  } catch (error) {
-    logger('member').error('fs error', error)
-  }
+// 初始化
+Ran.Event.once('login', () => {
   if (fs.existsSync(path.join(Ran.Data, '/member/users.json'))) {
     logger('member').info('发现老版本数据...')
     try {
@@ -48,10 +32,23 @@ const start = () => {
     }
     logger('member').info('初始化完成')
   }
-}
-
-// 初始化
-Ran.Event.on('login', () => {
+  logger('member').info('正在初始化')
+  try { fs.mkdirSync(path.join(Ran.Data, '/member')) } catch (error) { }
+  if (!fs.existsSync(path.join(Ran.Data, '/member/members.json'))) fs.writeFileSync(path.join(Ran.Data, '/member/members.json'), '{}')
+  if (!fs.existsSync(path.join(Ran.Data, '/member/option.json'))) fs.writeFileSync(path.join(Ran.Data, '/member/option.json'), '{}')
+  try {
+    Member.load()
+    autopay.load()
+    Actions.update()
+    autopayAction.startAutopayOperation()
+    command.memberCommand()
+    command.autopayOptionCommand()
+    event.room()
+    setInterval(() => Member.addminutes(), 1 * 60 * 1e3)
+    setInterval(() => Actions.update(), 15 * 60 * 1e3)
+  } catch (error) {
+    logger('member').error('fs error', error)
+  }
   Actions.update()
 })
 
@@ -190,4 +187,3 @@ const command = {
   }
 
 }
-start()

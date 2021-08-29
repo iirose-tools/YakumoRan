@@ -86,9 +86,9 @@ export class Member {
     for (const uid of Object.keys(this.users)) {
       if (Actions.checkOnline(uid)) {
         this.users[uid].Minutes = this.users[uid].Minutes + 1
-        this.write()
       }
     }
+    this.write()
   }
 
   /**
@@ -99,8 +99,8 @@ export class Member {
     if (new Date().getHours() === 0) {
       for (const uid of Object.keys(this.users)) {
         this.users[uid].Minutes = 0
-        this.write()
       }
+      this.write()
     }
   }
 }
