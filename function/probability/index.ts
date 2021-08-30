@@ -103,21 +103,36 @@ api.command(new RegExp(`^${config.app.nickname}压(.*)$`), 'probability.do', asy
   const glo = getMoney('config')
   if (glo.list == null) { glo.list = [nowMoney.money] }
   if (glo.name == null) { glo.name = [e.uid] }
+  const num = glo.name.indexOf(e.uid)
+  if (num !== -1) {
+    if (glo.list[num] < nowMoney.money) {
+      glo.list.splice(num, 1)
+      glo.name.splice(num, 1)
+    } else {
+      return
+    }
+  }
 
+  if (glo.list.length === 0) {
+    glo.list.push(nowMoney.money)
+    glo.name.push(e.uid)
+    return
+  }
   for (let i = 0; i < glo.list.length; i++) {
-    console.log('test  :  ' + glo.list[i])
-    if (nowMoney.money > glo.list[i]) {
-      const num = glo.name.indexOf(e.uid)
-      if (glo.list[num] > nowMoney.money) {
-        break
-      } else {
-        glo.list.splice(num, 1)
-        glo.name.splice(num, 1)
-
-        glo.list.splice(i - 1, 0, nowMoney.money)
-        glo.name.splice(i - 1, 0, `${e.uid}`)
-        break
-      }
+    console.log('true')
+    let num1 = glo.list[i + 1]
+    let num2 = glo.list[i - 1]
+    console.log('i : ' + i)
+    if (num1 == null) { num1 = 0 }
+    if (num2 == null) { num2 = nowMoney.money + 1 }
+    if (nowMoney.money < glo.list[i] && nowMoney.money > num1) {
+      glo.list.splice(i + 1, 0, nowMoney.money)
+      glo.name.splice(i + 1, 0, e.uid)
+      break
+    } else if (nowMoney.money > glo.list[i] && nowMoney.money < num2) {
+      glo.list.splice(i, 0, nowMoney.money)
+      glo.name.splice(i, 0, e.uid)
+      break
     }
   }
 
