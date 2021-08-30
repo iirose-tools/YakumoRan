@@ -20,7 +20,7 @@ if (!config.function.chat.disable) {
         reply('阁下有什么事吗？')
       } else {
         try {
-          const data = JSON.parse((await got(encodeURI(`https://api.peer.ink/api/v1/nlp/chat?msg=${msg}`))).body).data
+          const data = JSON.parse((await got(encodeURI(`https://api.peer.ink/api/v1/nlp/chat?msg=${m}`))).body).data
           reply(data.result.replace(/{{name}}/gm, config.app.nickname))
         } catch (error) {
           reply([
