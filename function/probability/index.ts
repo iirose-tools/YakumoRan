@@ -119,10 +119,8 @@ api.command(new RegExp(`^${config.app.nickname}压(.*)$`), 'probability.do', asy
     return
   }
   for (let i = 0; i < glo.list.length; i++) {
-    console.log('true')
     let num1 = glo.list[i + 1]
     let num2 = glo.list[i - 1]
-    console.log('i : ' + i)
     if (num1 == null) { num1 = 0 }
     if (num2 == null) { num2 = nowMoney.money + 1 }
     if (nowMoney.money < glo.list[i] && nowMoney.money > num1) {
