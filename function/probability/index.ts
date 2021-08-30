@@ -158,7 +158,7 @@ api.command(/^重启钱包$/, 'probability.reset', async function (m, e, reply) 
 })
 
 // 设置积分
-api.command(/^设置(.*):(.*)$/, 'probability.setting', async function (m, e, reply) {
+api.command(/^设置\s\[@(.*)@]\s:(.*)$/, 'probability.setting', async function (m, e, reply) {
   const m1 = Number(m[2].trim())
   if (m1 <= Math.max() || m1 >= Math.min()) return reply('请输入一个正常的数字', config.app.color)
   const nowMoney = getMoney(e.uid)
@@ -167,10 +167,9 @@ api.command(/^设置(.*):(.*)$/, 'probability.setting', async function (m, e, re
     return null
   }
 
-  const theUid = m[1].replace(/[@[\] ]/g, '').trim()
   nowMoney.money = m1
-  update(theUid, nowMoney)
-  reply(` [*${e.username}*]   :  您的余额为  :  ${String(nowMoney.money)}钞`, config.app.color)
+  update(m[1], nowMoney)
+  reply(` [*${e.username}*]   :  [@${m[1]}@]  的余额为  :  ${String(nowMoney.money)}钞`, config.app.color)
 })
 
 // 查看自己的信息
