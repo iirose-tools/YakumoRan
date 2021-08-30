@@ -160,7 +160,10 @@ api.command(/^重启钱包$/, 'probability.reset', async function (m, e, reply) 
 // 设置积分
 api.command(/^设置\s\[@(.*)@]\s:(.*)$/, 'probability.setting', async function (m, e, reply) {
   const m1 = Number(m[2].trim())
-  if (m1 <= Math.max() || m1 >= Math.min()) return reply('请输入一个正常的数字', config.app.color)
+  if (isNaN(m1)) return reply(` [*${e.username}}*]  : 你输入的似乎不是数字哦~换成数字再试一下吧`, config.app.color)
+  if (m1 <= 0) return reply(` [*${e.username}}*]  : 下注金额必须大于0`, config.app.color)
+  if (m1 <= Math.max() || m1 >= Math.min()) return reply(` [*${e.username}}*]  : 请输入一个正常的数字`, config.app.color)
+
   const nowMoney = getMoney(e.uid)
   if (!per.users.hasPermission(e.uid, 'permission.probability') && !per.users.hasPermission(e.uid, 'probability.op')) {
     reply(` [*${e.username}*]   :  ${config.app.nickname}做不到啦...去叫叫咱的主人来试试..(?`, config.app.color)
