@@ -1,0 +1,21 @@
+{
+  "name": "数据包",
+  "id": "datapack",
+  "main": "",
+  "author": {
+    "name": "风间苏苏",
+    "github": "TheresaQWQ",
+    "iirose": "风间苏苏"
+  },
+  "intro": [],
+  "commands": [{
+    "cmd": ".datapack load <file/url>",
+    "helper": "加载一个数据包(支持从网络加载)"
+  }, {
+    "cmd": ".datapack unload <id>",
+    "helper": "卸载一个数据包"
+  }, {
+    "cmd": ".datapack list",
+    "helper": "查看数据包列表"
+  }]
+}
