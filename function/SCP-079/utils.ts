@@ -13,11 +13,15 @@ export const getImg = (msg: string) => {
 }
 
 export const getRealUrl = async (url: string): Promise<string> => {
-  const resp = await got.head(url, {
-    followRedirect: false
-  })
-  if (resp.statusCode > 300 && resp.statusCode < 400) return String(resp.headers.location)
-  return url
+  try {
+    const resp = await got.head(url, {
+      followRedirect: false
+    })
+    if (resp.statusCode > 300 && resp.statusCode < 400) return String(resp.headers.location)
+    return url
+  } catch (e) {
+    return url
+  }
 }
 
 export const isPorn = async (url: string) => {
