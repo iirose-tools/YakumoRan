@@ -119,10 +119,8 @@ api.command(new RegExp(`^${config.app.nickname}压(.*)$`), 'probability.do', asy
     return
   }
   for (let i = 0; i < glo.list.length; i++) {
-    console.log('true')
     let num1 = glo.list[i + 1]
     let num2 = glo.list[i - 1]
-    console.log('i : ' + i)
     if (num1 == null) { num1 = 0 }
     if (num2 == null) { num2 = nowMoney.money + 1 }
     if (nowMoney.money < glo.list[i] && nowMoney.money > num1) {
@@ -160,19 +158,21 @@ api.command(/^重启钱包$/, 'probability.reset', async function (m, e, reply) 
 })
 
 // 设置积分
-api.command(/^设置(.*):(.*)$/, 'probability.setting', async function (m, e, reply) {
+api.command(/^设置\s\[@(.*)@]\s:(.*)$/, 'probability.setting', async function (m, e, reply) {
   const m1 = Number(m[2].trim())
-  if (m1 <= Math.max() || m1 >= Math.min()) return reply('请输入一个正常的数字', config.app.color)
+  if (isNaN(m1)) return reply(` [*${e.username}}*]  : 你输入的似乎不是数字哦~换成数字再试一下吧`, config.app.color)
+  if (m1 <= 0) return reply(` [*${e.username}}*]  : 下注金额必须大于0`, config.app.color)
+  if (m1 <= Math.max() || m1 >= Math.min()) return reply(` [*${e.username}}*]  : 请输入一个正常的数字`, config.app.color)
+
   const nowMoney = getMoney(e.uid)
   if (!per.users.hasPermission(e.uid, 'permission.probability') && !per.users.hasPermission(e.uid, 'probability.op')) {
     reply(` [*${e.username}*]   :  ${config.app.nickname}做不到啦...去叫叫咱的主人来试试..(?`, config.app.color)
     return null
   }
 
-  const theUid = m[1].replace(/[@[\] ]/g, '').trim()
   nowMoney.money = m1
-  update(theUid, nowMoney)
-  reply(` [*${e.username}*]   :  您的余额为  :  ${String(nowMoney.money)}钞`, config.app.color)
+  update(m[1], nowMoney)
+  reply(` [*${e.username}*]   :  [@${m[1]}@]  的余额为  :  ${String(nowMoney.money)}钞`, config.app.color)
 })
 
 // 查看自己的信息
