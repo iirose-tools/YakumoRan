@@ -1,6 +1,6 @@
 {
   "name": "yakumo-ran",
-  "version": "1.2.2-u1",
+  "version": "1.2.3",
   "description": "iirose bot",
   "main": "dist/index.js",
   "scripts": {

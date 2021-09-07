@@ -1,0 +1,24 @@
+{
+  "name": "数据包",
+  "id": "datapack",
+  "main": "",
+  "author": {
+    "name": "风间苏苏",
+    "github": "TheresaQWQ",
+    "iirose": "风间苏苏"
+  },
+  "intro": [
+    "参考MC做的数据包插件",
+    "文档还在施工中（咕咕咕）"
+  ],
+  "commands": [{
+    "cmd": ".dp load <file/url>",
+    "helper": "加载一个数据包(支持从网络加载)"
+  }, {
+    "cmd": ".dp unload <id>",
+    "helper": "卸载一个数据包"
+  }, {
+    "cmd": ".dp list",
+    "helper": "查看数据包列表"
+  }]
+}
