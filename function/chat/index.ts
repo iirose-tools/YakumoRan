@@ -20,8 +20,9 @@ if (!config.function.chat.disable) {
         reply('阁下有什么事吗？')
       } else {
         try {
-          const data = JSON.parse((await got(encodeURI(`https://api.peer.ink/api/v1/nlp/chat?msg=${m}&uid=${msg.uid}`))).body).data
-          reply(data.result.replace(/{{name}}/gm, config.app.nickname))
+          const resp = await got(encodeURI(`https://api.peer.ink/api/v1/nlp/chat?msg=${m}&uid=${msg.uid}`))
+          const data = JSON.parse(resp.body).result
+          reply(data.replace(/{{name}}/gm, config.app.nickname))
         } catch (error) {
           reply([
             '出现了意料之外的错误',
