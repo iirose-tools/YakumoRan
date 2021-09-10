@@ -98,10 +98,6 @@ export const method = {
    * @returns {Promise}
    */
   sendPublicMessage: (message: string, color?: string) => {
-    if (message.length > 1000) {
-      logger('Bot').warn(`群聊消息太长，已取消发送: ${message.substr(0, 100)}`)
-      return new Error('消息太长')
-    }
     logger('Bot').debug(`发送了群聊消息: ${message}`)
     const data = PublicMessage(message, color || config.app.color)
     return send(data)
@@ -113,10 +109,6 @@ export const method = {
    * @returns {Promise}
    */
   sendPrivateMessage: (uid: string, message: string, color?: string) => {
-    if (message.length > 1000) {
-      logger('Bot').warn(`向 ${uid} 发送的私聊消息太长，已取消发送: ${message.substr(0, 100)}`)
-      return new Error('消息太长')
-    }
     logger('Bot').debug(`向 ${uid} 发送了私聊消息: ${message}`)
     const data = PrivateMessage(uid, message, color || config.app.color)
     return send(data)
