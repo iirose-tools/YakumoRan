@@ -25,11 +25,11 @@ export const getRealUrl = async (url: string): Promise<string> => {
 }
 
 export const isPorn = async (url: string) => {
-  const resp = await got.get('https://api.peer.ink/api/v2/nsfw', {
+  const resp = await got.get('https://api.peer.ink/api/v2/nsfw/image', {
     searchParams: {
       url: url
     }
   })
 
-  return JSON.parse(resp.body).result
+  return JSON.parse(resp.body).result.Score
 }
