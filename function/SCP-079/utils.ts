@@ -31,5 +31,5 @@ export const isPorn = async (url: string) => {
     }
   })
 
-  return JSON.parse(resp.body).result.Score
+  return JSON.parse(resp.body).result
 }

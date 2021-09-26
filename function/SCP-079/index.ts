@@ -63,19 +63,24 @@ Ran.Event.on('PublicMessage', async msg => {
     for (const url of imgs) {
       logger('SCP-079').info(`正在检查第 ${imgs.indexOf(url) + 1}/${imgs.length} 张图片...`)
       const realUrl = await getRealUrl(url)
-      const rate = await isPorn(realUrl)
-      logger('SCP-079').info(`第 ${imgs.indexOf(url) + 1}/${imgs.length} 张图片检测完成，rate: ${rate}`)
-      if (rate > config.function.scp079.nsfw_rate) {
-        // 是涩图
+      const result = await isPorn(realUrl)
+      logger('SCP-079').info(`第 ${imgs.indexOf(url) + 1}/${imgs.length} 张图片检测完成，Suggestion: ${result.Suggestion}`)
+      if (result.Suggestion === 'forbid') {
+        // 封禁
         Ran.method.admin.mute('all', msg.username, '30m', `[YakumoRan|${config.account.username}] 涩图自动封禁`)
-        Ran.method.sendPublicMessage('\n'.repeat(200), '000')
         Ran.method.sendPrivateMessage(config.app.master_uid, [
           `用户  [*${msg.username}*]  (uid: [@${msg.uid}@] ) 刚刚发送了一条包含涩图的消息`,
-          `rate: ${rate * 1e2}%`,
           '原始消息: ',
           msg.message
         ].join('\n'), config.app.color)
         break
+      } else if (result.Suggestion === 'check') {
+        // 人工审核
+        Ran.method.sendPrivateMessage(config.app.master_uid, [
+          `用户  [*${msg.username}*]  (uid: [@${msg.uid}@] ) 刚刚发送了一条疑似包含涩图的消息，建议人工重审`,
+          '原始消息: ',
+          msg.message
+        ].join('\n'), config.app.color)
       }
     }
   }
