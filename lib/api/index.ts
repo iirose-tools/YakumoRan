@@ -67,6 +67,7 @@ export const command = (regexp: RegExp, id: string, callback: (m: RegExpExecArra
     })
 
     Bot.on('PublicMessage', e => {
+      if (e.isBot()) return
       if (e.username === config.account.username) return
 
       regexp.lastIndex = 0

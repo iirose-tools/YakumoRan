@@ -67,6 +67,14 @@ export class PublicMessage {
   like (msg: string) {
     api.method.like(this.uid, msg)
   }
+
+  /**
+   * @description 判断是否为机器人
+   */
+  isBot () {
+    if (this.title === '4\'') return true
+    return false
+  }
 }
 
 const replyMsg = (msg: string): replyMessage[] | null => {

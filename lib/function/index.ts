@@ -60,7 +60,7 @@ Event.on('PublicMessage', (msg) => {
         if (maxLen < e.cmd.length) maxLen = e.cmd.length
       }
 
-      const len = maxLen + 6
+      const len = maxLen + 3
       const tmp = []
 
       tmp.push(`${name}: `)
@@ -85,7 +85,7 @@ Event.on('PublicMessage', (msg) => {
       tmp.push('')
 
       for (const e of helper) {
-        tmp.push(`${e.cmd.replace('{{nickname}}', config.app.nickname)}${' '.repeat(len - e.cmd.length)}${e.helper}`)
+        tmp.push(`${e.cmd.replace('{{nickname}}', config.app.nickname)}${' '.repeat((len - e.cmd.length) * 2)}${e.helper}`)
       }
 
       return tmp.join('\n')
@@ -100,7 +100,7 @@ Event.on('PublicMessage', (msg) => {
       tmp.push(helper(id))
     }
 
-    method.sendPublicMessage(tmp.slice((page - 1) * 3, page * 3).join('\n================================\n'), config.app.color)
+    method.sendPublicMessage('\\\\\\~' + tmp.slice((page - 1) * 3, page * 3).join('\n================================\n'), config.app.color)
   }
 
   if (msg.message.trim() === '.help') {
@@ -112,6 +112,6 @@ Event.on('PublicMessage', (msg) => {
     // eslint-disable-next-line eqeqeq
     if (Number(id) == id) return helpPage(Number(id))
 
-    method.sendPublicMessage(helper(id), config.app.color)
+    method.sendPublicMessage('\\\\\\~' + helper(id), config.app.color)
   }
 })

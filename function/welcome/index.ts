@@ -10,6 +10,14 @@ try {
 
 const random = (n: number, m: number): number => { return Math.floor(Math.random() * (m - n + 1) + n) }
 
+const filter = (str: string) => {
+  let output = str
+
+  output = output.replace(/(压|押)(完|\d+)/gmi, '压{filter}$2')
+
+  return output
+}
+
 const GetWelcomeBack = (uid: string): (string | null) => {
   const file = path.join(api.Data, 'welcome', uid)
   if (fs.existsSync(file)) {
@@ -99,7 +107,7 @@ const users: { [index: string]: boolean } = {}
 api.command(/^\.wb set (.*)$/, 'welcome.set', (m, e, reply) => {
   const file = path.join(api.Data, 'welcome', e.uid)
   try {
-    fs.writeFileSync(file, m[1])
+    fs.writeFileSync(file, filter(m[1]))
     reply('[Welcome] 设置成功', config.app.color)
   } catch (error) {
     reply('[Welcome] 设置失败', config.app.color)
