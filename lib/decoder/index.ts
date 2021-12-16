@@ -13,6 +13,7 @@ import UserProfileCallback from './UserProfileCallback'
 import BankCallback from './BankCallback'
 import MediaListCallback from './MediaListCallback'
 import SelfMove from './SelfMove'
+import payment from './payment'
 
 export default (msg: string) => {
   const status = []
@@ -32,6 +33,7 @@ export default (msg: string) => {
   status.push(BankCallback(msg))
   status.push(MediaListCallback(msg))
   status.push(SelfMove(msg))
+  status.push(payment(msg))
 
   const len = status.filter(e => !!e).length
 
