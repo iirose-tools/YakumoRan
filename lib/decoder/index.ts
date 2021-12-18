@@ -1,7 +1,4 @@
 import damaku from './damaku'
-import JoinRoom from './JoinRoom'
-import LeaveRoom from './LeaveRoom'
-import MoveToRoom from './SwitchRoom'
 import Music from './Music'
 import paymentCallback from './paymentCallback'
 import PrivateMessage from './PrivateMessage'
@@ -19,11 +16,8 @@ export default (msg: string) => {
 
   status.push(userlist(msg))
   status.push(PublicMessage(msg))
-  status.push(LeaveRoom(msg))
-  status.push(JoinRoom(msg))
   status.push(PrivateMessage(msg))
   status.push(damaku(msg))
-  status.push(MoveToRoom(msg))
   status.push(Music(msg))
   status.push(paymentCallback(msg))
   status.push(GetUserListCallback(msg))

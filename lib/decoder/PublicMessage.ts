@@ -9,6 +9,27 @@ export interface replyMessage {
   time: number
 }
 
+export interface SystemMessage {
+  timestamp: number,
+  avatar: string,
+  username: string,
+  color: string,
+  uid: string,
+  title: string,
+  room: string
+}
+
+export interface SwitchRoom {
+  timestamp: number,
+  avatar: string,
+  username: string,
+  color: string,
+  uid: string,
+  title: string,
+  room: string,
+  targetRoom: string
+}
+
 interface data {
   timestamp: number,
   avatar: string,
@@ -108,7 +129,7 @@ const replyMsg = (msg: string): replyMessage[] | null => {
 }
 
 export default (message: string) => {
-  if (message.indexOf('<') !== -1) {
+  if (/^\d+/.test(message)) {
     let parser = false
 
     const tmp1 = message.split('<')
@@ -176,28 +197,5 @@ export default (message: string) => {
     })
 
     return parser
-  } else {
-    const tmp = message.split('>')
-    if (tmp.length === 11) {
-      if (/^\d+$/.test(tmp[0])) {
-        const reply = replyMsg(tmp[3])
-        const message = reply ? String(reply.shift()) : tmp[3]
-
-        const msg = {
-          timestamp: Number(tmp[0]),
-          avatar: tmp[1],
-          username: decode(tmp[2]),
-          message: decode(message),
-          color: tmp[5],
-          uid: tmp[8],
-          title: tmp[9] === "'108" ? '花瓣' : tmp[9],
-          messageId: Number(tmp[10]),
-          replyMessage: reply
-        }
-
-        Bot.emit('PublicMessage', new PublicMessage(msg))
-        return true
-      }
-    }
   }
 }
