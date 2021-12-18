@@ -1,10 +1,7 @@
 import { EventEmitter } from 'events'
-import { SystemMessage } from './decoder/LeaveRoom'
-import { PublicMessage } from './decoder/PublicMessage'
 import { PrivateMessage } from './decoder/PrivateMessage'
 import { UserList } from './decoder/userlist'
 import { Damaku } from './decoder/damaku'
-import { SwitchRoom } from './decoder/SwitchRoom'
 import { Music } from './decoder/Music'
 import { paymentCallback } from './decoder/paymentCallback'
 import { GetUserListCallback } from './decoder/GetUserListCallback'
@@ -13,6 +10,7 @@ import { BankCallback } from './decoder/BankCallback'
 import { MediaListCallback } from './decoder/MediaListCallback'
 import { SelfMove } from './decoder/SelfMove'
 import { Payment, Like, Follower, RoomNotice } from './decoder/MailboxMessage'
+import { PublicMessage, SystemMessage, SwitchRoom } from './decoder/PublicMessage'
 
 interface WebSocketEvent {
   on(event: 'send', listener: (msg: string) => void): void;
