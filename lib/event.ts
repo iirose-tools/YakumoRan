@@ -4,7 +4,6 @@ import { PublicMessage } from './decoder/PublicMessage'
 import { PrivateMessage } from './decoder/PrivateMessage'
 import { UserList } from './decoder/userlist'
 import { Damaku } from './decoder/damaku'
-import { Like } from './decoder/like'
 import { SwitchRoom } from './decoder/SwitchRoom'
 import { Music } from './decoder/Music'
 import { paymentCallback } from './decoder/paymentCallback'
@@ -13,6 +12,7 @@ import { UserProfileCallback } from './decoder/UserProfileCallback'
 import { BankCallback } from './decoder/BankCallback'
 import { MediaListCallback } from './decoder/MediaListCallback'
 import { SelfMove } from './decoder/SelfMove'
+import { Payment, Like, Follower, RoomNotice } from './decoder/MailboxMessage'
 
 interface WebSocketEvent {
   on(event: 'send', listener: (msg: string) => void): void;
@@ -53,6 +53,9 @@ interface BotEvent {
   on(event: 'BankCallback', listener: (msg: BankCallback) => void): void;
   on(event: 'MediaListCallback', listener: (msg: MediaListCallback[]) => void): void;
   on(event: 'SelfMove', listener: (msg: SelfMove) => void): void;
+  on(event: 'payment', listener: (msg: Payment) => void): void;
+  on(event: 'roomNotice', listener: (msg: RoomNotice) => void): void;
+  on(event: 'follower', listener: (msg: Follower) => void): void;
 
   once(event: 'login', listener: () => void): void;
   once(event: 'UserList', listener: (msg: UserList[]) => void): void;
@@ -70,6 +73,9 @@ interface BotEvent {
   once(event: 'BankCallback', listener: (msg: BankCallback) => void): void;
   once(event: 'MediaListCallback', listener: (msg: MediaListCallback[]) => void): void;
   once(event: 'SelfMove', listener: (msg: SelfMove) => void): void;
+  once(event: 'payment', listener: (msg: Payment) => void): void;
+  once(event: 'roomNotice', listener: (msg: RoomNotice) => void): void;
+  once(event: 'follower', listener: (msg: Follower) => void): void;
 
   emit(event: 'login'): void;
   emit(event: 'UserList', msg: UserList[]): void;
@@ -87,6 +93,9 @@ interface BotEvent {
   emit(event: 'BankCallback', msg: BankCallback): void;
   emit(event: 'MediaListCallback', msg: MediaListCallback[]): void;
   emit(event: 'SelfMove', msg: SelfMove): void;
+  emit(event: 'payment', msg: Payment): void;
+  emit(event: 'roomNotice', msg: RoomNotice): void;
+  emit(event: 'follower', msg: Follower): void;
 
   removeAllListeners(event: 'login'): void
   removeAllListeners(event: 'UserList'): void
@@ -104,6 +113,9 @@ interface BotEvent {
   removeAllListeners(event: 'BankCallback'): void
   removeAllListeners(event: 'MediaListCallback'): void
   removeAllListeners(event: 'SelfMove'): void
+  removeAllListeners(event: 'payment'): void
+  removeAllListeners(event: 'roomNotice'): void
+  removeAllListeners(event: 'follower'): void
 }
 
 export const WebSocket: WebSocketEvent = new EventEmitter()
