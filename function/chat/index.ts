@@ -3,8 +3,25 @@ import got from 'got'
 import config from '../../config'
 import util from 'util'
 
+const chat = async (msg: string, uid: string): Promise<string> => {
+  if (config.function.chat.api === 'Rin') {
+    const resp = await got(encodeURI(`https://bot.fly3m.icu/api/chat?msg=${msg}`))
+    return resp.body
+  } else if (config.function.chat.api === 'Old') {
+    const resp = await got(encodeURI(`https://api.peer.ink/api/v1/nlp/chat?msg=${msg}&uid=${uid}`))
+    const data = JSON.parse(resp.body).result
+    const reply = data.replace(/{{name}}/gm, config.app.nickname)
+
+    return reply
+  }
+
+  return '配置文件错误'
+}
+
 if (!config.function.chat.disable) {
   api.Event.on('PrivateMessage', async msg => {
+    if (config.function.chat.api !== 'Rin') return
+
     if (msg.message === '训练计划') {
       const url = (await got(`https://bot.fly3m.icu/getSession?username=IIROSE@${msg.username}`)).body
 
@@ -20,11 +37,11 @@ if (!config.function.chat.disable) {
       api.method.sendPublicMessage(data, config.app.color)
     }
 
-    if (msg.message.includes('Rin') || msg.message.includes('rin') || msg.message.includes('麟')) {
+    if (msg.message.includes(config.app.nickname)) {
       try {
-        const resp = await got(encodeURI(`https://bot.fly3m.icu/api/chat?msg=${msg.message}`))
-        if (resp.body.length === 0) return
-        reply(resp.body)
+        const replyMsg = await chat(msg.message, msg.uid)
+        if (replyMsg.length === 0) return
+        reply(replyMsg)
       } catch (error) {
         reply([
           '出现了意料之外的错误',

@@ -4,6 +4,7 @@
 import * as Ran from '../../lib/api'
 import log from '../../lib/logger'
 
+// 日志实例
 const logger = log("xxx")
 ```
 
@@ -25,7 +26,7 @@ Ran.Event.on(event: 'JoinRoom', listener: (msg: SystemMessage) => void): void;
 Ran.Event.on(event: 'LeaveRoom', listener: (msg: SystemMessage) => void): void;
 // 切换房间
 Ran.Event.on(event: 'SwitchRoom', listener: (msg: SwitchRoom) => void): void;
-// 银行消息Callback
+// 银行消息Callback(建议调用 Ran.method.system.bank 函数获取返回值，不要使用次事件)
 Ran.Event.on(event: 'BankCallback', listener: (msg: BankCallback) => void): void;
 // 群聊消息
 Ran.Event.on(event: 'PublicMessage', listener: (msg: PublicMessage) => void): void;
@@ -33,11 +34,11 @@ Ran.Event.on(event: 'PublicMessage', listener: (msg: PublicMessage) => void): vo
 Ran.Event.on(event: 'PrivateMessage', listener: (msg: PrivateMessage) => void): void;
 // 支付Callback
 Ran.Event.on(event: 'paymentCallback', listener: (msg: paymentCallback) => void): void;
-// 获取用户列表Callback
+// 获取用户列表Callback (建议调用 Ran.method.utils.getMediaList 函数获取返回值，不要使用次事件)
 Ran.Event.on(event: 'GetUserListCallback', listener: (msg: GetUserListCallback[]) => void): void;
-// 用户资料卡Callback
+// 用户资料卡Callback (建议调用 Ran.method.utils.getUserProfile 函数获取返回值，不要使用次事件)
 Ran.Event.on(event: 'UserProfileCallback', listener: (msg: UserProfileCallback) => void): void;
-// 媒体列表Callback
+// 媒体列表Callback (建议调用 Ran.method.utils.getMediaList 函数获取返回值，不要使用次事件)
 Ran.Event.on(event: 'MediaListCallback', listener: (msg: MediaListCallback[]) => void): void;
 ```
 
@@ -60,7 +61,7 @@ Ran.method.admin.setMaxUser() // 清除房间人数上限
 Ran.method.admin.setMaxUser(10) // 设置房间人数上线为 10
 Ran.method.admin.whiteList('username', '10s', 'xxx') // 把 username 加入白名单 10 秒，备注 xxx
 Ran.method.bot.moveTo('roomid') // 把机器人移动到房间id为 roomid 的房间
-Ran.method.like('qwq', 'xxx') // 给 uid 为 qwq 的用户点个赞
+Ran.method.like('qwq', 'xxx') // 给 uid 为 qwq 的用户点个赞，备注 xxx
 Ran.method.payment('qwq', 10, 'xxx') // 给 uid 为 qwq 的用户转账 10 钞，备注 xxx
 Ran.method.sendDamaku('xxx', '66ccff') // 发送弹幕，内容为 xxx ，颜色为 #66ccff
 Ran.method.sendMedia('music', '标题', '歌手', '封面图', '链接', '歌曲链接', 120, 320, '66ccff') // 发送歌曲，比特率 320kbps ，时长 120 秒，卡片颜色66ccff

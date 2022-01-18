@@ -13,15 +13,11 @@ const defaultConfig = {
   },
   function: {
     chat: {
-      disable: false
+      disable: false,
+      api: 'Old'
     },
     pixiv: {
       disable: false
-    },
-    wolf: {
-      day: 300e3,
-      night: 5e3,
-      vote: 60e3
     },
     scp079: {
       nsfw_rate: 0.8,
@@ -72,4 +68,6 @@ if (!fs.existsSync(configPath)) {
   }
 }
 
-export default JSON.parse(fs.readFileSync('./config.json').toString())
+const configData = JSON.parse(fs.readFileSync('./config.json').toString())
+
+export default configData
