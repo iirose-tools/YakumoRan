@@ -40,6 +40,12 @@ Ran.Event.on(event: 'GetUserListCallback', listener: (msg: GetUserListCallback[]
 Ran.Event.on(event: 'UserProfileCallback', listener: (msg: UserProfileCallback) => void): void;
 // 媒体列表Callback (建议调用 Ran.method.utils.getMediaList 函数获取返回值，不要使用次事件)
 Ran.Event.on(event: 'MediaListCallback', listener: (msg: MediaListCallback[]) => void): void;
+// 转账信息
+Ran.Event.on(event: 'payment', listener: (msg: Payment) => void): void;
+// 房间公告
+Ran.Event.on(event: 'roomNotice', listener: (msg: RoomNotice) => void): void;
+// 被关注
+Ran.Event.on(event: 'follower', listener: (msg: Follower) => void): void;
 ```
 
 ## 方法
