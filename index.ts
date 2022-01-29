@@ -44,7 +44,7 @@ const init = async () => {
 
   update()
   await import('./lib/core')
-  await import('./lib/function')
+  await import('./lib/plugins')
 }
 
 process.on('uncaughtException', (err: any, origin: any) => {

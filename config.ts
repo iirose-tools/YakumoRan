@@ -3,15 +3,41 @@ import pack from './package.json'
 
 const configPath = './config.json'
 
+export interface Config {
+  version: string
+  app: {
+    nickname: string
+    master: string
+    // eslint-disable-next-line camelcase
+    master_uid: string
+    color: string
+    prefix: string
+  },
+  plugins: {
+    [key: string]: {
+      [key: string]: any
+    }
+  },
+  account: {
+    username: string,
+    password: string,
+    room: string
+  },
+  logger: {
+    level: string
+  }
+}
+
 const defaultConfig = {
   version: pack.version,
   app: {
     nickname: '机器人昵称',
     master: '主人用户名',
     master_uid: '主人uid',
-    color: '消息颜色'
+    color: '消息颜色',
+    prefix: '.'
   },
-  function: {
+  plugins: {
     chat: {
       disable: false,
       api: 'Old'
