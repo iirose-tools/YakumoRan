@@ -144,6 +144,8 @@ class Command {
 
         parsedParams[config.name] = item
       }
+
+      // TODO: 构建event以及执行回调函数
     }
 
     globalMessageEvents.push(bind)
