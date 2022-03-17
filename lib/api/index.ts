@@ -100,7 +100,7 @@ Bot.on('PublicMessage', (e) => {
       )
 
       const reply = (msg: string, color?: string) => {
-        return method.sendPrivateMessage(e.uid, msg, color || config.app.color)
+        return method.sendPublicMessage(msg, color || config.app.color)
       }
 
       regexp.lastIndex = 0
