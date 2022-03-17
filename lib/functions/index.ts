@@ -4,7 +4,7 @@ import config from '../../config'
 import { Event, method } from '../api'
 import logger from '../logger'
 
-const functionPath = path.join(process.cwd(), 'function')
+const functionPath = path.join(__dirname, '../../function')
 
 const func: any = {}
 
