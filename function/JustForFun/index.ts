@@ -6,9 +6,9 @@ Ran.command(/^\/(\S+)$/, 'fun.reply.signal', (m, e, reply) => {
     const r = e.replyMessage.pop()
     if (r) {
       if (e.username === r.username) {
-        reply(` [*${e.username}*]  ${m[1]}了 自己！`, config.app.color)
+        reply(` [*${e.username}*]  ${m[1]}  了 自己！`, config.app.color)
       } else {
-        reply(` [*${e.username}*]  ${m[1]}了  [*${r.username}*]！`, config.app.color)
+        reply(` [*${e.username}*]  ${m[1]}  了  [*${r.username}*]！`, config.app.color)
       }
     }
   }
