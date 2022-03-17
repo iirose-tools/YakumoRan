@@ -450,7 +450,7 @@ const input2 = (msage:string) => {
   let hello:any = []
   const out:any = []
   let out1:any = []
-  while (/(\[@.*?@\])/.test(msage)) {
+  while (/(\[@[0-9a-f]{13}@\])/.test(msage)) {
     hello = msage.match(/\[@(.*?)@\]/g)
     const test = hello[0]
     out1 = test.match(/(\w+)/g)

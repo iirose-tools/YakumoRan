@@ -4009,11 +4009,6 @@ locate-path@^5.0.0:
   dependencies:
     p-locate "^4.1.0"
 
-locks@^0.2.2:
-  version "0.2.2"
-  resolved "https://registry.nlark.com/locks/download/locks-0.2.2.tgz#259933d1327cbaf0fd3662f8fffde36809d84ced"
-  integrity sha1-JZkz0TJ8uvD9NmL4//3jaAnYTO0=
-
 lodash.debounce@^4.0.8:
   version "4.0.8"
   resolved "https://registry.nlark.com/lodash.debounce/download/lodash.debounce-4.0.8.tgz#82d79bff30a67c4005ffd5e2515300ad9ca4d7af"
@@ -5801,13 +5796,6 @@ which@^2.0.1, which@^2.0.2:
   integrity sha1-fGqN0KY2oDJ+ELWckobu6T8/UbE=
   dependencies:
     isexe "^2.0.0"
-
-whoiser@^1.12.0:
-  version "1.12.0"
-  resolved "https://registry.yarnpkg.com/whoiser/-/whoiser-1.12.0.tgz#12ecbd5d446eab55eebfd7fe0f7d117aa35fbfcc"
-  integrity sha512-eulb9MLmODHIagkcIRJ0QWgH8cqIdZbGk/a07ZxUri9uCSa2tUDKB8WlSKir8MdLnIyWTSqjR80NtxebCriI3A==
-  dependencies:
-    punycode "^2.1.1"
 
 word-wrap@^1.2.3, word-wrap@~1.2.3:
   version "1.2.3"

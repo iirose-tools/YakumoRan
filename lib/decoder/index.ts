@@ -1,7 +1,6 @@
 import damaku from './damaku'
 import JoinRoom from './JoinRoom'
 import LeaveRoom from './LeaveRoom'
-import like from './like'
 import MoveToRoom from './SwitchRoom'
 import Music from './Music'
 import paymentCallback from './paymentCallback'
@@ -13,6 +12,7 @@ import UserProfileCallback from './UserProfileCallback'
 import BankCallback from './BankCallback'
 import MediaListCallback from './MediaListCallback'
 import SelfMove from './SelfMove'
+import MailboxMessage from './MailboxMessage'
 
 export default (msg: string) => {
   const status = []
@@ -23,7 +23,6 @@ export default (msg: string) => {
   status.push(JoinRoom(msg))
   status.push(PrivateMessage(msg))
   status.push(damaku(msg))
-  status.push(like(msg))
   status.push(MoveToRoom(msg))
   status.push(Music(msg))
   status.push(paymentCallback(msg))
@@ -32,6 +31,7 @@ export default (msg: string) => {
   status.push(BankCallback(msg))
   status.push(MediaListCallback(msg))
   status.push(SelfMove(msg))
+  status.push(MailboxMessage(msg))
 
   const len = status.filter(e => !!e).length
 

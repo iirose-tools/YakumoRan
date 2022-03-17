@@ -2,14 +2,6 @@ import got from 'got'
 import config from '../../config'
 import * as Ran from '../../lib/api'
 
-// 屏蔽的标签，作品中包含这些标签会返回没有搜索到任何结果
-const blockTags = [
-  'R-18',
-  'R-18G',
-  '機械姦',
-  'R-17.9'
-]
-
 const limit: any = {}
 
 // 限速
@@ -31,7 +23,6 @@ const parserTag = (tags: any): string[] | false => {
   const items: any = Object.values(tags)
   for (const item of items) {
     const tag = item.translated_name || item.name
-    if (blockTags.includes(tag)) return false
     result.push(tag)
   }
   return result
@@ -48,8 +39,9 @@ const pixivSearch = async (word: string) => {
     if (e.total_bookmarks > 300) return true
     return false
   })
+
   for (const item of tmp) {
-    if (item.sanity_level > 5) continue
+    if (item.sanity_level > 4) continue
     illusts.push(item)
   }
   return illusts
@@ -61,7 +53,6 @@ Ran.command(/^搜图(.*)$/, 'pixiv.search', async (m, e, reply) => {
     if (!getLimit(e.uid, 10e3)) return
     reply('[Pixiv] Searching...', config.app.color)
     const word: string = m[1].trim()
-    if (blockTags.includes(word)) return reply('[Pixiv] 你 想 干 啥?', config.app.color)
 
     const illusts = await pixivSearch(word)
 

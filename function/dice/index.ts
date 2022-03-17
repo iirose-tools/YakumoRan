@@ -7,7 +7,8 @@ api.command(/^骰子 (\d+)(D|d)(\d+)$/, 'dice.do', (m, e, reply) => {
   const count = Number(m[1])
   const max = Number(m[3])
 
-  if (count > 50) return reply('次数太多')
+  if (count > 10) return reply('次数太多')
+  if (max > 1000) return reply('骰子最大值不能超过1000')
 
   const dice = []
   const msg = []

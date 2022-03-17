@@ -4,7 +4,7 @@ import config from '../../config'
 import { Event, method } from '../api'
 import logger from '../logger'
 
-const functionPath = path.join(__dirname, '../../function')
+const functionPath = path.join(process.cwd(), 'function')
 
 const func: any = {}
 
@@ -52,7 +52,7 @@ Event.on('PublicMessage', (msg) => {
           iirose: ' [*{author}*] '
         }
 
-        return `${typeMap[type]}: ${(authorMap[type] || '{author}').replace('{author}', author)}`
+        return `${typeMap[type] || type}: ${(authorMap[type] || '{author}').replace('{author}', author)}`
       }
 
       let maxLen = 0

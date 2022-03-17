@@ -3,7 +3,6 @@ import { mkdirSync } from 'fs'
 import logger from '../logger'
 import { Bot } from '../event'
 import { send } from '../websocket'
-import { isTest } from '../utils'
 import damaku from '../encoder/messages/damaku'
 import Like from '../encoder/system/Like'
 import payment from '../encoder/system/payment'
@@ -36,59 +35,128 @@ import { GetUserListCallback } from '../decoder/GetUserListCallback'
 export const Event = Bot
 
 export const commands: {
-  [index: string]: (m: RegExpExecArray, e: typePublicMessage, reply: (message: string, color?: string) => void) => void
+  [index: string]: (
+    m: RegExpExecArray,
+    e: typePublicMessage,
+    reply: (message: string, color?: string) => void
+  ) => void;
 } = {}
 
-export const command = (regexp: RegExp, id: string, callback: (m: RegExpExecArray, e: typePublicMessage, reply: (message: string, color?: string) => void) => void) => {
-  logger('Command').debug(`开始注册 ${regexp} 命令`)
+export const getMyId = () => {
+  const err = new Error('get plugin id')
+  const sep = path.sep
 
-  if (commands[id]) {
-    logger('Command').error(`${id} 重复，命令注册失败`)
+  const file = err.stack?.split('\n')[2].split(/\s+/)[3].split(sep)
+  const id = file && file[file.length - 2]
+
+  console.log(id)
+
+  return id
+}
+
+const commandList: {
+  regexp: RegExp
+  id: string
+  from: string
+  callback: (
+    m: RegExpExecArray,
+    e: typePublicMessage,
+    reply: (message: string, color?: string) => void
+  ) => void;
+}[] = []
+
+// 私聊消息
+Bot.on('PrivateMessage', (e) => {
+  if (e.username === config.account.username) return
+
+  commandList.forEach(({ regexp, from, id, callback }) => {
+    regexp.lastIndex = 0
+    if (regexp.test(e.message)) {
+      logger(`Command[${from}]`).info(
+        `${e.username} 在私聊中触发了 ${id} 命令: ${e.message}`
+      )
+
+      const reply = (msg: string, color?: string) => {
+        return method.sendPrivateMessage(e.uid, msg, color || config.app.color)
+      }
+
+      regexp.lastIndex = 0
+      // @ts-ignore
+      callback(regexp.exec(e.message), e, reply)
+    }
+  })
+})
+
+// 群聊消息
+Bot.on('PublicMessage', (e) => {
+  if (e.isBot()) return
+  if (e.username === config.account.username) return
+
+  commandList.forEach(({ regexp, from, id, callback }) => {
+    regexp.lastIndex = 0
+    if (regexp.test(e.message)) {
+      logger(`Command[${from}]`).info(
+        `${e.username} 在群聊中触发了 ${id} 命令: ${e.message}`
+      )
+
+      const reply = (msg: string, color?: string) => {
+        return method.sendPrivateMessage(e.uid, msg, color || config.app.color)
+      }
+
+      regexp.lastIndex = 0
+      // @ts-ignore
+      callback(regexp.exec(e.message), e, reply)
+    }
+  })
+})
+
+/**
+ * @description 注册命令
+ * @param regexp 正则表达式
+ * @param id id
+ * @param callback Callback
+ */
+export const command = (
+  regexp: RegExp,
+  id: string,
+  callback: (
+    m: RegExpExecArray,
+    e: typePublicMessage,
+    reply: (message: string, color?: string) => void
+  ) => void
+) => {
+  const err = new Error('get stack')
+  const sep = path.sep
+
+  const file = err.stack?.split('\n')[2].split(/\s+/)[3].split(sep)
+  const from = file && file[file.length - 2]
+
+  if (!from) {
+    logger('Command[Unknown]').error('无法获取调用链')
     return
   }
+
+  logger(`Command[${from}]`).debug(`开始注册 ${regexp} 命令`)
+
+  if (commands[id]) {
+    logger(`Command[${from}]`).error(`${id} 重复，命令注册失败`)
+    return
+  }
+
   commands[id] = callback
 
   const bind = () => {
-    Bot.on('PrivateMessage', e => {
-      if (e.username === config.account.username) return
-
-      regexp.lastIndex = 0
-      if (regexp.test(e.message)) {
-        logger('Command').info(`${e.username} 在私聊中触发了 ${id} 命令: ${e.message}`)
-
-        const reply = (msg: string, color?: string) => {
-          return method.sendPrivateMessage(e.uid, msg, color || config.app.color)
-        }
-
-        regexp.lastIndex = 0
-        // @ts-ignore
-        callback(regexp.exec(e.message), e, reply)
-      }
-    })
-
-    Bot.on('PublicMessage', e => {
-      if (e.isBot()) return
-      if (e.username === config.account.username) return
-
-      regexp.lastIndex = 0
-      if (regexp.test(e.message)) {
-        logger('Command').info(`${e.username} 在群聊中触发了 ${id} 命令: ${e.message}`)
-
-        const reply = (msg: string, color?: string) => {
-          return method.sendPublicMessage(msg, color || config.app.color)
-        }
-
-        regexp.lastIndex = 0
-        // @ts-ignore
-        callback(regexp.exec(e.message), e, reply)
-      }
+    commandList.push({
+      regexp,
+      id,
+      from,
+      callback
     })
   }
 
-  if (!isTest) setTimeout(bind, 1e3)
-  if (isTest) bind()
+  bind()
 
-  logger('Command').debug(`${id} 命令注册完成`)
+  logger(`Command[${from}]`).debug(`${id} 命令注册完成`)
 }
 
 export const method = {
@@ -161,14 +229,21 @@ export const method = {
    * @param color 颜色
    * @returns {[Promise, Promise]}
    */
-  sendMedia: (type: 'music' | 'video', title: string, signer: string, cover: string, link: string, url: string, duration: number, BitRate: number, color: string) => {
+  sendMedia: (
+    type: 'music' | 'video',
+    title: string,
+    signer: string,
+    cover: string,
+    link: string,
+    url: string,
+    duration: number,
+    BitRate: number,
+    color: string
+  ) => {
     const cardData = mediaCard(type, title, signer, cover, BitRate, color)
     const mData = mediaData(type, title, signer, cover, link, url, duration)
 
-    return [
-      send(cardData),
-      send(mData)
-    ]
+    return [send(cardData), send(mData)]
   },
   utils: {
     /**
@@ -229,7 +304,12 @@ export const method = {
      * @param time 时长，与花园一致
      * @param msg 备注
      */
-    mute: (type: 'chat' | 'music' | 'all', username: string, time: string, msg: string) => {
+    mute: (
+      type: 'chat' | 'music' | 'all',
+      username: string,
+      time: string,
+      msg: string
+    ) => {
       const data = mute(type, username, time, msg)
       send(data)
     },
