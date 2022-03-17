@@ -2,7 +2,6 @@ import config from '../../config'
 import * as Ran from '../../lib/api'
 import logger from '../../lib/logger'
 import per from '../permission/permission'
-import { getImg, getRealUrl, isPorn } from './utils'
 
 const limit: any = {}
 
@@ -50,39 +49,6 @@ Ran.Event.on('PublicMessage', async msg => {
     logger('SCP-079').info(`检测到 ${msg.username} 赌博，已移除`)
     Ran.method.sendPrivateMessage(msg.uid, '[YakumoRan] 本房禁止赌博', config.app.color)
     Ran.method.admin.kick(msg.username)
-  }
-})
-
-Ran.Event.on('PublicMessage', async msg => {
-  if (msg.username === config.account.username) return
-  if (per.users.hasPermission(msg.uid, 'scp079.whitelist')) return
-  // 图片检测
-  const imgs = getImg(msg.message)
-  if (imgs) {
-    logger('SCP-079').info(`${msg.username} 的消息中包含 ${imgs.length} 张图片，检测中...`)
-    for (const url of imgs) {
-      logger('SCP-079').info(`正在检查第 ${imgs.indexOf(url) + 1}/${imgs.length} 张图片...`)
-      const realUrl = await getRealUrl(url)
-      const result = await isPorn(realUrl)
-      logger('SCP-079').info(`第 ${imgs.indexOf(url) + 1}/${imgs.length} 张图片检测完成，Suggestion: ${result.Suggestion}`)
-      if (result.Suggestion === 'forbid') {
-        // 封禁
-        Ran.method.admin.mute('all', msg.username, '30m', `[YakumoRan|${config.account.username}] 涩图自动封禁`)
-        Ran.method.sendPrivateMessage(config.app.master_uid, [
-          `用户  [*${msg.username}*]  (uid: [@${msg.uid}@] ) 刚刚发送了一条包含涩图的消息`,
-          '原始消息: ',
-          msg.message
-        ].join('\n'), config.app.color)
-        break
-      } else if (result.Suggestion === 'check') {
-        // 人工审核
-        Ran.method.sendPrivateMessage(config.app.master_uid, [
-          `用户  [*${msg.username}*]  (uid: [@${msg.uid}@] ) 刚刚发送了一条疑似包含涩图的消息，建议人工重审`,
-          '原始消息: ',
-          msg.message
-        ].join('\n'), config.app.color)
-      }
-    }
   }
 })
 
