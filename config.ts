@@ -37,7 +37,7 @@ const defaultConfig = {
     color: '消息颜色',
     prefix: '.'
   },
-  functions: {
+  function: {
     chat: {
       disable: false,
       api: 'Old'
