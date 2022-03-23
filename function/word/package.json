@@ -3,29 +3,40 @@
   "id": "word",
   "main": "index",
   "author": {
-    "name": "春风~",
+    "name": "春风萧落",
     "github": "BSTluo",
     "iirose": "春风萧落"
   },
   "intro": [
-    "自定义词库",
-    "权限节点",
-    "word.op  : 拥有这个权限的用户能够修改词库",
+    "【词库2.0】",
+    "唔..非常抱歉，使用特殊语法的词库会和谐一部分，本次更新优化了写法，修改了一些无用的功能",
+    "使用文档：http://blog.bstluo.top/index.php/docs/花园词库插件指北/",
+    "开发词库文档：http://blog.bstluo.top/index.php/docs/花园词库开发指北/",
     "",
-    "词库使用指北",
-    "链接  ：https://blog.bstluo.top/index.php/花园词库引擎使用指南"
+    "权限节点：",
+    "word.edit.add    添加词库的权限",
+    "word.edit.del    删除词库的权限",
+    "word.kick        禁止使用词库的权限",
+    "word.edit.in     编辑选中库的权限",
+    "word.edit.out    编辑默认库的权限"
   ],
   "commands": [{
-    "cmd": ".问<message1>答<message2>",
-    "helper": "设置对话词库"
-  }, {
-    "cmd": ".删全问<message1>",
-    "helper": "删除一个触发词的所有结果"
+    "cmd": ".问<触发词>答<回答>",
+    "helper": "当机器人检测到信息<触发词>的时候发送<回答>"
   },{
-    "cmd": ".删问<message1>序号<词库序号>",
-    "helper": "删除一个触发词的某个结果"
+    "cmd": ".删问<触发词>序号<第几个问>库<库名>",
+    "helper": "删除某一个序号的答，序号为all的时候删除该问"
   },{
-    "cmd": ".问表<message1>",
-    "helper": "查看一个触发词的结果(可看序号)"
+    "cmd": ".问表<触发词>",
+    "helper": "查询某个问题处于哪个库，结果发送至私聊"
+  },{
+    "cmd": ".答表<触发词>",
+    "helper": "查询某个答处于哪个库以及哪个触发词下，结果发送至私聊"
+  },{
+    "cmd": ".入库<库名>",
+    "helper": "设定接下来添加的词放入指定库"
+  },{
+    "cmd": ".出库",
+    "helper": "设定接下来添加的词放入默认库"
   }]
 }
