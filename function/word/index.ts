@@ -6,7 +6,6 @@ import fs from 'fs'
 import path from 'path'
 
 try {
-  fs.mkdirSync(path.join(api.Data, 'word'))
   fs.mkdirSync(path.join(api.Data, 'word/wordData'))
   fs.mkdirSync(path.join(api.Data, 'word/userData'))
   fs.mkdirSync(path.join(api.Data, 'word/wordlist'))
