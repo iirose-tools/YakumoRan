@@ -36,10 +36,10 @@ api.command(/^\.问(.*?)答(.*)$/, 'word.add', async (m, e, reply) => {
 )
 
 // 删除问答√
-api.command(/^\.删问(.*?)序号(.*)库(.*)$/, 'word.del', async (m, e, reply) => {
+api.command(/^\.删(.*?)序号(.*)$/, 'word.del', async (m, e, reply) => {
   if (!per.users.hasPermission(e.uid, 'word.edit.del') && !per.users.hasPermission(e.uid, 'permission.word')) return // 不响应没有权限的人，@后期改为能设置config文件内决定是否开启这一条
   if (per.users.hasPermission(e.uid, 'word.kick')) return // 不响应已经被踢出的人
-  reply(word.del(m[1], m[2], m[3]))
+  reply(word.del(m[1], m[2], e.uid))
 }
 )
 
@@ -70,6 +70,13 @@ api.command(/^\.出库$/, 'word.out', async (m, e, reply) => {
   if (!per.users.hasPermission(e.uid, 'word.edit.out') && !per.users.hasPermission(e.uid, 'permission.word')) return // 不响应没有权限的人，@后期改为能设置config文件内决定是否开启这一条
   if (per.users.hasPermission(e.uid, 'word.kick')) return // 不响应已经被踢出的人
   reply(word.out(e.uid))
+}
+)
+
+api.command(/^\.表(.*)$/, 'word.list', async (m, e, reply) => {
+  if (!per.users.hasPermission(e.uid, 'word.edit.out') && !per.users.hasPermission(e.uid, 'permission.word')) return // 不响应没有权限的人，@后期改为能设置config文件内决定是否开启这一条
+  if (per.users.hasPermission(e.uid, 'word.kick')) return // 不响应已经被踢出的人
+  reply(word.list(m[1], e.uid))
 }
 )
 

@@ -105,20 +105,30 @@ export default class word {
     * @param listName 指定库名
     * @return 返回为字符串，成功/失败
   */
-  del (q:string, num:string, listName:string) {
+  del (q:string, num:string, id:string) {
     // 获取json对象后，删除其中的一项，若删除后数组为空则删除key，存储数组
-    const word = this.getjson('wordData', listName)
+    const ku = this.getjson('wordlist', 'userlist')
+    let word
+    let outList = ''
+    if (ku[id]) {
+      outList = ku[id]
+      word = this.getjson('wordData', ku[id])
+    } else {
+      outList = '默认'
+      word = this.getjson('wordData', '默认')
+    }
+    if (!word[q]) { return '  [ 词库核心 ]  并未在当前库中找到相应的关键词' }
     if (num === 'all') {
       delete word[q]
     } else {
       word[q].splice(Number(num) - 1, 1)
-      if (!word[q]) {
+      if (!word[q].length) {
         delete word[q]
       }
     }
 
-    this.update('wordData', listName, word)
-    return (`  [ 词库核心 ]  删除成功，词库【${listName}】，处理成功`)
+    this.update('wordData', outList, word)
+    return (`  [ 词库核心 ]  删除成功，词库【${outList}】，处理成功`)
   }
 
   /**
@@ -163,6 +173,35 @@ export default class word {
       }
     })
     return (`  [ 词库核心 ]  相关询问存储于\n ${aDataList.join('\n')}`)
+  }
+
+  /**
+    * 获取问的表
+    * @param q 显示的库
+    * @param id 查询者id
+    * @return 返回为搜索结果（字符串）
+  */
+  list (q:string, id:string) {
+    const ku = this.getjson('wordlist', 'userlist')
+    let word
+    let outList = ''
+    if (ku[id]) {
+      outList = ku[id]
+      word = this.getjson('wordData', ku[id])
+    } else {
+      outList = '默认'
+      word = this.getjson('wordData', '默认')
+    }
+
+    if (word[q]) {
+      let out = ''
+      word[q].forEach(function (item:any, index:any) {
+        out = out + `\n${index + 1}` + item
+      })
+      return ` [词库核心]  查询到以下回答：\n\n\n ${out}`
+    } else {
+      return `  [ 词库核心 ]  库【 ${outList}} 】 无法查询到此回答，请确定该词条存在或进入其他库查询`
+    }
   }
 
   /**
@@ -235,7 +274,7 @@ export default class word {
     const next1 = wd.match(/%(.*?)\s(.*)%/)
     if (next1) {
       const num = this.random(0, 100)
-      if (num > Number(next1[1])) {
+      if (num < Number(next1[1])) {
         wd = wd.replace(next1[0], next1[2])
       } else {
         wd = wd.replace(next1[0], '')
