@@ -218,15 +218,17 @@ export default class word {
     // 将唯一标识转换为id
     let wd = ''
     let tid:any
+    let tname:any
+
     // 将各种情况的唯一标识转换为id
-    if (q.match(/^\[@(.*?)@\]\s/)) {
-      tid = q.match(/^\[@(.*?)@\]\s/)
+    if (q.match(/^\[@(.*?)@\]\s*/)) {
+      tid = q.match(/^\[@(.*?)@\]\s*/)
     }
-    if (q.match(/\s\[@(.*?)@\]$/)) {
-      tid = q.match(/\s\[@(.*?)@\]$/)
+    if (q.match(/\s*\[@(.*?)@\]$/)) {
+      tid = q.match(/\s*\[@(.*?)@\]$/)
     }
-    if (q.match(/\s\[@(.*?)@\]\s/)) {
-      tid = q.match(/\s\[@(.*?)@\]\s/)
+    if (q.match(/\s*\[@(.*?)@\]\s*/)) {
+      tid = q.match(/\s*\[@(.*?)@\]\s*/)
     }
     if (q.match(/^\[@(.*?)@\]$/)) {
       tid = q.match(/^\[@(.*?)@\]$/)
@@ -238,20 +240,22 @@ export default class word {
     }
 
     // 将各种情况的艾特转换为@
-    if (q.match(/^\[\*(.*?)\*\]\s/)) {
-      tid = q.match(/^\[\*(.*?)\*\]\s/)
+    if (q.match(/^\[\*(.*?)\*\]\s*/)) {
+      tname = q.match(/^\[\*(.*?)\*\]\s*/)
     }
-    if (q.match(/\s\[\*(.*?)\*\]$/)) {
-      tid = q.match(/\s\[\*(.*?)\*\]$/)
+    if (q.match(/\s*\[\*(.*?)\*\]$/)) {
+      tname = q.match(/\s\[\*(.*?)\*\]$/)
     }
-    if (q.match(/\s\[\*(.*?)\*\]\s/)) {
-      tid = q.match(/\s\[\*(.*?)\*\]\s/)
+    if (q.match(/\s*\[\*(.*?)\*\]\s*/)) {
+      tname = q.match(/\s*\[\*(.*?)\*\]\s*/)
     }
     if (q.match(/^\[\*(.*?)\*\]$/)) {
-      tid = q.match(/^\[\*(.*?)\*\]$/)
+      tname = q.match(/^\[\*(.*?)\*\]$/)
     }
-    if (tid) {
-      q = q.replace(tid[0], '(@)') // 我tm终于转换好了
+    let name = ''
+    if (tname) {
+      name = tname[1]
+      q = q.replace(tname[0], '(@)') // 我tm终于转换好了
     }
 
     // 获取全部的词库
@@ -262,6 +266,21 @@ export default class word {
     } else {
       return null
     }
+
+    // 将$@$变为
+    while (wd.match(/\$@\$/)) {
+      if (wd.match(/\$@\$/)) {
+        const over = wd.match(/\$@\$/)
+        try {
+          if (over) {
+            wd = wd.replace(over[0], name)
+          }
+        } catch (err) {
+          return '  【 词库核心 】  $@$无法获取对应数据'
+        }
+      }
+    }
+
     // 开始解析判断    ?物品名<>=<>数量 语句?
     while (wd.match(/\?(.*?)\s(.*?)\s(.*?)\s(.*?)\?/)) {
       const first = wd.match(/\?(.*?)\s(.*?)\s(.*?)\s(.*?)\?/)
@@ -443,6 +462,7 @@ export default class word {
         }
       }
     }
+
     if (wd) {
       return wd
     }
