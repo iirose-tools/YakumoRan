@@ -79,13 +79,26 @@ api.command(/^\.出库$/, 'word.out', async (m, e, reply) => {
 }
 )
 
-api.command(/^\.表(.*)$/, 'word.list', async (m, e, reply) => {
+api.command(/^\.表(.*)$/, 'word.list.a', async (m, e, reply) => {
   if (!per.users.hasPermission(e.uid, 'word.edit.out') && !per.users.hasPermission(e.uid, 'permission.word')) return // 不响应没有权限的人，@后期改为能设置config文件内决定是否开启这一条
   if (per.users.hasPermission(e.uid, 'word.kick')) return // 不响应已经被踢出的人
-  reply(word.list(m[1], e))
+  api.method.sendPrivateMessage(e.uid, word.alist(m[1], e))
 }
 )
 
+api.command(/^\.库表$/, 'word.list', async (m, e, reply) => {
+  if (!per.users.hasPermission(e.uid, 'word.edit.out') && !per.users.hasPermission(e.uid, 'permission.word')) return // 不响应没有权限的人，@后期改为能设置config文件内决定是否开启这一条
+  if (per.users.hasPermission(e.uid, 'word.kick')) return // 不响应已经被踢出的人
+  api.method.sendPrivateMessage(e.uid, word.list())
+}
+)
+
+api.command(/^\.栈(.*)$/, 'word.list.q', async (m, e, reply) => {
+  if (!per.users.hasPermission(e.uid, 'word.edit.out') && !per.users.hasPermission(e.uid, 'permission.word')) return // 不响应没有权限的人，@后期改为能设置config文件内决定是否开启这一条
+  if (per.users.hasPermission(e.uid, 'word.kick')) return // 不响应已经被踢出的人
+  api.method.sendPrivateMessage(e.uid, word.qlist(m[1]))
+}
+)
 /**
  * 导出，导入词库功能
  * 以node POST给服务器然后导出为直链

@@ -193,7 +193,7 @@ export default class word {
     * @param m 查询者数据json：{uid:"id",name:"昵称"}
     * @return 返回为搜索结果（字符串）
   */
-  list (q:string, m:any) {
+  alist (q:string, m:any) {
     const ku = this.getjson('wordlist', 'userlist')
     let word
     let outList = ''
@@ -508,5 +508,37 @@ export default class word {
       this.update('wordlist', 'userlist', list)
       return ' [词库核心] 设置成功，将添加至【默认】词库'
     } catch (err) { return ' [词库核心] 设置失败' }
+  }
+
+  /**
+    * 获取库的表
+    * @return 返回为搜索结果（字符串）
+  */
+  list () {
+    const fileName = path.join(this.dir, './word/wordData')
+    const list = fs.readdirSync(fileName)
+    const kulist:any = []
+    list.forEach(function (item, index) {
+      const name = item.match(/(.*).json/)
+      if (name) {
+        kulist.push(name[1])
+      }
+    }
+    )
+    return ` [词库核心] 当前拥有这些库：【${kulist.join(' ， ')}】`
+  }
+
+  /**
+    * 获取库内的问表
+    * @name 库名（字符串）
+    * @return 返回为搜索结果（字符串）
+  */
+  qlist (name:string) {
+    const word = this.getjson('wordData', name)
+    const outlist = []
+    for (let i = 0; i < Object.keys(word).length; i++) {
+      outlist.push(`${i + 1}.       ${Object.keys(word)[i]}`)
+    }
+    return ` [词库核心] 搜索到的库内含有以下的触发词 ： \n\n ${outlist.join('\n')}`
   }
 }
