@@ -139,19 +139,24 @@ export default class word {
     * @return 返回为搜索结果（字符串）
   */
   getas (q:string) {
-    const fileName = path.join(this.dir, './word/wordData')
-    const list = fs.readdirSync(fileName)
-    const qList:any = []
-    list.forEach(function (item, index) {
-      const word = JSON.parse(fs.readFileSync(path.join(fileName + `/${list}`)).toString())
-      if (word[q]) {
-        const name = item.match(/(.*).json/)
-        if (name) {
-          qList.push(name[1])
+    try {
+      const fileName = path.join(this.dir, './word/wordData')
+      const list = fs.readdirSync(fileName)
+      const qList:any = []
+      list.forEach(function (item, index) {
+        const word = JSON.parse(fs.readFileSync(path.join(fileName + `/${item}`)).toString())
+        if (word[q]) {
+          const name = item.match(/(.*).json/)
+          if (name) {
+            qList.push(name[1])
+          }
         }
-      }
-    })
-    return (`  [ 词库核心 ]  相关询问存储于【${qList.join('  ,  ')}】词库中`)
+      })
+      return (`  [ 词库核心 ]  相关询问存储于【${qList.join('  ,  ')}】词库中`)
+    } catch (err) {
+      console.log(err)
+      return '  [词库核心]  啊哦...好像产生了未知错误....快告诉开发者...!'
+    }
   }
 
   /**
@@ -160,21 +165,26 @@ export default class word {
     * @return 返回为搜索结果（字符串）
   */
   getqs (a:string) {
-    const fileName = path.join(this.dir, './word/wordData')
-    const list = fs.readdirSync(fileName)
-    const aDataList:any = []
-    list.forEach(function (item, index) {
-      const word = JSON.parse(fs.readFileSync(path.join(fileName + `/${list}`)).toString())
-      const name = item.match(/(.*).json/)
-      if (name) {
-        for (let i = 0; i < Object.keys(word).length; i++) {
-          if (word[Object.keys(word)[i]].indexOf(a) >= 0) {
-            aDataList.push(`词库【${name[1]}】  ：  问【${Object.keys(word)[i]}】  序号：【${word[Object.keys(word)[i]].indexOf(a) + 1}】`)
+    try {
+      const fileName = path.join(this.dir, './word/wordData')
+      const list = fs.readdirSync(fileName)
+      const aDataList:any = []
+      list.forEach(function (item, index) {
+        const word = JSON.parse(fs.readFileSync(path.join(fileName + `/${item}`)).toString())
+        const name = item.match(/(.*).json/)
+        if (name) {
+          for (let i = 0; i < Object.keys(word).length; i++) {
+            if (word[Object.keys(word)[i]].indexOf(a) >= 0) {
+              aDataList.push(`词库【${name[1]}】  ：  问【${Object.keys(word)[i]}】  序号：【${word[Object.keys(word)[i]].indexOf(a) + 1}】`)
+            }
           }
         }
-      }
-    })
-    return (`  [ 词库核心 ]  相关询问存储于\n ${aDataList.join('\n')}`)
+      })
+      return (`  [ 词库核心 ]  相关询问存储于\n ${aDataList.join('\n')}`)
+    } catch (err) {
+      console.log(err)
+      return '  [词库核心]  啊哦...好像产生了未知错误....快告诉开发者...!'
+    }
   }
 
   /**
