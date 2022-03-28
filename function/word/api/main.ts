@@ -202,7 +202,7 @@ export default class word {
       })
       return ` [词库核心]  查询到以下回答：\n\n\n ${out}`
     } else {
-      return `  [ 词库核心 ]  库【 ${outList}} 】 无法查询到此回答，请确定该词条存在或进入其他库查询`
+      return `  [ 词库核心 ]  库【 ${outList} 】 无法查询到此回答，请确定该词条存在或进入其他库查询`
     }
   }
 
@@ -267,202 +267,205 @@ export default class word {
       return null
     }
 
+    try {
     // 将$@$变为
-    while (wd.match(/\$@\$/)) {
-      if (wd.match(/\$@\$/)) {
-        const over = wd.match(/\$@\$/)
-        try {
+      while (wd.match(/\$@\$/)) {
+        if (wd.match(/\$@\$/)) {
+          const over = wd.match(/\$@\$/)
+          try {
+            if (over) {
+              wd = wd.replace(over[0], name)
+            }
+          } catch (err) {
+            return '  【 词库核心 】  $@$无法获取对应数据'
+          }
+        }
+      }
+
+      // 开始解析判断    ?物品名<>=<>数量 语句?
+      while (wd.match(/\?(.*?)\s(.*?)\s(.*?)\s(.*?)\?/)) {
+        const first = wd.match(/\?(.*?)\s(.*?)\s(.*?)\s(.*?)\?/)
+        if (first) {
+          const mData = this.getjson('userData', uid)
+          let out = ''
+          if (first[2] === '<' && mData[first[1]] < Number(first[3])) { out = first[4] }
+          if (first[2] === '>' && mData[first[1]] > Number(first[3])) { out = first[4] }
+          if (first[2] === '=' && mData[first[1]] === Number(first[3])) { out = first[4] }
+          if (first[2] === '<>' && mData[first[1]] !== Number(first[3])) { out = first[4] }
+          wd = wd.replace(first[0], out)
+        }
+      }
+
+      // 开始解析概率    %30 语句%
+      while (wd.match(/%(.*?)\s(.*?)%/)) {
+        const next1 = wd.match(/%(.*?)\s(.*?)%/)
+        if (next1) {
+          const num = this.random(0, 100)
+          if (num < Number(next1[1])) {
+            wd = wd.replace(next1[0], next1[2])
+          } else {
+            wd = wd.replace(next1[0], '')
+          }
+        }
+      }
+
+      // 开始解析减少     -物品名 数量 目标/that-
+      while (wd.match(/-(.*?)-/)) {
+        const third = wd.match(/-(.*?)-/)
+        if (third) {
+          let outNumber:number
+          let user:any
+          const mData = third[1].split(' ')
+          if (mData.length >= 3) {
+            if (mData[2] === 'that' && tha) {
+              user = this.getjson('userData', tha)
+              if (!user[mData[0]]) { user[mData[0]] = 0 }
+              if (mData[1].search('-') >= 0) {
+                const num = mData[1].split('-')
+                outNumber = this.random(Number(num[0]), Number(num[1]))
+                user[mData[0]] = user[mData[0]] - outNumber
+                if (user[mData[0]] < 0) { return '  [ 词库核心 ]  似乎失败了...唔..好像物品不够' }
+                this.update('userData', tha, user)
+              } else {
+                outNumber = Number(mData[1])
+                user[mData[0]] = user[mData[0]] - outNumber
+                if (user[mData[0]] < 0) { return '  [ 词库核心 ]  似乎失败了...唔..好像物品不够' }
+                this.update('userData', tha, user)
+              }
+            } else {
+              user = this.getjson('userData', mData[2])
+              if (!user[mData[0]]) { user[mData[0]] = 0 }
+              if (mData[1].search('-') >= 0) {
+                const num = mData[1].split('-')
+                outNumber = this.random(Number(num[0]), Number(num[1]))
+                user[mData[0]] = user[mData[0]] - outNumber
+                if (user[mData[0]] < 0) { return '  [ 词库核心 ]  似乎失败了...唔..好像物品不够' }
+                this.update('userData', mData[2], user)
+              } else {
+                outNumber = Number(mData[1])
+                user[mData[0]] = user[mData[0]] - outNumber
+                if (user[mData[0]] < 0) { return '  [ 词库核心 ]  似乎失败了...唔..好像物品不够' }
+                this.update('userData', mData[2], user)
+              }
+            }
+          } else {
+            user = this.getjson('userData', uid)
+            if (!user[mData[0]]) { user[mData[0]] = 0 }
+            if (mData[1].search('-') >= 0) {
+              const num = mData[1].split('-')
+              outNumber = this.random(Number(num[0]), Number(num[1]))
+              user[mData[0]] = user[mData[0]] - outNumber
+              if (user[mData[0]] < 0) { return '  [ 词库核心 ]  似乎失败了...唔..好像物品不够' }
+              this.update('userData', uid, user)
+            } else {
+              outNumber = Number(mData[1])
+              user[mData[0]] = user[mData[0]] - outNumber
+              if (user[mData[0]] < 0) { return '  [ 词库核心 ]  似乎失败了...唔..好像物品不够' }
+              this.update('userData', uid, user)
+            }
+          }
+          wd = wd.replace(third[0], String(outNumber))
+        }
+      }
+
+      // 开始解析添加    +物品名 数量 目标/that+
+      while (wd.match(/\+(.*?)\+/)) {
+        const second = wd.match(/\+(.*?)\+/)
+        if (second) {
+          let outNumber:number
+          let user:any
+          const mData = second[1].split(' ')
+          if (mData.length >= 3) {
+            if (mData[2] === 'that' && tha) {
+              user = this.getjson('userData', tha)
+              if (!user[mData[0]]) { user[mData[0]] = 0 }
+              if (mData[1].search('-') >= 0) {
+                const num = mData[1].split('-')
+                outNumber = this.random(Number(num[0]), Number(num[1]))
+                user[mData[0]] = outNumber + user[mData[0]]
+                this.update('userData', tha, user)
+              } else {
+                outNumber = Number(mData[1])
+                user[mData[0]] = outNumber + user[mData[0]]
+                this.update('userData', tha, user)
+              }
+            } else {
+              user = this.getjson('userData', mData[2])
+              if (!user[mData[0]]) { user[mData[0]] = 0 }
+              if (mData[1].search('-') >= 0) {
+                const num = mData[1].split('-')
+                outNumber = this.random(Number(num[0]), Number(num[1]))
+                user[mData[0]] = outNumber + user[mData[0]]
+                this.update('userData', mData[2], user)
+              } else {
+                outNumber = Number(mData[1])
+                user[mData[0]] = outNumber + user[mData[0]]
+                console.log(user)
+                this.update('userData', mData[2], user)
+              }
+            }
+          } else {
+            user = this.getjson('userData', uid)
+            if (!user[mData[0]]) { user[mData[0]] = 0 }
+            if (mData[1].search('-') >= 0) {
+              const num = mData[1].split('-')
+              outNumber = this.random(Number(num[0]), Number(num[1]))
+              user[mData[0]] = outNumber + user[mData[0]]
+              this.update('userData', uid, user)
+            } else {
+              outNumber = Number(mData[1])
+              user[mData[0]] = outNumber + user[mData[0]]
+              this.update('userData', uid, user)
+            }
+          }
+          wd = wd.replace(second[0], String(outNumber))
+        }
+      }
+
+      // 获取属性  #物品名 目标#
+      while (wd.match(/#(.*?)#/)) {
+        const end = wd.match(/#(.*?)#/)
+        if (end) {
+          const endData = end[1].split(' ')
+          let out:number
+          if (endData.length === 2) {
+            if (endData[1] === 'that') {
+              const data = this.getjson('userData', tha)
+              out = Number(data[endData[0]])
+            } else {
+              const data = this.getjson('userData', endData[1])
+              out = Number(data[endData[0]])
+            }
+          } else {
+            const data = this.getjson('userData', uid)
+            out = Number(data[endData[0]])
+          }
+          wd = wd.replace(end[0], String(out))
+        }
+      }
+
+      // 将$发$变为发送人昵称
+      while (wd.match(/\$发\$/)) {
+        if (wd.match(/\$发\$/)) {
+          const over = wd.match(/\$发\$/)
           if (over) {
-            wd = wd.replace(over[0], name)
-          }
-        } catch (err) {
-          return '  【 词库核心 】  $@$无法获取对应数据'
-        }
-      }
-    }
-
-    // 开始解析判断    ?物品名<>=<>数量 语句?
-    while (wd.match(/\?(.*?)\s(.*?)\s(.*?)\s(.*?)\?/)) {
-      const first = wd.match(/\?(.*?)\s(.*?)\s(.*?)\s(.*?)\?/)
-      if (first) {
-        const mData = this.getjson('userData', uid)
-        let out = ''
-        if (first[2] === '<' && mData[first[1]] < Number(first[3])) { out = first[4] }
-        if (first[2] === '>' && mData[first[1]] > Number(first[3])) { out = first[4] }
-        if (first[2] === '=' && mData[first[1]] === Number(first[3])) { out = first[4] }
-        if (first[2] === '<>' && mData[first[1]] !== Number(first[3])) { out = first[4] }
-        wd = wd.replace(first[0], out)
-      }
-    }
-
-    // 开始解析概率    %30 语句%
-    while (wd.match(/%(.*?)\s(.*?)%/)) {
-      const next1 = wd.match(/%(.*?)\s(.*?)%/)
-      if (next1) {
-        const num = this.random(0, 100)
-        if (num < Number(next1[1])) {
-          wd = wd.replace(next1[0], next1[2])
-        } else {
-          wd = wd.replace(next1[0], '')
-        }
-      }
-    }
-
-    // 开始解析添加    +物品名 数量 目标/that+
-    while (wd.match(/\+(.*?)\+/)) {
-      const second = wd.match(/\+(.*?)\+/)
-      if (second) {
-        let outNumber:number
-        let user:any
-        const mData = second[1].split(' ')
-        if (mData.length >= 3) {
-          if (mData[2] === 'that' && tha) {
-            user = this.getjson('userData', tha)
-            if (!user[mData[0]]) { user[mData[0]] = 0 }
-            if (mData[1].search('-') >= 0) {
-              const num = mData[1].split('-')
-              outNumber = this.random(Number(num[0]), Number(num[1]))
-              user[mData[0]] = outNumber + user[mData[0]]
-              this.update('userData', tha, user)
-            } else {
-              outNumber = Number(mData[1])
-              user[mData[0]] = outNumber + user[mData[0]]
-              this.update('userData', tha, user)
-            }
-          } else {
-            user = this.getjson('userData', mData[2])
-            if (!user[mData[0]]) { user[mData[0]] = 0 }
-            if (mData[1].search('-') >= 0) {
-              const num = mData[1].split('-')
-              outNumber = this.random(Number(num[0]), Number(num[1]))
-              user[mData[0]] = outNumber + user[mData[0]]
-              this.update('userData', mData[2], user)
-            } else {
-              outNumber = Number(mData[1])
-              user[mData[0]] = outNumber + user[mData[0]]
-              console.log(user)
-              this.update('userData', mData[2], user)
-            }
-          }
-        } else {
-          user = this.getjson('userData', uid)
-          if (!user[mData[0]]) { user[mData[0]] = 0 }
-          if (mData[1].search('-') >= 0) {
-            const num = mData[1].split('-')
-            outNumber = this.random(Number(num[0]), Number(num[1]))
-            user[mData[0]] = outNumber + user[mData[0]]
-            this.update('userData', uid, user)
-          } else {
-            outNumber = Number(mData[1])
-            user[mData[0]] = outNumber + user[mData[0]]
-            this.update('userData', uid, user)
+            wd = wd.replace(over[0], userName)
           }
         }
-        wd = wd.replace(second[0], String(outNumber))
       }
-    }
 
-    // 开始解析减少     -物品名 数量 目标/that-
-    while (wd.match(/-(.*?)-/)) {
-      const third = wd.match(/-(.*?)-/)
-      if (third) {
-        let outNumber:number
-        let user:any
-        const mData = third[1].split(' ')
-        if (mData.length >= 3) {
-          if (mData[2] === 'that' && tha) {
-            user = this.getjson('userData', tha)
-            if (!user[mData[0]]) { user[mData[0]] = 0 }
-            if (mData[1].search('-') >= 0) {
-              const num = mData[1].split('-')
-              outNumber = this.random(Number(num[0]), Number(num[1]))
-              user[mData[0]] = user[mData[0]] - outNumber
-              if (user[mData[0]] < 0) { return '  [ 词库核心 ]  似乎失败了...唔..好像物品不够' }
-              this.update('userData', tha, user)
-            } else {
-              outNumber = Number(mData[1])
-              user[mData[0]] = user[mData[0]] - outNumber
-              if (user[mData[0]] < 0) { return '  [ 词库核心 ]  似乎失败了...唔..好像物品不够' }
-              this.update('userData', tha, user)
-            }
-          } else {
-            user = this.getjson('userData', mData[2])
-            if (!user[mData[0]]) { user[mData[0]] = 0 }
-            if (mData[1].search('-') >= 0) {
-              const num = mData[1].split('-')
-              outNumber = this.random(Number(num[0]), Number(num[1]))
-              user[mData[0]] = user[mData[0]] - outNumber
-              if (user[mData[0]] < 0) { return '  [ 词库核心 ]  似乎失败了...唔..好像物品不够' }
-              this.update('userData', mData[2], user)
-            } else {
-              outNumber = Number(mData[1])
-              user[mData[0]] = user[mData[0]] - outNumber
-              if (user[mData[0]] < 0) { return '  [ 词库核心 ]  似乎失败了...唔..好像物品不够' }
-              this.update('userData', mData[2], user)
-            }
-          }
-        } else {
-          user = this.getjson('userData', uid)
-          if (!user[mData[0]]) { user[mData[0]] = 0 }
-          if (mData[1].search('-') >= 0) {
-            const num = mData[1].split('-')
-            outNumber = this.random(Number(num[0]), Number(num[1]))
-            user[mData[0]] = user[mData[0]] - outNumber
-            if (user[mData[0]] < 0) { return '  [ 词库核心 ]  似乎失败了...唔..好像物品不够' }
-            this.update('userData', uid, user)
-          } else {
-            outNumber = Number(mData[1])
-            user[mData[0]] = user[mData[0]] - outNumber
-            if (user[mData[0]] < 0) { return '  [ 词库核心 ]  似乎失败了...唔..好像物品不够' }
-            this.update('userData', uid, user)
+      // 将$换$变为
+      while (wd.match(/\$换\$/)) {
+        if (wd.match(/\$换\$/)) {
+          const over = wd.match(/\$换\$/)
+          if (over) {
+            wd = wd.replace(over[0], '\n')
           }
         }
-        wd = wd.replace(third[0], String(outNumber))
       }
+    } catch (err) {
+      return '  [词库核心]  发生致命解析错误，请查看当前解析词条中符号是否为英文，若无法解决请联系开发者'
     }
-
-    // 获取属性  #物品名 目标#
-    while (wd.match(/#(.*?)#/)) {
-      const end = wd.match(/#(.*?)#/)
-      if (end) {
-        const endData = end[1].split(' ')
-        let out:number
-        if (endData.length === 2) {
-          if (endData[1] === 'that') {
-            const data = this.getjson('userData', tha)
-            out = Number(data[endData[0]])
-          } else {
-            const data = this.getjson('userData', endData[1])
-            out = Number(data[endData[0]])
-          }
-        } else {
-          const data = this.getjson('userData', uid)
-          out = Number(data[endData[0]])
-        }
-        wd = wd.replace(end[0], String(out))
-      }
-    }
-
-    // 将$发$变为发送人昵称
-    while (wd.match(/\$发\$/)) {
-      if (wd.match(/\$发\$/)) {
-        const over = wd.match(/\$发\$/)
-        if (over) {
-          wd = wd.replace(over[0], userName)
-        }
-      }
-    }
-
-    // 将$换$变为
-    while (wd.match(/\$换\$/)) {
-      if (wd.match(/\$换\$/)) {
-        const over = wd.match(/\$换\$/)
-        if (over) {
-          wd = wd.replace(over[0], '\n')
-        }
-      }
-    }
-
     if (wd) {
       return wd
     }
