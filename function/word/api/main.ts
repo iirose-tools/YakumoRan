@@ -320,8 +320,8 @@ export default class word {
             if (mData[2] === 'that' && tha) {
               user = this.getjson('userData', tha)
               if (!user[mData[0]]) { user[mData[0]] = 0 }
-              if (mData[1].search('-') >= 0) {
-                const num = mData[1].split('-')
+              if (mData[1].search('~') >= 0) {
+                const num = mData[1].split('~')
                 outNumber = this.random(Number(num[0]), Number(num[1]))
                 user[mData[0]] = user[mData[0]] - outNumber
                 if (user[mData[0]] < 0) { return '  [ 词库核心 ]  似乎失败了...唔..好像物品不够' }
@@ -335,8 +335,8 @@ export default class word {
             } else {
               user = this.getjson('userData', mData[2])
               if (!user[mData[0]]) { user[mData[0]] = 0 }
-              if (mData[1].search('-') >= 0) {
-                const num = mData[1].split('-')
+              if (mData[1].search('~') >= 0) {
+                const num = mData[1].split('~')
                 outNumber = this.random(Number(num[0]), Number(num[1]))
                 user[mData[0]] = user[mData[0]] - outNumber
                 if (user[mData[0]] < 0) { return '  [ 词库核心 ]  似乎失败了...唔..好像物品不够' }
@@ -351,8 +351,8 @@ export default class word {
           } else {
             user = this.getjson('userData', uid)
             if (!user[mData[0]]) { user[mData[0]] = 0 }
-            if (mData[1].search('-') >= 0) {
-              const num = mData[1].split('-')
+            if (mData[1].search('~') >= 0) {
+              const num = mData[1].split('~')
               outNumber = this.random(Number(num[0]), Number(num[1]))
               user[mData[0]] = user[mData[0]] - outNumber
               if (user[mData[0]] < 0) { return '  [ 词库核心 ]  似乎失败了...唔..好像物品不够' }
@@ -379,8 +379,8 @@ export default class word {
             if (mData[2] === 'that' && tha) {
               user = this.getjson('userData', tha)
               if (!user[mData[0]]) { user[mData[0]] = 0 }
-              if (mData[1].search('-') >= 0) {
-                const num = mData[1].split('-')
+              if (mData[1].search('~') >= 0) {
+                const num = mData[1].split('~')
                 outNumber = this.random(Number(num[0]), Number(num[1]))
                 user[mData[0]] = outNumber + user[mData[0]]
                 this.update('userData', tha, user)
@@ -392,8 +392,8 @@ export default class word {
             } else {
               user = this.getjson('userData', mData[2])
               if (!user[mData[0]]) { user[mData[0]] = 0 }
-              if (mData[1].search('-') >= 0) {
-                const num = mData[1].split('-')
+              if (mData[1].search('~') >= 0) {
+                const num = mData[1].split('~')
                 outNumber = this.random(Number(num[0]), Number(num[1]))
                 user[mData[0]] = outNumber + user[mData[0]]
                 this.update('userData', mData[2], user)
@@ -407,8 +407,8 @@ export default class word {
           } else {
             user = this.getjson('userData', uid)
             if (!user[mData[0]]) { user[mData[0]] = 0 }
-            if (mData[1].search('-') >= 0) {
-              const num = mData[1].split('-')
+            if (mData[1].search('~') >= 0) {
+              const num = mData[1].split('~')
               outNumber = this.random(Number(num[0]), Number(num[1]))
               user[mData[0]] = outNumber + user[mData[0]]
               this.update('userData', uid, user)
