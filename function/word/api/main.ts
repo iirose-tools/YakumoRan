@@ -11,7 +11,7 @@ export default class word {
 
   /**
   * 返回一个文件的json对象
-  * @param list 词库文件目录（wordlist/userData/wordData）
+  * @param list 词库文件目录（wordconfig/userData/wordData）
   * @param name 词库文件名
   * @return 词库json对象
   */
@@ -61,14 +61,17 @@ export default class word {
     * 初始化词库对象
     * @dir 指定词库存储根目录
   */
-  constructor (dir:string) {
+  constructor (dir:string, uid:string) {
     this.dir = dir
-    try {
-      fs.mkdirSync(path.join(dir, 'word'))
-      fs.mkdirSync(path.join(dir, 'word/wordData'))
-      fs.mkdirSync(path.join(dir, 'word/userData'))
-      fs.mkdirSync(path.join(dir, 'word/wordlist'))
-    } catch (err) { }
+    try { fs.mkdirSync(path.join(dir, 'word')) } catch (err) { }
+    try { fs.mkdirSync(path.join(dir, 'word/wordData')) } catch (err) { }
+    try { fs.mkdirSync(path.join(dir, 'word/userData')) } catch (err) { }
+    try { fs.mkdirSync(path.join(dir, 'word/wordconfig')) } catch (err) { }
+    const adminlist = this.getjson('wordconfig', 'adminlist')
+    if (!adminlist.admin) { // admin高级权限
+      adminlist.admin = [uid]
+    }
+    this.update('wordconfig', 'adminlist', adminlist)
   }
 
   /**
@@ -82,7 +85,7 @@ export default class word {
     // 获取json对象后判断key是否存在，不存在则定义为数组，若存在则为数组添加元素，并存储它
     const uid = m.uid
     let listName = ''
-    const list = this.getjson('wordlist', 'userlist')
+    const list = this.getjson('wordconfig', 'userlist')
     if (Object.prototype.hasOwnProperty.call(list, uid)) {
       listName = list[uid]
     } else {
@@ -109,7 +112,7 @@ export default class word {
   del (q:string, num:string, m:any) {
     const id = m.uid
     // 获取json对象后，删除其中的一项，若删除后数组为空则删除key，存储数组
-    const ku = this.getjson('wordlist', 'userlist')
+    const ku = this.getjson('wordconfig', 'userlist')
     let word
     let outList = ''
     if (ku[id]) {
@@ -194,7 +197,7 @@ export default class word {
     * @return 返回为搜索结果（字符串）
   */
   alist (q:string, m:any) {
-    const ku = this.getjson('wordlist', 'userlist')
+    const ku = this.getjson('wordconfig', 'userlist')
     let word
     let outList = ''
     if (ku[m.uid]) {
@@ -229,6 +232,7 @@ export default class word {
     let wd = ''
     let tid:any
     let tname:any
+    const numdata = []
 
     // 将各种情况的唯一标识转换为id
     if (q.match(/^\[@(.*?)@\]\s*/)) {
@@ -268,6 +272,15 @@ export default class word {
       q = q.replace(tname[0], '(@)') // 我tm终于转换好了
     }
 
+    // 将数字替换为(数)
+    while (q.match(/(\d+)/)) {
+      const reg = q.match(/(\d+)/)
+      if (reg) {
+        numdata.push(reg[1])
+        q = q.replace(reg[0], '(数)')
+      }
+    }
+
     // 获取全部的词库
     if (this.getword()[q]) {
       const num = this.random(0, this.getword()[q].length - 1)
@@ -277,8 +290,36 @@ export default class word {
       return null
     }
 
+    // 将$数$替换为数
+    while (wd.match(/\$数(.*?)\$/)) {
+      const reg = wd.match(/\$数(.*?)\$/)
+      if (reg) {
+        const index = Number(reg[1]) - 1
+        wd = wd.replace(reg[0], String(numdata[index]))
+      }
+    }
+
     try {
-    // 将$@$变为
+    // 判断管理员命令
+      while (wd.match(/{(.*?)}/)) {
+        if (wd.match(/{(.*?)}/)) {
+          const over = wd.match(/{(.*?)}/)
+          try {
+            if (over) {
+              const admin = this.getjson('wordconfig', 'adminlist')
+              if (admin.admin.indexOf(uid) >= 0) {
+                wd = wd.replace(over[0], over[1])
+              } else {
+                wd = wd.replace(over[0], '')
+              }
+            }
+          } catch (err) {
+            return '  【 词库核心 】  $@$无法获取对应数据'
+          }
+        }
+      }
+
+      // 将$@$变为
       while (wd.match(/\$@\$/)) {
         if (wd.match(/\$@\$/)) {
           const over = wd.match(/\$@\$/)
@@ -314,11 +355,14 @@ export default class word {
           if (num < Number(next1[1])) {
             wd = wd.replace(next1[0], next1[2])
           } else {
-            wd = wd.replace(next1[0], '')
+            wd = wd.replace(next1[0], '什么都木有')
           }
         }
       }
 
+      // 收集本次干了啥，失败则恢复
+      const things:any = {}
+      let thingnum = 0
       // 开始解析减少     -物品名 数量 目标/that-
       while (wd.match(/-(.*?)-/)) {
         const third = wd.match(/-(.*?)-/)
@@ -326,7 +370,7 @@ export default class word {
           let outNumber:number
           let user:any
           const mData = third[1].split(' ')
-          if (mData.length >= 3) {
+          if (mData.length >= 3) { // 如果有3个参数
             if (mData[2] === 'that' && tha) {
               user = this.getjson('userData', tha)
               if (!user[mData[0]]) { user[mData[0]] = 0 }
@@ -334,13 +378,35 @@ export default class word {
                 const num = mData[1].split('~')
                 outNumber = this.random(Number(num[0]), Number(num[1]))
                 user[mData[0]] = user[mData[0]] - outNumber
-                if (user[mData[0]] < 0) { return '  [ 词库核心 ]  似乎失败了...唔..好像物品不够' }
+                if (user[mData[0]] < 0) {
+                  this.losserr(things)
+                  return `  [ 词库核心 ]  似乎失败了...唔..好像物品【${mData[0]}】不够`
+                }
+                thingnum++
+                things[String(thingnum)] = [tha, mData[0], outNumber]
                 this.update('userData', tha, user)
               } else {
-                outNumber = Number(mData[1])
-                user[mData[0]] = user[mData[0]] - outNumber
-                if (user[mData[0]] < 0) { return '  [ 词库核心 ]  似乎失败了...唔..好像物品不够' }
-                this.update('userData', tha, user)
+                if (mData[1] === 'all') {
+                  if (user[mData[0]] < 0) {
+                    this.losserr(things)
+                    return `  [ 词库核心 ]  似乎失败了...唔..好像物品【${mData[0]}】的数量比0还少...!`
+                  }
+                  user[mData[0]] = 0
+                  outNumber = user[mData[0]]
+                  thingnum++
+                  things[String(thingnum)] = [tha, mData[0], outNumber]
+                  this.update('userData', tha, user)
+                } else {
+                  outNumber = Number(mData[1])
+                  user[mData[0]] = user[mData[0]] - outNumber
+                  if (user[mData[0]] < 0) {
+                    this.losserr(things)
+                    return `  [ 词库核心 ]  似乎失败了...唔..好像物品【${mData[0]}】不够`
+                  }
+                  thingnum++
+                  things[String(thingnum)] = [tha, mData[0], outNumber]
+                  this.update('userData', tha, user)
+                }
               }
             } else {
               user = this.getjson('userData', mData[2])
@@ -349,13 +415,35 @@ export default class word {
                 const num = mData[1].split('~')
                 outNumber = this.random(Number(num[0]), Number(num[1]))
                 user[mData[0]] = user[mData[0]] - outNumber
-                if (user[mData[0]] < 0) { return '  [ 词库核心 ]  似乎失败了...唔..好像物品不够' }
+                if (user[mData[0]] < 0) {
+                  this.losserr(things)
+                  return `  [ 词库核心 ]  似乎失败了...唔..好像物品【${mData[0]}】不够`
+                }
+                thingnum++
+                things[String(thingnum)] = [mData[2], mData[0], outNumber]
                 this.update('userData', mData[2], user)
               } else {
-                outNumber = Number(mData[1])
-                user[mData[0]] = user[mData[0]] - outNumber
-                if (user[mData[0]] < 0) { return '  [ 词库核心 ]  似乎失败了...唔..好像物品不够' }
-                this.update('userData', mData[2], user)
+                if (mData[1] === 'all') {
+                  if (user[mData[0]] < 0) {
+                    this.losserr(things)
+                    return `  [ 词库核心 ]  似乎失败了...唔..好像物品【${mData[0]}】的数量比0还少...!`
+                  }
+                  outNumber = user[mData[0]]
+                  user[mData[0]] = 0
+                  thingnum++
+                  things[String(thingnum)] = [mData[2], mData[0], outNumber]
+                  this.update('userData', mData[2], user)
+                } else {
+                  outNumber = Number(mData[1])
+                  user[mData[0]] = user[mData[0]] - outNumber
+                  if (user[mData[0]] < 0) {
+                    this.losserr(things)
+                    return `  [ 词库核心 ]  似乎失败了...唔..好像物品【${mData[0]}】不够`
+                  }
+                  thingnum++
+                  things[String(thingnum)] = [mData[2], mData[0], outNumber]
+                  this.update('userData', mData[2], user)
+                }
               }
             }
           } else {
@@ -365,13 +453,35 @@ export default class word {
               const num = mData[1].split('~')
               outNumber = this.random(Number(num[0]), Number(num[1]))
               user[mData[0]] = user[mData[0]] - outNumber
-              if (user[mData[0]] < 0) { return '  [ 词库核心 ]  似乎失败了...唔..好像物品不够' }
+              if (user[mData[0]] < 0) {
+                this.losserr(things)
+                return `  [ 词库核心 ]  似乎失败了...唔..好像物品【${mData[0]}】不够`
+              }
+              thingnum++
+              things[String(thingnum)] = [uid, mData[0], outNumber]
               this.update('userData', uid, user)
             } else {
-              outNumber = Number(mData[1])
-              user[mData[0]] = user[mData[0]] - outNumber
-              if (user[mData[0]] < 0) { return '  [ 词库核心 ]  似乎失败了...唔..好像物品不够' }
-              this.update('userData', uid, user)
+              if (mData[1] === 'all') {
+                if (user[mData[0]] < 0) {
+                  this.losserr(things)
+                  return `  [ 词库核心 ]  似乎失败了...唔..好像物品【${mData[0]}】的数量比0还少...!`
+                }
+                outNumber = user[mData[0]]
+                user[mData[0]] = 0
+                thingnum++
+                things[String(thingnum)] = [uid, mData[0], outNumber]
+                this.update('userData', uid, user)
+              } else {
+                outNumber = Number(mData[1])
+                user[mData[0]] = user[mData[0]] - outNumber
+                if (user[mData[0]] < 0) {
+                  this.losserr(things)
+                  return `  [ 词库核心 ]  似乎失败了...唔..好像物品【${mData[0]}】不够`
+                }
+                thingnum++
+                things[String(thingnum)] = [uid, mData[0], outNumber]
+                this.update('userData', uid, user)
+              }
             }
           }
           wd = wd.replace(third[0], String(outNumber))
@@ -489,9 +599,9 @@ export default class word {
   */
   in (db:string, m:any) {
     const uid = m.uid
-    const list = this.getjson('wordlist', 'userlist')
+    const list = this.getjson('wordconfig', 'userlist')
     list[uid] = db
-    this.update('wordlist', 'userlist', list)
+    this.update('wordconfig', 'userlist', list)
     return ` [词库核心] 设置成功，接下来您添加的词库将添加至【${db}】词库`
   }
 
@@ -502,10 +612,10 @@ export default class word {
   */
   out (m:any) {
     const uid = m.uid
-    const list = this.getjson('wordlist', 'userlist')
+    const list = this.getjson('wordconfig', 'userlist')
     try {
       delete list[uid]
-      this.update('wordlist', 'userlist', list)
+      this.update('wordconfig', 'userlist', list)
       return ' [词库核心] 设置成功，将添加至【默认】词库'
     } catch (err) { return ' [词库核心] 设置失败' }
   }
@@ -540,5 +650,54 @@ export default class word {
       outlist.push(`${i + 1}.       ${Object.keys(word)[i]}`)
     }
     return ` [词库核心] 搜索到的库内含有以下的触发词 ： \n\n ${outlist.join('\n')}`
+  }
+
+  // 反馈减少的错误
+  losserr = (things:any) => {
+    for (let n = 0; n < Object.keys(things).length; n++) {
+      const json = things[n + 1]
+      const data = this.getjson('userData', json[0])
+      data[json[1]] = data[json[1]] + json[2]
+      this.update('userData', json[0], data)
+    }
+  }
+
+  /**
+    * 增加词库管理员
+    * @name 唯一标识（字符串）
+    * @return 返回为结果（字符串）
+  */
+  op (name:string) {
+    let id = ''
+    const a = name.match(/\s*\[@(.*?)@\]\s*/)
+    console.log('test' + a)
+    if (a) {
+      id = a[1]
+    }
+    const adminlist = this.getjson('wordconfig', 'adminlist')
+    if (adminlist.admin.indexOf(id) < 0) {
+      adminlist.admin.push(id)
+    }
+    this.update('wordconfig', 'adminlist', adminlist)
+    return ' [词库核心] 词库管理员设置成功...!'
+  }
+
+  /**
+    * 去除词库管理员
+    * @name 唯一标识（字符串）
+    * @return 返回为结果（字符串）
+  */
+  deop (name:string) {
+    let id = ''
+    const a = name.match(/\s*\[@(.*?)@\]\s*/)
+    if (a) {
+      id = a[1]
+    }
+    const adminlist = this.getjson('wordconfig', 'adminlist')
+    if (adminlist.admin.indexOf(id) >= 0) {
+      adminlist.admin.splice(adminlist.admin.indexOf(id), 1)
+    }
+    this.update('wordconfig', 'adminlist', adminlist)
+    return ' [词库核心] 词库管理员取消成功...!'
   }
 }
