@@ -6,6 +6,8 @@ export default class word {
   dir:any
   wordData:any
   userData:any
+  nickname:string
+
   // 苏苏的随机数生成姬
   random = (n: number, m: number): number => { return Math.floor(Math.random() * (m - n + 1) + n) }
 
@@ -60,8 +62,10 @@ export default class word {
   /**
     * 初始化词库对象
     * @dir 指定词库存储根目录
+    * @uid 机器人主人
+    * @nick 机器人昵称
   */
-  constructor (dir:string, uid:string) {
+  constructor (dir:string, uid:string, nick:string) {
     this.dir = dir
     try { fs.mkdirSync(path.join(dir, 'word')) } catch (err) { }
     try { fs.mkdirSync(path.join(dir, 'word/wordData')) } catch (err) { }
@@ -72,6 +76,7 @@ export default class word {
       adminlist.admin = [uid]
     }
     this.update('wordconfig', 'adminlist', adminlist)
+    this.nickname = nick
   }
 
   /**
@@ -157,7 +162,6 @@ export default class word {
       })
       return (`  [ 词库核心 ]  相关询问存储于【${qList.join('  ,  ')}】词库中`)
     } catch (err) {
-      console.log(err)
       return '  [词库核心]  啊哦...好像产生了未知错误....快告诉开发者...!'
     }
   }
@@ -185,7 +189,6 @@ export default class word {
       })
       return (`  [ 词库核心 ]  相关询问存储于\n ${aDataList.join('\n')}`)
     } catch (err) {
-      console.log(err)
       return '  [词库核心]  啊哦...好像产生了未知错误....快告诉开发者...!'
     }
   }
@@ -290,17 +293,76 @@ export default class word {
       return null
     }
 
-    // 将$数$替换为数
-    while (wd.match(/\$数(.*?)\$/)) {
-      const reg = wd.match(/\$数(.*?)\$/)
-      if (reg) {
-        const index = Number(reg[1]) - 1
-        wd = wd.replace(reg[0], String(numdata[index]))
-      }
-    }
-
     try {
-    // 判断管理员命令
+    // 将$数$替换为数
+      while (wd.match(/\$数(.*?)\$/)) {
+        const reg = wd.match(/\$数(.*?)\$/)
+        if (reg) {
+          const index = Number(reg[1]) - 1
+          wd = wd.replace(reg[0], String(numdata[index]))
+        }
+      }
+
+      // 将$id$变为发送人id
+      while (wd.match(/\$id\$/)) {
+        if (wd.match(/\$id\$/)) {
+          const over = wd.match(/\$id\$/)
+          if (over) {
+            wd = wd.replace(over[0], uid)
+          }
+        }
+      }
+
+      // 优先获取属性  `物品名 目标`
+      while (wd.match(/`(.*?)`/)) {
+        const end = wd.match(/`(.*?)`/)
+        if (end) {
+          const endData = end[1].split(' ')
+          let mubiao = ''
+          if (endData.length === 2) {
+            mubiao = (endData[1] === 'that') ? (tha) : (endData[1])
+          } else {
+            mubiao = uid
+          }
+          const data = this.getjson('userData', mubiao)
+          if (endData[0].substring(0, 2) === '武器' || endData[0].substring(0, 2) === '防具') {
+            if (endData[0].substring(2, 3)) {
+              if (endData[0].substring(2, 3) === '名') { wd = wd.replace(end[0], data[endData[0].substring(0, 2)].name) }
+              if (endData[0].substring(2, 3) === '值') { wd = wd.replace(end[0], data[endData[0].substring(0, 2)].value) }
+            }
+          } else if (endData[0].substring(0, 3) === 'str') {
+            const name = endData[0].replace('str', '')
+            wd = wd.replace(end[0], data[name].join('，'))
+          } else {
+            const out = Number((data[endData[0]]) ? data[endData[0]] : 0)
+            wd = wd.replace(end[0], String(out))
+          }
+        }
+      }
+
+      // 延迟
+      while (wd.match(/\^(\d+)\s(.*?)\^/)) {
+        const load = wd.match(/\^(\d+)\s(.*?)\^/)
+        if (load) {
+          const now = Date.parse(new Date().toString()) / 1000
+          const nowlist = this.getjson('wordconfig', 'timelist')
+          if (!nowlist[uid]) { nowlist[uid] = {} }
+          if (!nowlist[uid][load[2]]) {
+            nowlist[uid][load[2]] = Number(now + Number(load[1]))
+            wd = wd.replace(load[0], load[2])
+          } else {
+            if (nowlist[uid][load[2]] > now) {
+              return `  【 词库核心: ${userName} 】  ${q} 任务未完成...`
+            } else {
+              nowlist[uid][load[2]] = Number(now + Number(load[1]))
+              wd = wd.replace(load[0], load[2])
+            }
+          }
+          this.update('wordconfig', 'timelist', nowlist)
+        }
+      }
+
+      // 判断管理员命令
       while (wd.match(/{(.*?)}/)) {
         if (wd.match(/{(.*?)}/)) {
           const over = wd.match(/{(.*?)}/)
@@ -314,7 +376,7 @@ export default class word {
               }
             }
           } catch (err) {
-            return '  【 词库核心 】  $@$无法获取对应数据'
+            return `  【 词库核心 】  [${q}]   无法获取对应数据`
           }
         }
       }
@@ -328,7 +390,21 @@ export default class word {
               wd = wd.replace(over[0], name)
             }
           } catch (err) {
-            return '  【 词库核心 】  $@$无法获取对应数据'
+            return `  【 词库核心 】  [${q}]   无法获取对应数据`
+          }
+        }
+      }
+
+      // 将$称$变为机器人昵称
+      while (wd.match(/\$称\$/)) {
+        if (wd.match(/\$称\$/)) {
+          const over = wd.match(/\$称\$/)
+          try {
+            if (over) {
+              wd = wd.replace(over[0], this.nickname)
+            }
+          } catch (err) {
+            return `  【 词库核心 】  [${q}]   无法获取对应数据`
           }
         }
       }
@@ -368,123 +444,67 @@ export default class word {
         const third = wd.match(/-(.*?)-/)
         if (third) {
           let outNumber:number
-          let user:any
           const mData = third[1].split(' ')
+          let mubiao = ''
           if (mData.length >= 3) { // 如果有3个参数
-            if (mData[2] === 'that' && tha) {
-              user = this.getjson('userData', tha)
-              if (!user[mData[0]]) { user[mData[0]] = 0 }
-              if (mData[1].search('~') >= 0) {
-                const num = mData[1].split('~')
-                outNumber = this.random(Number(num[0]), Number(num[1]))
-                user[mData[0]] = user[mData[0]] - outNumber
-                if (user[mData[0]] < 0) {
-                  this.losserr(things)
-                  return `  [ 词库核心 ]  似乎失败了...唔..好像物品【${mData[0]}】不够`
-                }
-                thingnum++
-                things[String(thingnum)] = [tha, mData[0], outNumber]
-                this.update('userData', tha, user)
-              } else {
-                if (mData[1] === 'all') {
-                  if (user[mData[0]] < 0) {
-                    this.losserr(things)
-                    return `  [ 词库核心 ]  似乎失败了...唔..好像物品【${mData[0]}】的数量比0还少...!`
-                  }
-                  user[mData[0]] = 0
-                  outNumber = user[mData[0]]
-                  thingnum++
-                  things[String(thingnum)] = [tha, mData[0], outNumber]
-                  this.update('userData', tha, user)
-                } else {
-                  outNumber = Number(mData[1])
-                  user[mData[0]] = user[mData[0]] - outNumber
-                  if (user[mData[0]] < 0) {
-                    this.losserr(things)
-                    return `  [ 词库核心 ]  似乎失败了...唔..好像物品【${mData[0]}】不够`
-                  }
-                  thingnum++
-                  things[String(thingnum)] = [tha, mData[0], outNumber]
-                  this.update('userData', tha, user)
-                }
-              }
-            } else {
-              user = this.getjson('userData', mData[2])
-              if (!user[mData[0]]) { user[mData[0]] = 0 }
-              if (mData[1].search('~') >= 0) {
-                const num = mData[1].split('~')
-                outNumber = this.random(Number(num[0]), Number(num[1]))
-                user[mData[0]] = user[mData[0]] - outNumber
-                if (user[mData[0]] < 0) {
-                  this.losserr(things)
-                  return `  [ 词库核心 ]  似乎失败了...唔..好像物品【${mData[0]}】不够`
-                }
-                thingnum++
-                things[String(thingnum)] = [mData[2], mData[0], outNumber]
-                this.update('userData', mData[2], user)
-              } else {
-                if (mData[1] === 'all') {
-                  if (user[mData[0]] < 0) {
-                    this.losserr(things)
-                    return `  [ 词库核心 ]  似乎失败了...唔..好像物品【${mData[0]}】的数量比0还少...!`
-                  }
-                  outNumber = user[mData[0]]
-                  user[mData[0]] = 0
-                  thingnum++
-                  things[String(thingnum)] = [mData[2], mData[0], outNumber]
-                  this.update('userData', mData[2], user)
-                } else {
-                  outNumber = Number(mData[1])
-                  user[mData[0]] = user[mData[0]] - outNumber
-                  if (user[mData[0]] < 0) {
-                    this.losserr(things)
-                    return `  [ 词库核心 ]  似乎失败了...唔..好像物品【${mData[0]}】不够`
-                  }
-                  thingnum++
-                  things[String(thingnum)] = [mData[2], mData[0], outNumber]
-                  this.update('userData', mData[2], user)
-                }
-              }
-            }
+            mubiao = (mData[2] === 'that' && tha) ? (tha) : (mData[2])
           } else {
-            user = this.getjson('userData', uid)
+            mubiao = uid
+          }
+          const user = this.getjson('userData', mubiao)
+          if (mData[0].substring(0, 2) === '武器' || mData[0].substring(0, 2) === '防具') {
+            if (!user[mData[0].substring(0, 2)]) { user[mData[0].substring(0, 2)] = { name: '', value: 0 } }
+            const name = user[mData[0].substring(0, 2)].name
+            thingnum++
+            things[String(thingnum)] = [mubiao, mData[0].substring(0, 2), user[mData[0].substring(0, 2)], 'other1']
+            if (mData[1].search('~') >= 0) {
+              const num = mData[1].split('~')
+              outNumber = this.random(Number(num[0]), Number(num[1]))
+            } else {
+              outNumber = (mData[1] === 'all') ? (user[mData[0].substring(0, 2)].name) : (Number(mData[1]))
+            }
+            user[mData[0].substring(0, 2)].value = user[mData[0].substring(0, 2)].value - outNumber
+            if (!user[mData[0].substring(0, 2)].value || user[mData[0].substring(0, 2)].value <= 0) { delete user[mData[0].substring(0, 2)] }
+            this.update('userData', mubiao, user)
+            if (user[mData[0].substring(0, 2)]) { wd = wd.replace(third[0], String(user[mData[0].substring(0, 2)].value)) }
+            if (!user[mData[0].substring(0, 2)]) { wd = wd.replace(third[0], name) }
+          } else if (mData[0].substring(0, 3) === 'str') {
+            const name = mData[0].replace('str', '')
+            if (!user[name]) { user[name] = [] }
+            if (mData[1] === 'all') {
+              thingnum++
+              things[String(thingnum)] = [mubiao, mData[0].substring(0, 2), user[mData[0].substring(0, 2)], 'other1']
+              delete user[name]
+              wd = wd.replace(third[0], '无')
+            } else if (user[name].indexOf(mData[1]) >= 0) {
+              thingnum++
+              things[String(thingnum)] = [mubiao, mData[0].substring(0, 2), user[mData[0].substring(0, 2)], 'other1']
+              user[name].splice(user[name].indexOf(mData[1]), 1)
+              if (!user[name].length) { delete user[name] }
+              wd = wd.replace(third[0], mData[1])
+            } else {
+              this.losserr(things)
+              return `  [ 词库核心 ]  【${userName}】  似乎失败了...唔..好像没有物品【${name}】`
+            }
+            this.update('userData', mubiao, user)
+          } else {
             if (!user[mData[0]]) { user[mData[0]] = 0 }
             if (mData[1].search('~') >= 0) {
               const num = mData[1].split('~')
               outNumber = this.random(Number(num[0]), Number(num[1]))
-              user[mData[0]] = user[mData[0]] - outNumber
-              if (user[mData[0]] < 0) {
-                this.losserr(things)
-                return `  [ 词库核心 ]  似乎失败了...唔..好像物品【${mData[0]}】不够`
-              }
-              thingnum++
-              things[String(thingnum)] = [uid, mData[0], outNumber]
-              this.update('userData', uid, user)
             } else {
-              if (mData[1] === 'all') {
-                if (user[mData[0]] < 0) {
-                  this.losserr(things)
-                  return `  [ 词库核心 ]  似乎失败了...唔..好像物品【${mData[0]}】的数量比0还少...!`
-                }
-                outNumber = user[mData[0]]
-                user[mData[0]] = 0
-                thingnum++
-                things[String(thingnum)] = [uid, mData[0], outNumber]
-                this.update('userData', uid, user)
-              } else {
-                outNumber = Number(mData[1])
-                user[mData[0]] = user[mData[0]] - outNumber
-                if (user[mData[0]] < 0) {
-                  this.losserr(things)
-                  return `  [ 词库核心 ]  似乎失败了...唔..好像物品【${mData[0]}】不够`
-                }
-                thingnum++
-                things[String(thingnum)] = [uid, mData[0], outNumber]
-                this.update('userData', uid, user)
-              }
+              outNumber = (mData[1] === 'all') ? (user[mData[0]]) : (Number(mData[1]))
             }
+            user[mData[0]] = (user[mData[0]] * 1000 - outNumber * 1000) / 1000
+            if (user[mData[0]] < 0) {
+              this.losserr(things)
+              return `  [ 词库核心 ]  【${userName}】  似乎失败了...唔..好像物品【${mData[0]}】不够`
+            }
+            thingnum++
+            things[String(thingnum)] = [mubiao, mData[0], outNumber, '-']
+            this.update('userData', mubiao, user)
+            wd = wd.replace(third[0], String(outNumber))
           }
-          wd = wd.replace(third[0], String(outNumber))
         }
       }
 
@@ -492,75 +512,49 @@ export default class word {
       while (wd.match(/\+(.*?)\+/)) {
         const second = wd.match(/\+(.*?)\+/)
         if (second) {
-          let outNumber:number
-          let user:any
           const mData = second[1].split(' ')
+          let mubiao = ''
           if (mData.length >= 3) {
-            if (mData[2] === 'that' && tha) {
-              user = this.getjson('userData', tha)
-              if (!user[mData[0]]) { user[mData[0]] = 0 }
-              if (mData[1].search('~') >= 0) {
-                const num = mData[1].split('~')
-                outNumber = this.random(Number(num[0]), Number(num[1]))
-                user[mData[0]] = outNumber + user[mData[0]]
-                this.update('userData', tha, user)
-              } else {
-                outNumber = Number(mData[1])
-                user[mData[0]] = outNumber + user[mData[0]]
-                this.update('userData', tha, user)
-              }
-            } else {
-              user = this.getjson('userData', mData[2])
-              if (!user[mData[0]]) { user[mData[0]] = 0 }
-              if (mData[1].search('~') >= 0) {
-                const num = mData[1].split('~')
-                outNumber = this.random(Number(num[0]), Number(num[1]))
-                user[mData[0]] = outNumber + user[mData[0]]
-                this.update('userData', mData[2], user)
-              } else {
-                outNumber = Number(mData[1])
-                user[mData[0]] = outNumber + user[mData[0]]
-                console.log(user)
-                this.update('userData', mData[2], user)
-              }
-            }
+            mubiao = (mData[2] === 'that' && tha) ? (tha) : (mData[2])
           } else {
-            user = this.getjson('userData', uid)
+            mubiao = uid
+          }
+          const user = this.getjson('userData', mubiao)
+          if (mData[0].substring(0, 2) === '武器' || mData[0].substring(0, 2) === '防具') {
+            if (!user[mData[0].substring(0, 2)]) { user[mData[0].substring(0, 2)] = { name: '', value: 0 } }
+            const name = mData[0].replace(mData[0].substring(0, 2), '')
+            thingnum++
+            things[String(thingnum)] = [mubiao, [mData[0].substring(0, 2), name], user[mData[0].substring(0, 2)], 'other1']
+            const outnum = Number((mData[1].search('~') >= 0) ? (this.random(Number(mData[1].split('~')[0]), Number(mData[1].split('~')[1]))) : Number(mData[1]))
+            if (outnum > user[mData[0].substring(0, 2)].value) {
+              user[mData[0].substring(0, 2)] = {
+                name: name,
+                value: outnum
+              }
+              this.update('userData', mubiao, user)
+              wd = wd.replace(second[0], `${name}，强度${outnum}`)
+            } else {
+              return '  [词库核心]  当前背包内的武器可能更好哦~新装备已被丢弃'
+            }
+          } else if (mData[0].substring(0, 3) === 'str') {
+            const name = mData[0].replace('str', '')
+            if (!user[name]) { user[name] = [] }
+            thingnum++
+            things[String(thingnum)] = [mubiao, name, user[name], 'other2']
+            if (user[name].indexOf(mData[1]) === -1) {
+              user[name].push(String(mData[1]))
+            }
+            this.update('userData', mubiao, user)
+            wd = wd.replace(second[0], String(mData[1]))
+          } else {
             if (!user[mData[0]]) { user[mData[0]] = 0 }
-            if (mData[1].search('~') >= 0) {
-              const num = mData[1].split('~')
-              outNumber = this.random(Number(num[0]), Number(num[1]))
-              user[mData[0]] = outNumber + user[mData[0]]
-              this.update('userData', uid, user)
-            } else {
-              outNumber = Number(mData[1])
-              user[mData[0]] = outNumber + user[mData[0]]
-              this.update('userData', uid, user)
-            }
+            const outNumber = (mData[1].search('~') >= 0) ? (this.random(Number(mData[1].split('~')[0]), Number(mData[1].split('~')[1]))) : Number(mData[1])
+            user[mData[0]] = (outNumber * 1000 + user[mData[0]] * 1000) / 1000
+            this.update('userData', mubiao, user)
+            thingnum++
+            things[String(thingnum)] = [mubiao, mData[0], outNumber, '+']
+            wd = wd.replace(second[0], String(outNumber))
           }
-          wd = wd.replace(second[0], String(outNumber))
-        }
-      }
-
-      // 获取属性  #物品名 目标#
-      while (wd.match(/#(.*?)#/)) {
-        const end = wd.match(/#(.*?)#/)
-        if (end) {
-          const endData = end[1].split(' ')
-          let out:number
-          if (endData.length === 2) {
-            if (endData[1] === 'that') {
-              const data = this.getjson('userData', tha)
-              out = Number(data[endData[0]])
-            } else {
-              const data = this.getjson('userData', endData[1])
-              out = Number(data[endData[0]])
-            }
-          } else {
-            const data = this.getjson('userData', uid)
-            out = Number(data[endData[0]])
-          }
-          wd = wd.replace(end[0], String(out))
         }
       }
 
@@ -570,6 +564,33 @@ export default class word {
           const over = wd.match(/\$发\$/)
           if (over) {
             wd = wd.replace(over[0], userName)
+          }
+        }
+      }
+
+      // 获取属性  #物品名 目标#
+      while (wd.match(/#(.*?)#/)) {
+        const end = wd.match(/#(.*?)#/)
+        if (end) {
+          const endData = end[1].split(' ')
+          let mubiao = ''
+          if (endData.length === 2) {
+            mubiao = (endData[1] === 'that') ? (tha) : (endData[1])
+          } else {
+            mubiao = uid
+          }
+          const data = this.getjson('userData', mubiao)
+          if (endData[0].substring(0, 2) === '武器' || endData[0].substring(0, 2) === '防具') {
+            if (endData[0].substring(2, 3)) {
+              if (endData[0].substring(2, 3) === '名') { wd = wd.replace(end[0], data[endData[0].substring(0, 2)].name) }
+              if (endData[0].substring(2, 3) === '值') { wd = wd.replace(end[0], data[endData[0].substring(0, 2)].value) }
+            }
+          } else if (endData[0].substring(0, 3) === 'str') {
+            const name = endData[0].replace('str', '')
+            wd = wd.replace(end[0], data[name].join('，'))
+          } else {
+            const out = Number((data[endData[0]]) ? data[endData[0]] : 0)
+            wd = wd.replace(end[0], String(out))
           }
         }
       }
@@ -584,7 +605,7 @@ export default class word {
         }
       }
     } catch (err) {
-      return '  [词库核心]  发生致命解析错误，请查看当前解析词条中符号是否为英文，若无法解决请联系开发者'
+      return `  [词库核心]    问：【${q}】词条【${wd}】    \n\n发生致命解析错误，请查看当前解析词条中符号是否为英文，若无法解决请联系开发者`
     }
     if (wd) {
       return wd
@@ -654,10 +675,13 @@ export default class word {
 
   // 反馈减少的错误
   losserr = (things:any) => {
-    for (let n = 0; n < Object.keys(things).length; n++) {
-      const json = things[n + 1]
+    for (let n = Object.keys(things).length; n > 0; n--) {
+      const json = things[n]
       const data = this.getjson('userData', json[0])
-      data[json[1]] = data[json[1]] + json[2]
+      if (json[3] === '-') { data[json[1]] = data[json[1]] + json[2] }
+      if (json[3] === '+') { data[json[1]] = data[json[1]] - json[2] }
+      if (json[3] === 'other1') { data[json[1]] = json[2] }
+      if (json[3] === 'other2') { data[json[1]] = json[2] }
       this.update('userData', json[0], data)
     }
   }
@@ -670,7 +694,6 @@ export default class word {
   op (name:string) {
     let id = ''
     const a = name.match(/\s*\[@(.*?)@\]\s*/)
-    console.log('test' + a)
     if (a) {
       id = a[1]
     }
@@ -699,5 +722,40 @@ export default class word {
     }
     this.update('wordconfig', 'adminlist', adminlist)
     return ' [词库核心] 词库管理员取消成功...!'
+  }
+
+  /**
+    * 查询排行榜
+    * @itemName 查询的物品（字符串），切记只能查询物品，不能查询文字
+    * @return 返回为结果（字符串）
+  */
+  leaderboard (itemName:string) {
+    try {
+      const pathName = path.join(this.dir, './word/userData')
+      const list = fs.readdirSync(pathName)
+      const dataList:any = {}
+      list.forEach(function (item, index) {
+        const word = JSON.parse(fs.readFileSync(path.join(pathName + `/${item}`)).toString())
+        const str = item.match(/(.*).json/)
+        if (str) {
+          if (word[itemName]) {
+            dataList[`${word[itemName]}`] = str[1]
+          }
+        }
+      })
+      const test = Object.keys(dataList).map(function (item:any) {
+        return Number(item)
+      })
+      test.sort(function (a:number, b:number) { return b - a })
+      let out = ''
+      let num = 0
+      test.forEach(function (item, index) {
+        num++
+        out = out + `\n${num} : 【${dataList[test[num - 1]]}】 - ${test[num - 1]}`
+      })
+      return (`  [ 词库核心 ]  相关询问存储于\n ${out}`)
+    } catch (err) {
+      return '  [词库核心]  啊哦...好像产生了未知错误....快告诉开发者...!'
+    }
   }
 }
