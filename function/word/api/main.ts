@@ -224,11 +224,11 @@ export default class word {
 
   /**
     * 词库解析
-    * @param q 需要回复的触发词
+    * @param rawq 需要回复的触发词
     * @param m 触发者的数据json:{uid:'id',name:'昵称'}
     * @return 返回为回复结果
   */
-  start (q:string, m:any) {
+  start (rawq:string, m:any) {
     const uid:string = m.uid
     const userName:string = m.username
     // 将唯一标识转换为id
@@ -236,7 +236,7 @@ export default class word {
     let tid:any
     let tname:any
     const numdata = []
-
+    let q = rawq
     // 将各种情况的唯一标识转换为id
     if (q.match(/^\[@(.*?)@\]\s*/)) {
       tid = q.match(/^\[@(.*?)@\]\s*/)
@@ -283,9 +283,12 @@ export default class word {
         q = q.replace(reg[0], '(数)')
       }
     }
-
     // 获取全部的词库
-    if (this.getword()[q]) {
+    if (this.getword()[rawq]) {
+      const num = this.random(0, this.getword()[rawq].length - 1)
+      wd = this.getword()[rawq][num]
+      console.log(`  【 词库核心 】  已触发词库   【${rawq}】 `)
+    } else if (this.getword()[q]) {
       const num = this.random(0, this.getword()[q].length - 1)
       wd = this.getword()[q][num]
       console.log(`  【 词库核心 】  已触发词库   【${q}】 `)
@@ -548,7 +551,12 @@ export default class word {
             wd = wd.replace(second[0], String(mData[1]))
           } else {
             if (!user[mData[0]]) { user[mData[0]] = 0 }
-            const outNumber = (mData[1].search('~') >= 0) ? (this.random(Number(mData[1].split('~')[0]), Number(mData[1].split('~')[1]))) : Number(mData[1])
+            let outNumber = 0
+            if (mData[1] === 'all') {
+              outNumber = user[mData[0]]
+            } else {
+              outNumber = (mData[1].search('~') >= 0) ? (this.random(Number(mData[1].split('~')[0]), Number(mData[1].split('~')[1]))) : Number(mData[1])
+            }
             user[mData[0]] = (outNumber * 1000 + user[mData[0]] * 1000) / 1000
             this.update('userData', mubiao, user)
             thingnum++

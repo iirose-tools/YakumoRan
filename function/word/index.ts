@@ -4,6 +4,7 @@ import config from '../../config'
 import per from '../permission/permission'
 import fs from 'fs'
 import path from 'path'
+import got from 'got'
 
 try {
   fs.mkdirSync(path.join(api.Data, 'word/wordData'))
@@ -128,11 +129,44 @@ api.command(/^\.wdeop(.*)$/, 'word.admin.del', async (m, e, reply) => {
 )
 
 api.command(/^\.(.*)天梯$/, 'word.list.data', async (m, e, reply) => {
-  if (!per.users.hasPermission(e.uid, 'word.admin.del') && !per.users.hasPermission(e.uid, 'permission.word')) return // 不响应没有权限的人，@后期改为能设置config文件内决定是否开启这一条
   if (per.users.hasPermission(e.uid, 'word.kick')) return // 不响应已经被踢出的人
   reply(word.leaderboard(m[1]))
 }
 )
+
+api.command(/^.上传(.*)$/, 'word.upload', async (m, e, reply) => {
+  if (!per.users.hasPermission(e.uid, 'word.edit.upload') && !per.users.hasPermission(e.uid, 'permission.word')) return // 不响应没有权限的人，@后期改为能设置config文件内决定是否开启这一条
+  if (per.users.hasPermission(e.uid, 'word.kick')) return // 不响应已经被踢出的人
+  const up = word.getjson('wordData', m[1])
+  if (JSON.stringify(up) !== '{}') {
+    try {
+      const response = await got('https://word.bstluo.top/new.php', {
+        method: 'post',
+        json: up
+      })
+      reply(` [词库核心] ${response.body}`)
+    } catch (error) {
+      reply('投稿失败，请联系管理员手动进行投稿')
+    }
+  }
+})
+
+api.command(/^.下载(.*):(.*)$/, 'word.download', async (m, e, reply) => {
+  if (!per.users.hasPermission(e.uid, 'word.edit.download') && !per.users.hasPermission(e.uid, 'permission.word')) return // 不响应没有权限的人，@后期改为能设置config文件内决定是否开启这一条
+  if (per.users.hasPermission(e.uid, 'word.kick')) return // 不响应已经被踢出的人
+  try {
+    const response = await got('https://word.bstluo.top/read.php', {
+      method: 'post',
+      json: {
+        id: m[1]
+      }
+    })
+    word.update('wordData', m[2], JSON.parse(response.body))
+    reply(' [词库核心] 下载成功')
+  } catch (error) {
+    reply('下载失败，请联系管理员手动进行投稿')
+  }
+})
 /**
  * 导出，导入词库功能
  * 以node POST给服务器然后导出为直链
