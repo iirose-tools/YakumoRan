@@ -53,7 +53,7 @@ export default class word {
         if (!data[Object.keys(word)[i]]) {
           data[Object.keys(word)[i]] = []
         }
-        data[Object.keys(word)[i]] = word[Object.keys(word)[i]]
+        data[Object.keys(word)[i]] = data[Object.keys(word)[i]].concat(word[Object.keys(word)[i]])
       }
     })
     return data
@@ -283,6 +283,7 @@ export default class word {
         q = q.replace(reg[0], '(数)')
       }
     }
+
     // 获取全部的词库
     if (this.getword()[rawq]) {
       const num = this.random(0, this.getword()[rawq].length - 1)
@@ -335,6 +336,7 @@ export default class word {
             }
           } else if (endData[0].substring(0, 3) === 'str') {
             const name = endData[0].replace('str', '')
+            if (!data[name]) { data[name] = [] }
             wd = wd.replace(end[0], data[name].join('，'))
           } else {
             const out = Number((data[endData[0]]) ? data[endData[0]] : 0)
@@ -595,6 +597,7 @@ export default class word {
             }
           } else if (endData[0].substring(0, 3) === 'str') {
             const name = endData[0].replace('str', '')
+            if (!data[name]) { data[name] = [] }
             wd = wd.replace(end[0], data[name].join('，'))
           } else {
             const out = Number((data[endData[0]]) ? data[endData[0]] : 0)
