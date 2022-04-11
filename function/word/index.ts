@@ -161,9 +161,10 @@ api.command(/^.下载(.*):(.*)$/, 'word.download', async (m, e, reply) => {
         id: m[1]
       }
     })
-    word.update('wordData', m[2], JSON.parse(response.body))
+    word.update('wordData', m[2], JSON.parse(response.body.toString()))
     reply(' [词库核心] 下载成功')
   } catch (error) {
+    console.log(error)
     reply('下载失败，请联系管理员手动进行投稿')
   }
 })
