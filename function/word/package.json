@@ -10,8 +10,8 @@
   "intro": [
     "【词库2.0】",
     "本次更新优化了写法，修改了一些无用的功能，可以在私聊触发词库",
-    "使用文档：http://blog.bstluo.top/index.php/docs/花园词库插件指北/",
-    "开发词库文档：http://blog.bstluo.top/index.php/docs/花园词库开发指北/",
+    "使用文档：https://docs.bstluo.top/#/词库使用",
+    "开发词库文档：https://docs.bstluo.top/#/词库开发",
     "",
     "权限节点：",
     "word.edit.add    添加词库的权限",
