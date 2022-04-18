@@ -568,7 +568,7 @@ export default class word {
         }
       }
 
-      // 将$发$变为发送人昵称
+      // 将$发$变为机器人昵称
       while (wd.match(/\$发\$/)) {
         if (wd.match(/\$发\$/)) {
           const over = wd.match(/\$发\$/)
