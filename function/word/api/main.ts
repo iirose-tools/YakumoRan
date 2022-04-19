@@ -298,7 +298,7 @@ export default class word {
     }
 
     try {
-    // 将$数$替换为数
+      // 将$数$替换为数
       while (wd.match(/\$数(.*?)\$/)) {
         const reg = wd.match(/\$数(.*?)\$/)
         if (reg) {
@@ -341,12 +341,25 @@ export default class word {
             if (listData.length === 1) {
               wd = wd.replace(end[0], data[name].join('，'))
             } else {
-              wd = wd.replace(end[0], data[listData[0]][Number(listData[1]) - 1])
+              const ran = listData[1].split('~')
+              if (ran.length === 1) {
+                wd = wd.replace(end[0], data[listData[0]][Number(listData[1]) - 1])
+              } else {
+                wd = (ran[1] !== 'all') ? (wd.replace(end[0], data[listData[0]][this.random(Number(ran[0]), Number(ran[1])) - 1])) : (wd.replace(end[0], data[listData[0]][this.random(Number(ran[0]), data[listData[0]].length) - 1]))
+              }
             }
           } else {
             const out = Number((data[endData[0]]) ? data[endData[0]] : 0)
             wd = wd.replace(end[0], String(out))
           }
+        }
+      }
+
+      // 将$xx~xx$替换为随机数
+      while (wd.match(/\$(\d+)~(\d+)\$/)) {
+        const reg = wd.match(/\$(\d+)~(\d+)\$/)
+        if (reg) {
+          wd = wd.replace(reg[0], String(this.random(Number(reg[1]), Number(reg[2]))))
         }
       }
 
@@ -607,7 +620,12 @@ export default class word {
             if (listData.length === 1) {
               wd = wd.replace(end[0], data[name].join('，'))
             } else {
-              wd = wd.replace(end[0], data[listData[0]][Number(listData[1]) - 1])
+              const ran = listData[1].split('~')
+              if (ran.length === 1) {
+                wd = wd.replace(end[0], data[listData[0]][Number(listData[1]) - 1])
+              } else {
+                wd = (ran[1] !== 'all') ? (wd.replace(end[0], data[listData[0]][this.random(Number(ran[0]), Number(ran[1])) - 1])) : (wd.replace(end[0], data[listData[0]][this.random(Number(ran[0]), data[listData[0]].length) - 1]))
+              }
             }
           } else {
             const out = Number((data[endData[0]]) ? data[endData[0]] : 0)
