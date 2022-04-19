@@ -603,7 +603,12 @@ export default class word {
           } else if (endData[0].substring(0, 3) === 'str') {
             const name = endData[0].replace('str', '')
             if (!data[name]) { data[name] = [] }
-            wd = wd.replace(end[0], data[name].join('，'))
+            const listData = name.split(':')
+            if (listData.length === 1) {
+              wd = wd.replace(end[0], data[name].join('，'))
+            } else {
+              wd = wd.replace(end[0], data[listData[0]][Number(listData[1]) - 1])
+            }
           } else {
             const out = Number((data[endData[0]]) ? data[endData[0]] : 0)
             wd = wd.replace(end[0], String(out))
