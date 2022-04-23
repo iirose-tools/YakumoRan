@@ -4,7 +4,7 @@ import config from '../../config'
 import per from '../permission/permission'
 import fs from 'fs'
 import path from 'path'
-import got from 'got'
+import axios from 'axios'
 
 try {
   fs.mkdirSync(path.join(api.Data, 'word/wordData'))
@@ -140,11 +140,8 @@ api.command(/^.上传(.*)$/, 'word.upload', async (m, e, reply) => {
   const up = word.getjson('wordData', m[1])
   if (JSON.stringify(up) !== '{}') {
     try {
-      const response = await got('https://word.bstluo.top/new.php', {
-        method: 'post',
-        json: up
-      })
-      reply(` [词库核心] ${response.body}`)
+      const response = await axios.post('https://word.bstluo.top/new.php', up)
+      reply(` [词库核心] ${response.data}`)
     } catch (error) {
       reply('投稿失败，请联系管理员手动进行投稿')
     }
@@ -155,13 +152,10 @@ api.command(/^.下载(.*):(.*)$/, 'word.download', async (m, e, reply) => {
   if (!per.users.hasPermission(e.uid, 'word.edit.download') && !per.users.hasPermission(e.uid, 'permission.word')) return // 不响应没有权限的人，@后期改为能设置config文件内决定是否开启这一条
   if (per.users.hasPermission(e.uid, 'word.kick')) return // 不响应已经被踢出的人
   try {
-    const response = await got('https://word.bstluo.top/read.php', {
-      method: 'post',
-      json: {
-        id: m[1]
-      }
+    const response = await axios.post('https://word.bstluo.top/read.php', {
+      id: m[1]
     })
-    word.update('wordData', m[2], JSON.parse(response.body.toString()))
+    word.update('wordData', m[2], response.data)
     reply(' [词库核心] 下载成功')
   } catch (error) {
     console.log(error)

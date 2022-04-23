@@ -1,4 +1,4 @@
-import got from 'got'
+import axios from 'axios'
 
 interface UserInfo {
   id: number
@@ -47,7 +47,7 @@ interface CollectionItem {
 export const user = {
   userInfo: async (username: string): Promise<UserInfo | null> => {
     try {
-      const result = JSON.parse((await got(`https://api.bgm.tv/user/${username}`)).body)
+      const result = (await axios.get(`https://api.bgm.tv/user/${username}`)).data
       if (result.error) {
         return null
       } else {
@@ -60,7 +60,7 @@ export const user = {
   userCollection: async (username: string, cat: ('watching' | 'all_watching'), ids?: number[], responseGroup?: ('medium' | 'small')): Promise<CollectionItem[] | null> => {
     try {
       const url = `https://api.bgm.tv/user/${username}/collection?cat=${cat}&responseGroup=${responseGroup || ''}&ids=${ids ? ids.join(',') : ''}`
-      const result = JSON.parse((await got(url)).body)
+      const result = (await axios.get(url)).data
       if (result.error) {
         return null
       } else {
@@ -72,7 +72,7 @@ export const user = {
   },
   userCollectionsStatus: async (username: string) => {
     try {
-      const result = JSON.parse((await got(`https://api.bgm.tv/user/${username}/collections/status?app_id=bgm1741600d4a496bed5`)).body)
+      const result = (await axios.get(`https://api.bgm.tv/user/${username}/collections/status?app_id=bgm1741600d4a496bed5`)).data
       if (result.error) {
         return null
       } else {

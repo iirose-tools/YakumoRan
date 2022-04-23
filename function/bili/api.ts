@@ -1,4 +1,4 @@
-import got from 'got'
+import axios from 'axios'
 import NodeCache from 'node-cache'
 
 const cache: NodeCache = new NodeCache()
@@ -10,12 +10,12 @@ export const bili = {
 
     if (c) return JSON.parse(c)
 
-    const r = await got(`http://api.bilibili.com/x/web-interface/view?aid=${aid}`)
-    const e = JSON.parse(r.body)
+    const resp = await axios.get(`http://api.bilibili.com/x/web-interface/view?aid=${aid}`)
+    const data = resp.data
 
-    if (e.code === 0) {
-      cache.set(key, JSON.stringify(e.data), 3600 * 12)
-      return e.data
+    if (data.code === 0) {
+      cache.set(key, JSON.stringify(data.data), 3600 * 12)
+      return data.data
     }
 
     return null
@@ -26,12 +26,12 @@ export const bili = {
 
     if (c) return JSON.parse(c)
 
-    const r = await got(`http://api.bilibili.com/x/web-interface/view?bvid=${bvid}`)
-    const e = JSON.parse(r.body)
+    const resp = await axios.get(`http://api.bilibili.com/x/web-interface/view?bvid=${bvid}`)
+    const data = resp.data
 
-    if (e.code === 0) {
-      cache.set(key, JSON.stringify(e.data), 3600 * 12)
-      return e.data
+    if (data.code === 0) {
+      cache.set(key, JSON.stringify(data.data), 3600 * 12)
+      return data.data
     }
 
     return null
@@ -42,12 +42,12 @@ export const bili = {
 
     if (c) return JSON.parse(c)
 
-    const r = await got(`https://www.bilibili.com/audio/music-service-c/web/song/info?sid=${sid}`)
-    const e = JSON.parse(r.body)
+    const resp = await axios.get(`https://www.bilibili.com/audio/music-service-c/web/song/info?sid=${sid}`)
+    const data = resp.data
 
-    if (e.code === 0) {
-      cache.set(key, JSON.stringify(e.data), 3600 * 12)
-      return e.data
+    if (data.code === 0) {
+      cache.set(key, JSON.stringify(data.data), 3600 * 12)
+      return data.data
     }
 
     return null
@@ -58,12 +58,12 @@ export const bili = {
 
     if (c) return JSON.parse(c)
 
-    const r = await got('http://s.search.bilibili.com/main/hotword')
-    const e = JSON.parse(r.body)
+    const r = await axios.get('http://s.search.bilibili.com/main/hotword')
+    const data = JSON.parse(r.body)
 
-    if (e.code === 0) {
-      cache.set(key, JSON.stringify(e.list), 3600)
-      return e.list
+    if (data.code === 0) {
+      cache.set(key, JSON.stringify(data.list), 3600)
+      return data.list
     }
 
     return null
@@ -75,12 +75,12 @@ export const bili = {
 
       if (c) return JSON.parse(c)
 
-      const r = await got('https://bangumi.bilibili.com/web_api/timeline_global')
-      const e = JSON.parse(r.body)
+      const r = await axios.get('https://bangumi.bilibili.com/web_api/timeline_global')
+      const data = JSON.parse(r.body)
 
-      if (e.code === 0) {
-        cache.set(key, JSON.stringify(e.result), 3600)
-        return e.result
+      if (data.code === 0) {
+        cache.set(key, JSON.stringify(data.result), 3600)
+        return data.result
       }
 
       return null
@@ -93,9 +93,9 @@ export const bili = {
 
         let data = null
 
-        Object.values(result).forEach((e: any) => {
-          if (e.date === today) {
-            data = e
+        Object.values(result).forEach((item: any) => {
+          if (item.date === today) {
+            data = item
           }
         })
 
