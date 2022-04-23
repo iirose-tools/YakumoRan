@@ -58,8 +58,8 @@ export const bili = {
 
     if (c) return JSON.parse(c)
 
-    const r = await axios.get('http://s.search.bilibili.com/main/hotword')
-    const data = JSON.parse(r.body)
+    const resp = await axios.get('http://s.search.bilibili.com/main/hotword')
+    const data = resp.data
 
     if (data.code === 0) {
       cache.set(key, JSON.stringify(data.list), 3600)
@@ -75,8 +75,8 @@ export const bili = {
 
       if (c) return JSON.parse(c)
 
-      const r = await axios.get('https://bangumi.bilibili.com/web_api/timeline_global')
-      const data = JSON.parse(r.body)
+      const resp = await axios.get('https://bangumi.bilibili.com/web_api/timeline_global')
+      const data = resp.data
 
       if (data.code === 0) {
         cache.set(key, JSON.stringify(data.result), 3600)

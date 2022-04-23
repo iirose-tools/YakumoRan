@@ -3,8 +3,9 @@ import path from 'path'
 import * as api from '../../lib/api'
 import config from '../../config'
 import logger from '../../lib/logger'
-import random from 'random-number-csprng'
 import per from '../permission/permission'
+
+const random = (n: number, m: number): number => { return Math.floor(Math.random() * (m - n + 1) + n) }
 
 try {
   fs.mkdirSync(path.join(api.Data, './probability'))

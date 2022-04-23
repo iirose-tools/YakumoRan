@@ -1,4 +1,4 @@
-import got from 'got'
+import axios from 'axios'
 import config from '../../config'
 import * as Ran from '../../lib/api'
 
@@ -32,9 +32,9 @@ const pixivSearch = async (word: string) => {
   const illusts = []
   const resp = []
   for (let i = 1; i < 5; i++) {
-    resp.push(got.get('https://api.kyomotoi.moe/api/pixiv/search', { searchParams: { word, page: i } }))
+    resp.push(axios.get(`https://api.kyomotoi.moe/api/pixiv/search?word=${word}&page=${i}`))
   }
-  const r = (await Promise.all(resp)).flat().map(e => { return JSON.parse(e.body).illusts }).flat()
+  const r = (await Promise.all(resp)).flat().map(e => { return e.data.illusts }).flat()
   const tmp = Object.values(r).filter((e: any) => {
     if (e.total_bookmarks > 300) return true
     return false
