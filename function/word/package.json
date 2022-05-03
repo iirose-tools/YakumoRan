@@ -23,7 +23,8 @@
     "word.admin.del   删除词库管理员权限",
     "word.admin.add   添加词库管理员权限",
     "word.edit.upload     上传词库的权限",
-    "word.edit.download   下载内容的权限"
+    "word.edit.download   下载内容的权限",
+    "word.edit.over       删除词库的权限"
   ],
   "commands": [{
     "cmd": ".问<触发词>答<回答>",
@@ -67,5 +68,8 @@
   },{
     "cmd": ".下载<词库码>:<保存为的库名>",
     "helper": "从服务器下载库，切记，它会覆盖本地的库"
+  },{
+    "cmd": ".删库<库名称>",
+    "helper": "删除某个库"
   }]
 }
