@@ -2,14 +2,54 @@ import axios from 'axios'
 import * as Ran from '../../lib/api'
 import logger from '../../lib/logger'
 import vm from 'vm'
+import path from 'path'
+import fs from 'fs'
 
 interface EventData {
   event: string;
   data: any
 }
 
-const Store = {
-  // TODO: 完成数据存储API
+const Store: any = {
+  _filename: path.join(Ran.Data, 'script', 'store.json'),
+  _data: {},
+  _write: () => fs.writeFileSync(Store._filename, JSON.stringify(Store._data)),
+  _read: () => (Store._data = JSON.parse(fs.existsSync(Store._filename) ? fs.readFileSync(Store._filename).toString() : '{}')),
+
+  get: (namespace: string, key: string) => {
+    return Store._data[`${namespace}:${key}`]
+  },
+  set: (namespace: string, key: string, data: any) => {
+    try {
+      Store._data[`${namespace}:${key}`] = data
+      Store._write()
+      return true
+    } catch (error) {
+      return false
+    }
+  },
+  remove: (namespace: string, key: string) => {
+    try {
+      delete Store._data[`${namespace}:${key}`]
+      Store._write()
+      return true
+    } catch (error) {
+      return false
+    }
+  },
+  list: (namespace: string, query?: string) => {
+    const result: any = {}
+
+    for (const key of Object.keys(Store._data)) {
+      if (key.startsWith(`${namespace}:`)) {
+        if (!query) {
+          result[key.split(':')[1]] = Store._data[key]
+        } else {
+          if (key.split(':')[1].includes(query)) result[key.split(':')[1]] = Store._data[key]
+        }
+      }
+    }
+  }
 }
 
 const buildContext = (EventData: EventData) => {
