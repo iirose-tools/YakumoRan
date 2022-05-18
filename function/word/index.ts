@@ -4,7 +4,7 @@ import config from '../../config'
 import per from '../permission/permission'
 import fs from 'fs'
 import path from 'path'
-import got from 'got'
+import axios from 'axios'
 
 try {
   fs.mkdirSync(path.join(api.Data, 'word/wordData'))
@@ -60,7 +60,7 @@ api.Event.on('PrivateMessage', msg => {
   const outputText = outputResolution(out)
 
   if (outputText) {
-    if (outputText[2].length) { api.method.sendPublicMessage(outputText[2]) }
+    if (outputText[2].length) { api.method.sendPrivateMessage(msg.uid, outputText[2]) }
     if (outputText[1].length) { api.method.sendPrivateMessage(msg.uid, outputText[1].join('')) }
     if (outputText[0].length) { api.method.sendPublicMessage(outputText[0].join('')) }
   }
@@ -184,11 +184,8 @@ api.command(/^.上传(.*)$/, 'word.upload', async (m, e, reply) => {
   const up = word.getjson('wordData', m[1])
   if (JSON.stringify(up) !== '{}') {
     try {
-      const response = await got('https://word.bstluo.top/new.php', {
-        method: 'post',
-        json: up
-      })
-      reply(` [词库核心] ${response.body}`)
+      const response = await axios.post('https://word.bstluo.top/new.php', up)
+      reply(` [词库核心] ${response.data}`)
     } catch (error) {
       reply('投稿失败，请联系管理员手动进行投稿')
     }
@@ -199,13 +196,12 @@ api.command(/^.下载(.*):(.*)$/, 'word.download', async (m, e, reply) => {
   if (!per.users.hasPermission(e.uid, 'word.edit.download') && !per.users.hasPermission(e.uid, 'permission.word')) return // 不响应没有权限的人，@后期改为能设置config文件内决定是否开启这一条
   if (per.users.hasPermission(e.uid, 'word.kick')) return // 不响应已经被踢出的人
   try {
-    const response = await got('https://word.bstluo.top/read.php', {
-      method: 'post',
-      json: {
-        id: m[1]
-      }
+    const response = await axios.post('https://word.bstluo.top/read.php', {
+      id: m[1]
     })
-    word.update('wordData', m[2], JSON.parse(response.body.toString()))
+
+    word.update('wordData', m[2], response.data)
+
     reply(' [词库核心] 下载成功')
   } catch (error) {
     console.log(error)
@@ -224,22 +220,18 @@ api.command(/^.增量(.*):(.*)$/, 'word.download.add', async (m, e, reply) => {
   if (!per.users.hasPermission(e.uid, 'word.edit.download') && !per.users.hasPermission(e.uid, 'permission.word')) return // 不响应没有权限的人，@后期改为能设置config文件内决定是否开启这一条
   if (per.users.hasPermission(e.uid, 'word.kick')) return // 不响应已经被踢出的人
   try {
-    const response = await got('https://word.bstluo.top/read.php', {
-      method: 'post',
-      json: {
-        id: m[1]
-      }
+    const response = await axios.post('https://word.bstluo.top/read.php', {
+      id: m[1]
     })
-    word.incrementalUpdat('wordData', m[2], JSON.parse(response.body.toString()))
+
+    word.incrementalUpdat('wordData', m[2], response.data)
+
     reply(' [词库核心] 下载成功')
   } catch (error) {
     console.log(error)
     reply('下载失败，请联系管理员手动进行投稿')
   }
 })
-
-// 更新格式转换(?啥来着)
-// *添加词库时显示哪些库也含有此选项
 
 // 已完成
 // 入库需要word.in.库名才可入库
