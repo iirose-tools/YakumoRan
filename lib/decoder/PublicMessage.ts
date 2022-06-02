@@ -49,7 +49,11 @@ const replyMsg = (msg: string): replyMessage[] | null => {
   return null
 }
 
-export default (message: string) => {
+export default (input: string) => {
+  if (input.substring(0, 1) !== '"') return false
+
+  const message: string = input.substring(1)
+
   if (message.indexOf('<') !== -1) {
     let parser = false
 
