@@ -58,10 +58,10 @@ export class PrivateMessage {
 }
 
 export default (message: string) => {
-  if (message.substr(0, 1) === '"') {
+  if (message.substr(0, 2) === '""') {
     let flag = false
 
-    const item = message.substr(1).split('<')
+    const item = message.substr(2).split('<')
 
     for (const msg of item) {
       const tmp = msg.split('>')
