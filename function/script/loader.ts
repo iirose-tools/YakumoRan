@@ -64,9 +64,9 @@ const buildContext = (EventData: EventData) => {
 
   const context = {
     logger: logger(`ScriptVM ${Math.round(Math.random() * 1e8)}`),
-    Store: Store,
+    Store,
     Bot: {
-      API: API
+      API
     }
   }
 
@@ -110,7 +110,7 @@ class Script {
   async emit (name: string, data: any) {
     const context = buildContext({
       event: name,
-      data: data
+      data
     })
 
     this.run(context)
