@@ -93,6 +93,7 @@ const rateLimit = (uid: string) => {
   const diff = Date.now() - globalCache[uid].timestamp
   if (diff <= _10s && globalCache[uid].limit > 5) return true
 
+  if (diff >= _10s) globalCache[uid].limit = 0
   globalCache[uid].timestamp = Date.now()
 }
 
