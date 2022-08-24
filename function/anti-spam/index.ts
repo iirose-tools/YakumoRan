@@ -4,8 +4,7 @@ import logger from '../../lib/logger'
 const globalCache: {
   [index: string]: {
     timestamp: number,
-    list: string[],
-    limit: number
+    list: string[]
   }
 } = {}
 
@@ -42,8 +41,7 @@ const messageCompare = (uid: string, msg: string) => {
   if (!globalCache[uid]) {
     globalCache[uid] = {
       timestamp: Date.now(),
-      list: [],
-      limit: 0
+      list: []
     }
   }
 
@@ -78,35 +76,14 @@ const messageCompare = (uid: string, msg: string) => {
   return avg
 }
 
-const rateLimit = (uid: string) => {
-  if (!globalCache[uid]) {
-    globalCache[uid] = {
-      timestamp: Date.now(),
-      list: [],
-      limit: 0
-    }
-  }
-
-  globalCache[uid].limit++
-
-  const _10s = 10 * 1e3
-  const diff = Date.now() - globalCache[uid].timestamp
-  if (diff <= _10s && globalCache[uid].limit > 5) return true
-
-  if (diff >= _10s) globalCache[uid].limit = 0
-  globalCache[uid].timestamp = Date.now()
-}
-
 api.Event.on('PublicMessage', async event => {
   const dupeCounter = isDupe(event.message)
   const compare = messageCompare(event.uid, event.message)
-  const rate = rateLimit(event.uid)
   let block = false
 
   if (dupeCounter > 10) block = true
   if (event.message.length > 200) block = true
   if (compare > 0.8) block = true
-  if (rate) block = true
 
   if (block && !event.uid.startsWith('X')) {
     // 不是游客但是触发了规则的额外判断一下在线时长
