@@ -1,0 +1,26 @@
+{
+  "devDependencies": {
+    "@types/node": "^18.7.19",
+    "@types/pako": "^2.0.0",
+    "@types/ws": "^8.5.3",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "eslint": "^8.0.1",
+    "eslint-config-standard-with-typescript": "^23.0.0",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-n": "^15.0.0",
+    "eslint-plugin-promise": "^6.0.0",
+    "typescript": "*"
+  },
+  "name": "@yakumoran/core",
+  "version": "2.0.0",
+  "description": "IIROSE Chat bot",
+  "main": "./src/index.ts",
+  "repository": "git@github.com:iirose-tools/YakumoRan.git",
+  "author": "TheresaQWQ <yxiao2044@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "log4js": "^6.6.1",
+    "pako": "^2.0.4",
+    "ws": "^8.9.0"
+  }
+}
