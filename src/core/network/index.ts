@@ -3,14 +3,19 @@ import { EventEmitter } from 'events'
 import ws from 'ws'
 import { Logger } from '../logger'
 
-interface WebSocketEvent {
-  on(event: 'open', listener: () => void): this
-  on(event: 'close', listener: () => void): this
-  on(event: 'message', listener: (message: string) => void): this
-  on(event: 'error', listener: (error: ws.ErrorEvent) => void): this
+interface IEmissions {
+  open: () => void
+  close: () => void
+  error: (error: ws.ErrorEvent) => void
+  message: (data: string) => void
 }
 
-export class WebSocket extends EventEmitter implements WebSocketEvent {
+export class WebSocket extends EventEmitter {
+  private _untypedOn = this.on
+  private _untypedEmit = this.emit
+  public on = <K extends keyof IEmissions>(event: K, listener: IEmissions[K]): this => this._untypedOn(event, listener)
+  public emit = <K extends keyof IEmissions>(event: K, ...args: Parameters<IEmissions[K]>): boolean => this._untypedEmit(event, ...args)
+
   private socket: ws
   private isOpen: boolean = false
   private allowClose: boolean = false
