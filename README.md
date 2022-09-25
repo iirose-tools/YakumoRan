@@ -36,3 +36,58 @@
 
 ## 插件开发
 Comming soon...
+
+暂且放个demo
+```typescript
+import { App } from "../src";
+import { PublicMessage } from "../src/core/packet/decoder/PublicMessage";
+import { Plugin } from "../src/core/plugin";
+
+const config = {
+  // 配置文件
+}
+
+const app = new App(config)
+
+const MyPlugin = (app: App) => {
+  class MyPlugin extends Plugin {
+    async init () {
+      // 这里的信息暂且还没用上，暂且先预留
+      this.plugin_name = "Test Plugin"
+      this.plugin_author = "风间苏苏"
+      this.plugin_version = "2.0-beta"
+      this.plugin_description = [
+        "这是一个测试插件",
+        "多行文本测试",
+        '1111111111',
+        '222222222'
+      ].join('\n')
+      this.logger.info('Test Plugin Loaded')
+    }
+
+    // 监听事件
+    @app.decorators.EventListener('PublicMessage')
+    public onMessage (msg: PublicMessage) {
+      this.logger.info('Test Plugin Received Message: ', msg)
+    }
+
+    // 注册指令
+    @app.decorators.Command({
+      name: 'test',
+      command: /^\/test$/,
+      desc: '测试插件',
+      usage: '/test'
+    })
+    public onTestCommand (msg: PublicMessage, args: RegExpExecArray) {
+      this.logger.info('Test Plugin Received Command: ', msg)
+      this.app.api.sendPublicMessage('Test Plugin Received Command: ' + msg.message)
+      return false
+    }
+  }
+
+  return MyPlugin
+}
+
+// 加载插件
+app.loadPlugin('test-plugin', MyPlugin)
+```
