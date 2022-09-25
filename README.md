@@ -24,7 +24,7 @@
 
 ## 开发进度
 - [x] ~~插件加载器~~
-- [ ] 网页控制面板
+- [x] ~~网页控制面板~~
 - [x] ~~插件基类~~
 - [x] ~~机器人核心~~
 - [x] ~~网络模块~~
@@ -32,7 +32,8 @@
 - [x] ~~配置文件解析器~~
 - [ ] 配置文件热更新(用于SelfMove事件)
 - [x] ~~日志模块~~
-- [ ] 数据库
+- [x] ~~数据库~~
+- [ ] 指令菜单
 
 ## 插件开发
 Comming soon...
@@ -63,6 +64,35 @@ const MyPlugin = (app: App) => {
         '222222222'
       ].join('\n')
       this.logger.info('Test Plugin Loaded')
+
+      // 创建表单
+      const form = this.app.createForm('test-form', '测试表单', '') // id，标题，图标 (使用fontawesome)
+
+      // 自定义文本
+      form.addText('这是一个测试表单', ['text-align: center', 'font-size: 20px'])
+
+      // 各种输入框
+      form.addInput('test1', 'text', '测试输入框')
+      form.addInput('test2', 'number', '测试输入框')
+      form.addInput('test3', 'password', '测试输入框')
+      form.addInput('test4', 'select', '测试输入框', {
+        seletions: [{
+          text: '选项1',
+          value: '1'
+        }, {
+          text: '选项2',
+          value: '2'
+        }]
+      })
+
+      form.addInput('test5', 'checkbox', '测试输入框')
+      form.addInput('test6', 'textarea', '测试输入框')
+
+      // 表单提交事件
+      form.onSubmitted((data: any) => {
+        this.logger.info('表单提交数据: ', data)
+        return undefined
+      })
     }
 
     // 监听事件

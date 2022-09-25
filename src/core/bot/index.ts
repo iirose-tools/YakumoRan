@@ -22,6 +22,12 @@ import { RoomNotice as typesRoomNotice, Follower as typesFollower, Like as types
 import { globalInstances } from "../global";
 import { API } from "./api";
 
+import { Knex, knex } from "knex";
+import path from "path";
+import { WebServer } from "../web";
+import { WebForm } from "../web/WebForm";
+import { Router } from "express";
+
 
 export interface IEmissions {
   /**
@@ -120,6 +126,14 @@ export class Bot extends EventEmitter {
   public emit = <K extends keyof IEmissions>(event: K, ...args: Parameters<IEmissions[K]>): boolean => this._untypedEmit(event, ...args)
   
   public api: API
+  public db: Knex
+  public web: WebServer
+
+  private webMenus: {
+    id: string
+    title: string
+    icon: string
+  }[] = []
 
   constructor(config: Config) {
     super()
@@ -128,6 +142,8 @@ export class Bot extends EventEmitter {
     this.decoder = new Decoder()
     this.socket = new WebSocket()
     this.api = new API(this.socket, this.config, this)
+    this.db = knex(this.config.getConfig().database)
+    this.web = new WebServer(this.config.getConfig().bot.port)
 
     // 开始处理事件
     this.socket.on("message", (packet: string) => {
@@ -151,6 +167,7 @@ export class Bot extends EventEmitter {
       const room = this.config.getConfig().bot.room
       const roomPassword = this.config.getConfig().bot.room_password
 
+      // 处理服务器返回的第一个包
       this.socket.once('message', (msg) => {
         if (msg === '%*"2') {
           this.logger.fatal('登录失败，密码错误')
@@ -176,5 +193,30 @@ export class Bot extends EventEmitter {
 
     const username = this.config.getConfig().bot.username
     globalInstances[username] = this
+
+    this.initWeb()
+  }
+
+  /**
+   * @description 创建表单页面(会直接显示在菜单栏左侧)
+   * @param id 表单ID
+   * @param title 表单标题
+   * @param icon 表单图标(填写fontawesome class)
+   * @returns 
+   */
+  createForm (id: string, title: string, icon: string) {
+    const form = new WebForm(this.web, id)
+    this.webMenus.push({ id, title, icon })
+    return form
+  }
+
+  initWeb () {
+    const route = Router()
+
+    route.get('/menu', (req, res) => {
+      res.json(this.webMenus)
+    })
+
+    this.web.route('/api/core', route)
   }
 }

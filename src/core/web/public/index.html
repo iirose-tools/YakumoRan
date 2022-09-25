@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YakumoRan Dashboard</title>
+  <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.1/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.2.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.1/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="./index.css">
+</head>
+<body>
+  <div class="menu">
+    <div class="group">
+      <p class="title">YakumoRan</p>
+      <div class="items">
+        <div class="item active" data-id="home">
+          <i class="fas fa-home"></i>
+          <p>首页</p>
+        </div>
+        <div class="item" data-id="store">
+          <i class="fas fa-computer"></i>
+          <p>插件市场</p>
+        </div>
+      </div>
+    </div>
+    <div class="group">
+      <p class="title">插件</p>
+      <div class="items" id="plugins"></div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="home">
+      <h1>YakumoRan</h1>
+      <hr>
+      <p>当你看到这个页面，就代表你的机器人已经成功运行起来了</p>
+      <p>WARN: 本页面没有权限管理，请勿开放公网访问权限</p>
+      <p>GitHub: <a href="https://github.com/iirose-tools/YakumoRan" target="_blank">YakumoRan</a></p>
+    </div>
+  </div>
+
+  <div id="bg"></div>
+  
+  <script src="./index.js"></script>
+</body>
+</html>

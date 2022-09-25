@@ -1,0 +1,106 @@
+html,body {
+  width: 100%;
+}
+
+/* 侧边菜单栏 */
+.menu {
+  margin: 36px;
+  border-radius: 8px;
+  box-shadow: 0 0 4px #0006;
+  display: inline-block;
+  width: 340px;
+  height: calc(100vh - 72px);
+  padding: 16px;
+  background-color: #fff;
+  opacity: 0.8;
+  z-index: 999;
+}
+
+.menu .group {
+  margin-bottom: 16px;
+}
+
+.menu .title {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 4px;
+  width: 100%;
+  text-align: left;
+  border-bottom: 1px solid #0002;
+}
+
+.menu .items .item {
+  position: relative;
+  height: 40px;
+  line-height: 40px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+  margin-bottom: 4px;
+}
+
+.menu .items .item:hover {
+  background-color: #0001;
+}
+
+.menu .items .item:active {
+  background-color: #0002;
+}
+
+.menu .items .active {
+  background-color: #0002;
+}
+
+.menu .items .item i {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 8px;
+  font-size: 16px;
+  color: #000;
+}
+
+.menu .items .item p {
+  position: absolute;
+  display: inline-block;
+  font-size: 14px;
+  color: #000;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 32px;
+  margin: 0;
+}
+
+.container {
+  width: calc(100% - 470px);
+  height: calc(100vh - 72px);
+  display: inline-block;
+  vertical-align: top;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 0 4px #0006;
+  background-color: #fff;
+  margin-top: 36px;
+  opacity: 0.8;
+  z-index: 999;
+}
+
+.home {
+  text-align: center;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#bg {
+  z-index: -1;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  /* 毛玻璃背景效果 */
+  background: linear-gradient(to bottom right, rgba(45, 175, 230, 0.5), rgba(60, 255, 60, 0.5), rgba(255, 128, 255, 0.5));
+}

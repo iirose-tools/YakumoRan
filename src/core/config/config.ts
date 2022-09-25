@@ -11,6 +11,12 @@ export interface TypeofConfig {
     color: string,
     room: string,
     room_password: string,
+    port: number
+  },
+  database: {
+    client: string,
+    connection: any,
+    useNullAsDefault: boolean
   },
   plugins: {
     [key: string]: any
