@@ -151,7 +151,9 @@ export class Decoder {
   autoDecoder(packet: string) {
     for (const decoder of this.decoder) {
       const result = decoder(packet)
-      if (result instanceof Array && result.length > 0) return result
+      if (result instanceof Array && result.length > 0) {
+        return result
+      }
     }
 
     return false

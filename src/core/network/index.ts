@@ -28,6 +28,7 @@ export class WebSocket extends EventEmitter {
 
     this.logger.debug('正在初始化WebSocket...')
 
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
     this.socket = new ws('wss://m2.iirose.com:8778')
     this.init()
     

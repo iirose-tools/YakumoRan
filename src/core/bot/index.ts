@@ -19,9 +19,10 @@ import { MediaListCallback as typesMediaListCallback } from '../packet/decoder/M
 import { GetUserListCallback as typesGetUserListCallback } from '../packet/decoder/GetUserListCallback'
 import { UserProfileCallback as typesUserProfileCallback } from '../packet/decoder/UserProfileCallback'
 import { RoomNotice as typesRoomNotice, Follower as typesFollower, Like as typesLike, Payment as typesPayment } from '../packet/decoder/MailboxMessage'
+import { globalInstances } from "../global";
 
 
-interface IEmissions {
+export interface IEmissions {
   /**
    * @description 弹幕消息
    */
@@ -98,22 +99,29 @@ interface IEmissions {
    * @description 登录成功
    */
   Login(): void
+  /**
+   * @description 机器人接收到的所有事件
+   * @param event 事件名称
+   * @param data 事件数据
+   */
+  __ALL__(event: keyof IEmissions, data: any) : void
 }
 
 export class Bot extends EventEmitter {
   private decoder: Decoder
   private socket: WebSocket
   private logger = new Logger('Bot Core')
-  private config = new Config()
+  private config: Config
 
   private _untypedOn = this.on
   private _untypedEmit = this.emit
   public on = <K extends keyof IEmissions>(event: K, listener: IEmissions[K]): this => this._untypedOn(event, listener)
   public emit = <K extends keyof IEmissions>(event: K, ...args: Parameters<IEmissions[K]>): boolean => this._untypedEmit(event, ...args)
 
-  constructor() {
+  constructor(config: Config) {
     super()
 
+    this.config = config
     this.decoder = new Decoder()
     this.socket = new WebSocket()
 
@@ -127,6 +135,7 @@ export class Bot extends EventEmitter {
 
       for (const [event, data] of result) {
         this.emit(event as keyof IEmissions, data)
+        this.emit('__ALL__', event as keyof IEmissions, data)
       }
     })
 
@@ -157,8 +166,11 @@ export class Bot extends EventEmitter {
       })
 
       const packet = new Encoder().system.login(username, password, room, roomPassword)
-      await this.socket.send(packet)
+      this.socket.send(packet)
       this.logger.info('登录包已发送，等待服务器响应...')
     })
+
+    const username = this.config.getConfig().bot.username
+    globalInstances[username] = this
   }
 }
