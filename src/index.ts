@@ -16,10 +16,10 @@ export class App {
   constructor (config?: TypeofConfig) {
     this.config = new Config(config);
     this.bot = new Bot(this.config)
-    this.pluginLoader = new PluginLoader(this.bot, this.config)
+    this.pluginLoader = new PluginLoader(this.bot, this, this.config)
   }
 
-  public loadPlugin(name: string, plugin?: Plugin) {
+  public loadPlugin(name: string, plugin?: (app: App) => typeof Plugin) {
     try {
       this.logger.info(`正在加载插件 ${name}`)
       this.pluginLoader.load(name, plugin)
@@ -27,40 +27,5 @@ export class App {
     } catch (error) {
       this.logger.error(`插件 ${name} 加载失败: `, error)
     }
-  }
-
-  private async init () {
-    this.bot.on("__ALL__", async (event, args) => {
-      const middlewares = this.decorators.middlewares.get(event) || []
-      for (const middleware of middlewares) {
-        if (middleware.inBottom) continue
-        let next = true
-        if(isAsync(middleware.handle)) {
-          [next, args] = await middleware.handle(args)
-        } else {
-          [next, args] = middleware.handle(args)
-        }
-
-        if (!next) return
-      }
-
-      const listeners = this.decorators.events.get(event) || []
-      for (const listener of listeners) {
-        if(isAsync(listener.handle)) {
-          await listener.handle(args)
-        } else {
-          listener.handle(args)
-        }
-      }
-
-      for (const middleware of middlewares) {
-        if (!middleware.inBottom) continue
-        if(isAsync(middleware.handle)) {
-          args = await middleware.handle(args)
-        } else {
-          args = middleware.handle(args)
-        }
-      }
-    })
   }
 }

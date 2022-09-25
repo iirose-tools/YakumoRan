@@ -33,6 +33,10 @@ export class WebSocket extends EventEmitter {
     this.init()
     
     this.logger.debug('WebSocket初始化完成')
+
+    setInterval(() => {
+      if (this.isOpen) this.socket.send('')
+    }, 30e3)
   }
 
   // 手动断开连接
