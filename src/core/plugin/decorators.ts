@@ -39,15 +39,14 @@ export class Decorators {
   events = new Map<string, EventListener[]>();
 
   /**
-   * @description 注册命令
+   * @description 注册命令(需要返回一个boolean值，表示是否继续执行后续命令和中间件)
    * @param command 命令选项
-   * @returns 
    */
   Command(command: CommandOptions) {
     return (target: ExtendsPlugin, propertyKey: keyof ExtendsPlugin, descriptor: PropertyDescriptor) => {
       this.commands.push({
         options: command,
-        handle: descriptor.value.bind(target),
+        handle: descriptor.value,
         _this: target
       })
     }
@@ -65,7 +64,7 @@ export class Decorators {
 
       list.push({
         event: event,
-        handle: descriptor.value.bind(target),
+        handle: descriptor.value,
         inBottom: inBottom,
         _this: target
       })
@@ -85,7 +84,7 @@ export class Decorators {
 
       list.push({
         event: event,
-        handle: descriptor.value.bind(target),
+        handle: descriptor.value,
         _this: target
       })
 

@@ -3,9 +3,12 @@ import { Logger } from "../logger";
 
 export class Plugin {
   public app: Bot;
-  public plugin_id: string = '';
   public plugin_name: string = '';
+  public plugin_author: string = '';
+  public plugin_description: string = '';
+  public plugin_version: string = '';
   public config: any = {};
+  public logger: Logger = new Logger(this.constructor.name);
 
   constructor(app: Bot) {
     this.app = app;
@@ -15,15 +18,4 @@ export class Plugin {
    * @description 插件初始化
    */
   public async init() {}
-
-  /**
-   * @description 获取日志实例
-   */
-  public getLogger () {
-    return new Logger(this.plugin_name);
-  }
-
-  public getApp () {
-    return this.app;
-  }
 }

@@ -6,6 +6,8 @@ import { PublicMessage } from "../packet/decoder/PublicMessage";
 import { Plugin } from "../plugin";
 import { isAsync } from "../utils/isAsync";
 
+export const globalPlugins = new Map<string, Map<string, Plugin>>();
+
 export class PluginLoader {
   private readonly plugins: Plugin[] = []
   private config: Config
@@ -24,10 +26,15 @@ export class PluginLoader {
       for (const middleware of middlewares) {
         if (middleware.inBottom) continue
         let next = true
+
+        const username = this.config.getConfig().bot.username
+        const constructor = middleware._this.constructor.name
+        const plguinInstance = globalPlugins.get(username)?.get(constructor) as Plugin
+
         if(isAsync(middleware.handle)) {
-          [next, args] = await middleware.handle(args)
+          [next, args] = await middleware.handle.bind(plguinInstance)(args)
         } else {
-          [next, args] = middleware.handle(args)
+          [next, args] = middleware.handle.bind(plguinInstance)(args)
         }
 
         if (!next) return
@@ -42,16 +49,21 @@ export class PluginLoader {
         })
 
         for (const command of commands) {
+          const username = this.config.getConfig().bot.username
+          const constructor = command._this.constructor.name
+          const plguinInstance = globalPlugins.get(username)?.get(constructor) as Plugin
+
           const data = args as PublicMessage | PrivateMessage
           const message = data.message
           if (command.options.command.test(message)) {
             let next = true
             if (isAsync(command.handle)) {
-              next = await command.handle(data, command.options.command.exec(message))
+              next = await command.handle.bind(plguinInstance)(data, command.options.command.exec(message))
             } else {
-              next = command.handle(data, command.options.command.exec(message))
+              next = command.handle.bind(plguinInstance)(data, command.options.command.exec(message))
             }
 
+            command.options.command.lastIndex = 0
             if (next === false) return
           }
         }
@@ -60,20 +72,28 @@ export class PluginLoader {
       // 事件监听器
       const listeners = this.app.decorators.events.get(event) || []
       for (const listener of listeners) {
+        const username = this.config.getConfig().bot.username
+        const constructor = listener._this.constructor.name
+        const plguinInstance = globalPlugins.get(username)?.get(constructor) as Plugin
+
         if(isAsync(listener.handle)) {
-          await listener.handle(args)
+          await listener.handle.bind(plguinInstance)(args)
         } else {
-          listener.handle(args)
+          listener.handle.bind(plguinInstance)(args)
         }
       }
 
       // 中间件
       for (const middleware of middlewares) {
+        const username = this.config.getConfig().bot.username
+        const constructor = middleware._this.constructor.name
+        const plguinInstance = globalPlugins.get(username)?.get(constructor) as Plugin
+
         if (!middleware.inBottom) continue
         if(isAsync(middleware.handle)) {
-          args = await middleware.handle(args)
+          args = await middleware.handle.bind(plguinInstance)(args)
         } else {
-          args = middleware.handle(args)
+          args = middleware.handle.bind(plguinInstance)(args)
         }
       }
     })
@@ -87,10 +107,25 @@ export class PluginLoader {
 
     this.plugins.push(p);
 
-    Object.defineProperty(p, 'app', this.app)
-    Object.defineProperty(p, 'config', this.config.getConfig().plugins[name] || {})
+    p.app = this.bot
+    p.config = this.config;
 
     p.init();
+
+    const username = this.config.getConfig().bot.username
+    const constructor = p.constructor.name
+
+    if (!globalPlugins.has(username)) {
+      globalPlugins.set(username, new Map())
+    }
+    
+    const plugins = globalPlugins.get(username) as Map<string, Plugin>
+    
+    if (plugins.has(constructor)) {
+      throw new Error(`插件 ${constructor} 已经存在`)
+    }
+
+    plugins.set(constructor, p)
   }
 
   public getPlugins() {

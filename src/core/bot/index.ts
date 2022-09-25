@@ -20,6 +20,7 @@ import { GetUserListCallback as typesGetUserListCallback } from '../packet/decod
 import { UserProfileCallback as typesUserProfileCallback } from '../packet/decoder/UserProfileCallback'
 import { RoomNotice as typesRoomNotice, Follower as typesFollower, Like as typesLike, Payment as typesPayment } from '../packet/decoder/MailboxMessage'
 import { globalInstances } from "../global";
+import { API } from "./api";
 
 
 export interface IEmissions {
@@ -117,6 +118,8 @@ export class Bot extends EventEmitter {
   private _untypedEmit = this.emit
   public on = <K extends keyof IEmissions>(event: K, listener: IEmissions[K]): this => this._untypedOn(event, listener)
   public emit = <K extends keyof IEmissions>(event: K, ...args: Parameters<IEmissions[K]>): boolean => this._untypedEmit(event, ...args)
+  
+  public api: API
 
   constructor(config: Config) {
     super()
@@ -124,6 +127,7 @@ export class Bot extends EventEmitter {
     this.config = config
     this.decoder = new Decoder()
     this.socket = new WebSocket()
+    this.api = new API(this.socket, this.config, this)
 
     // 开始处理事件
     this.socket.on("message", (packet: string) => {
