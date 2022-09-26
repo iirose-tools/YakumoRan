@@ -1,7 +1,17 @@
 {
+  "name": "@yakumoran/core",
+  "version": "2.0.0-canary.2022.09.26",
+  "description": "IIROSE Chat bot",
+  "main": "./dist/index.js",
+  "repository": "git@github.com:iirose-tools/YakumoRan.git",
+  "author": "TheresaQWQ <yxiao2044@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc ./src/index.ts --outDir ./dist"
+  },
   "devDependencies": {
     "@types/express": "^4.17.14",
-    "@types/node": "^18.7.19",
+    "@types/node": "^18.7.21",
     "@types/pako": "^2.0.0",
     "@types/ws": "^8.5.3",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
@@ -12,13 +22,6 @@
     "eslint-plugin-promise": "^6.0.0",
     "typescript": "*"
   },
-  "name": "@yakumoran/core",
-  "version": "2.0.0",
-  "description": "IIROSE Chat bot",
-  "main": "./src/index.ts",
-  "repository": "git@github.com:iirose-tools/YakumoRan.git",
-  "author": "TheresaQWQ <yxiao2044@gmail.com>",
-  "license": "MIT",
   "dependencies": {
     "better-sqlite3": "^7.6.2",
     "express": "^4.18.1",

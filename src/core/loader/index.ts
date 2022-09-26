@@ -99,7 +99,7 @@ export class PluginLoader {
     })
   }
 
-  public load(name: string, plugin?: (app: App) => typeof Plugin) {
+  public load(name: string, plugin?: (app: App) => any) {
     if (!plugin) plugin = require(name).default;
     if (!plugin) return
     const Plugin = plugin(this.app);

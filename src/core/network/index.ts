@@ -1,12 +1,12 @@
-import pako from 'pako'
+import * as pako from 'pako'
 import { EventEmitter } from 'events'
-import ws from 'ws'
+import { WebSocket as ws, ErrorEvent, MessageEvent } from 'ws'
 import { Logger } from '../logger'
 
 interface IEmissions {
   open: () => void
   close: () => void
-  error: (error: ws.ErrorEvent) => void
+  error: (error: ErrorEvent) => void
   message: (data: string) => void
 }
 
@@ -81,7 +81,7 @@ export class WebSocket extends EventEmitter {
   }
 
   // 消息处理
-  private handleMessage(event: ws.MessageEvent) {
+  private handleMessage(event: MessageEvent) {
     const array = new Uint8Array(event.data as ArrayBuffer)
     const isCompressed = array[0] === 1
     const data = isCompressed ? pako.inflate(array.slice(1), { to: 'string' }) : Buffer.from(array).toString()
@@ -92,7 +92,7 @@ export class WebSocket extends EventEmitter {
   }
 
   // 错误处理
-  private handleError(error: ws.ErrorEvent) {
+  private handleError(error: ErrorEvent) {
     this.emit('error', error)
     this.close()
 

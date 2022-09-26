@@ -1,4 +1,4 @@
-import log4js from 'log4js'
+import * as log4js from 'log4js'
 
 const conf: any = {
   appenders: {

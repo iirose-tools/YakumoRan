@@ -3,3 +3,4 @@ data/
 debug/
 config.json
 node_modules/
+dist/
