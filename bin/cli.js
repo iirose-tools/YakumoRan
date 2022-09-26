@@ -1,6 +1,5 @@
 #! /usr/bin/env node
-const { App } = require('../dist')
-const { promises: fs, existsSync } = require('fs')
+const { promises: fs } = require('fs')
 const { join } = require('path')
 const { promises: readline } = require('readline')
 const { exec } = require('child_process')
@@ -50,17 +49,19 @@ const init = async () => {
   }
 
   await fs.writeFile(join(process.cwd(), 'config.json'), JSON.stringify(config, null, 2))
-  await fs.mkdir(join(process.cwd(), 'data'))
+
+  try {
+    await fs.mkdir(join(process.cwd(), 'data'))
+  } catch (error) { }
 
   console.log('配置文件创建完成，默认使用better-sqlite3数据库，如需使用其他数据库请手动修改配置文件')
+  fs.copyFile(join(__dirname, 'init.js'), join(process.cwd(), 'index.js'))
+
   const install = await question('要安装依赖吗? (y/n): ')
   if (install === 'y') {
     console.log('正在安装依赖...')
-    const p = exec('npm install')
-    p.on('exit', () => {
-      const p = exec('npm install better-sqlite3')
-      p.on('exit', () => console.log('安装完成'))
-    })
+    const p = exec('npm install better-sqlite3 @yakumoran/core', { cwd: process.cwd() })
+    p.on('exit', () => console.log('安装完成'))
   } else {
     console.log('配置完成，您可能需要手动安装依赖')
   }
@@ -69,19 +70,7 @@ const init = async () => {
 }
 
 const run = async () => {
-  const confPath = join(process.cwd(), 'config.json')
-
-  if (!existsSync(confPath)) {
-    console.log('配置文件不存在，请先运行init命令初始化配置文件')
-    return
-  }
-
-  const config = JSON.parse(await fs.readFile(confPath, 'utf-8'))
-  const app = new App(config)
-
-  for (const plugin of Object.keys(config.plugins)) {
-    app.loadPlugin(plugin)
-  }
+  require(`${process.cwd()}/index.js`)
 }
 
 const main = async () => {
