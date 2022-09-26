@@ -1,7 +1,8 @@
 {
   "include": [
-    "src/**/*"
-, "bin/cli.js"  ],
+    "src/**/*",
+    "bin/cli.js"
+  ],
   "compilerOptions": {
     "experimentalDecorators": true,
     /* Visit https://aka.ms/tsconfig to read more about this file */
