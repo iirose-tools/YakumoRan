@@ -198,16 +198,25 @@ export class Bot extends EventEmitter {
   }
 
   /**
-   * @description 创建表单页面(会直接显示在菜单栏左侧)
-   * @param id 表单ID
-   * @param title 表单标题
-   * @param icon 表单图标(填写fontawesome class)
+   * @description 创建页面(会直接显示在菜单栏左侧)
+   * @param id ID
+   * @param title 标题
+   * @param icon 图标(填写fontawesome class)
    * @returns 
    */
   createForm (id: string, title: string, icon: string) {
     const form = new WebForm(this.web, id)
     this.webMenus.push({ id, title, icon })
     return form
+  }
+
+  /**
+   * @description 删除页面
+   * @param form 页面对象
+   */
+  deleteForm (form: WebForm) {
+    this.webMenus = this.webMenus.filter((item) => item.id !== form.id)
+    form._destroy()
   }
 
   initWeb () {

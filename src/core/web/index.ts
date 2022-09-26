@@ -36,4 +36,11 @@ export class WebServer {
   public route (path: string, router: express.Router) {
     this.app.use(path, router)
   }
+
+  public unroute (path: string) {
+    this.app._router.stack = this.app._router.stack.filter((r: any) => {
+      if (r.name === 'router' && r.regexp.test(path)) return false
+      return true
+    })
+  }
 }

@@ -18,11 +18,12 @@ const storeRender = () => {
 
 const renderElement = (fid, options) => {
   const { type, id, custom, name, options: opts } = options
+  if (opts && !opts.value) opts.value = ''
 
   if (['text', 'password', 'input'].includes(type)) {
     return `
     <div class="form-floating mb-3">
-      <input type="${type}" class="form-control" id="${fid}-${id}" placeholder="${opts.placeholder || ''}">
+      <input type="${type}" class="form-control" id="${fid}-${id}" value="${opts.value}" placeholder="${opts.placeholder || ''}">
       <label for="floatingInput">${name}</label>
     </div>
     `
@@ -30,14 +31,14 @@ const renderElement = (fid, options) => {
     const options = opts.seletions.map(opt => `<option value="${opt.value}">${opt.text}</option>`).join('')
 
     return `
-    <select class="form-select" aria-label="Default select example">
+    <select class="form-select" value="${opts.value}">
       <option selected disabled>${name}</option>
       ${options}
     </select>`
   } else if (type === 'checkbox') {
     return `
     <div class="form-check">
-      <input class="form-check-input" type="checkbox" value="" id="${fid}-${id}">
+      <input class="form-check-input" value="${opts.value}" type="checkbox" value="" id="${fid}-${id}">
       <label class="form-check-label" for="${fid}-${id}">
         ${name}
       </label>
@@ -46,7 +47,7 @@ const renderElement = (fid, options) => {
   } else if (type === 'textarea') {
     return `
     <div class="form-floating mb-3">
-      <textarea class="form-control" placeholder="${opts.placeholder || ''}" id="${fid}-${id}" style="height: 100px"></textarea>
+      <textarea class="form-control" placeholder="${opts.placeholder || ''}" id="${fid}-${id}" style="height: 100px">${opts.value}</textarea>
       <label for="floatingTextarea2">${name}</label>
     </div>
     `
@@ -80,8 +81,11 @@ const submit = async id => {
   const err = result.err
   if (err) {
     // eslint-disable-next-line no-undef
-    alert(err)
+    return alert(err)
   }
+
+  // eslint-disable-next-line no-undef
+  alert('提交成功')
 }
 
 const render = async id => {
@@ -94,7 +98,6 @@ const render = async id => {
     const data = await resp.json()
 
     const html = data.map(form => renderElement(id, form))
-    html.push(`<button type="button" class="btn btn-primary" onclick="submit('${id}')">提交</button>`)
 
     document.querySelector('.container').innerHTML = html.join('')
   }

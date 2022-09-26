@@ -22,19 +22,33 @@ export class WebForm {
   private web: WebServer
   private router: Router = Router()
   private config: InputConfig[] = []
-  private submit: (data: any) => string | undefined
-  private id: string
+  private submit?: (data: any) => string | undefined
+  public id: string
 
   constructor (web: WebServer, id: string) {
     this.web = web
     this.id = id
-    this.submit = (data: any) => '';
 
     this.router.get('/config', (req, res) => {
-      res.json(this.config)
+      res.json([
+        ...this.config,
+        ...(this.submit ? [{
+          type: 'custom',
+          id: '',
+          name: '',
+          custom: `<button type="button" class="btn btn-primary" onclick="submit('${id}')">提交</button>`
+        }] : [])
+      ])
     })
 
     this.router.post('/submit', (req, res) => {
+      if (!this.submit) {
+        res.json({
+          err: '未配置回调函数'
+        })
+        return
+      }
+
       const err = this.submit(req.body)
       if (err) return res.json({ err })
       res.json({ err: null })
@@ -86,14 +100,33 @@ export class WebForm {
   }
 
   /**
+   * @description 添加iframe页面
+   * @param url iframe的url
+   */
+  public addIframe (url: string) {
+    this.config.push({
+      type: 'custom',
+      id: '',
+      name: '',
+      custom: `<iframe src="${url}" style="width: 100%; height: 100%; border: none; border-radius: 4px;"></iframe>`
+    })
+  }
+
+  /**
    * @description 表单提交后的回调函数
    * @param callback 回调函数，返回值为错误信息，若返回值为 undefined 则表示没有错误
    */
   public onSubmitted (callback: (data: any) => string | undefined) {
-    if (this.submit !== ((data: any) => '')) {
+    if (this.submit) {
       throw new Error('onSubmitted can only be called once')
     }
 
     this.submit = callback
+  }
+
+  public _destroy () {
+    this.web.unroute(`/form/${this.id}`)
+    this.submit = undefined
+    this.config = []
   }
 }
