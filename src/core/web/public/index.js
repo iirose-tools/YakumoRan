@@ -20,35 +20,33 @@ const renderElement = (fid, options) => {
   const { type, id, custom, name, options: opts } = options
   if (opts && !opts.value) opts.value = ''
 
-  if (['text', 'password', 'input'].includes(type)) {
+  if (['text', 'password', 'number'].includes(type)) {
     return `
-    <div class="form-floating mb-3">
-      <input type="${type}" class="form-control" id="${fid}-${id}" value="${opts.value}" placeholder="${opts.placeholder || ''}">
-      <label for="floatingInput">${name}</label>
+    <div class="mb-3">
+      <label for="${fid}-${id}" class="form-label">${name}</label>
+      <input type="${type}" class="form-control" id="${fid}-${id}" placeholder="${opts.placeholder || ''}">
     </div>
     `
   } else if (type === 'select') {
     const options = opts.seletions.map(opt => `<option value="${opt.value}">${opt.text}</option>`).join('')
 
     return `
-    <select class="form-select" value="${opts.value}">
-      <option selected disabled>${name}</option>
-      ${options}
-    </select>`
+    <div class="mb-3">
+      <label for="${fid}-${id}" class="form-label">${name}</label>
+      <select class="form-select" value="${opts.value}" id="${fid}-${id}">${options}</select>
+    </div>`
   } else if (type === 'checkbox') {
     return `
     <div class="form-check">
-      <input class="form-check-input" value="${opts.value}" type="checkbox" value="" id="${fid}-${id}">
-      <label class="form-check-label" for="${fid}-${id}">
-        ${name}
-      </label>
+      <label for="${fid}-${id}" class="form-label">${name}</label>
+      <input class="form-check-input" value="${opts.value}" type="checkbox" id="${fid}-${id}">
     </div>
     `
   } else if (type === 'textarea') {
     return `
-    <div class="form-floating mb-3">
+    <div class="mb-3">
+      <label for="${fid}-${id}" class="form-label">${name}</label>
       <textarea class="form-control" placeholder="${opts.placeholder || ''}" id="${fid}-${id}" style="height: 100px">${opts.value}</textarea>
-      <label for="floatingTextarea2">${name}</label>
     </div>
     `
   } else if (type === 'custom') {
@@ -60,8 +58,13 @@ const renderElement = (fid, options) => {
 const submit = async id => {
   const resp = await fetch(`/form/${id}/config`)
   const data = await resp.json()
-  const ids = data.map(form => `${id}-${form.id}`)
-  const values = ids.map(id => document.getElementById(id) ? document.getElementById(id).value : '')
+  const ids = data.filter(form => !!form.id).map(form => `${id}-${form.id}`)
+  const values = ids.map(id => {
+    const element = document.getElementById(id)
+    if (!element) return null
+    if (element.type === 'checkbox') return element.checked
+    return element.value
+  })
 
   const body = {}
 
