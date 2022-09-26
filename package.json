@@ -3,11 +3,15 @@
   "version": "2.0.0-canary.2022.09.26",
   "description": "IIROSE Chat bot",
   "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "repository": "git@github.com:iirose-tools/YakumoRan.git",
   "author": "TheresaQWQ <yxiao2044@gmail.com>",
-  "license": "MIT",
+  "license": "APACHE-2.0",
   "scripts": {
-    "build": "tsc ./src/index.ts --outDir ./dist"
+    "build": "tsc"
+  },
+  "bin": {
+    "yakumoran-cli": "./bin/cli.js"
   },
   "devDependencies": {
     "@types/express": "^4.17.14",
@@ -23,7 +27,7 @@
     "typescript": "*"
   },
   "dependencies": {
-    "better-sqlite3": "^7.6.2",
+    "commander": "^9.4.0",
     "express": "^4.18.1",
     "html-entities": "^2.3.3",
     "knex": "^2.3.0",
