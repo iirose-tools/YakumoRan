@@ -179,6 +179,10 @@ export class Bot extends EventEmitter {
           // 这种错误真的需要处理吗(?)
           this.logger.fatal('登录失败，此名字已被占用')
           process.exit(1)
+        } else if (msg.startsWith('%*"s')) {
+          const room = msg.substring(4).split('>')[0]
+          this.logger.warn(`登录失败，机器人已在房间 ${room} 中，正在尝试移动至 ${room}`)
+          this.api.moveTo(room, '')
         } else {
           this.logger.info('收到服务器返回数据, 登录成功')
           this.logger.debug('咱的聊天群：700080009')
@@ -194,7 +198,14 @@ export class Bot extends EventEmitter {
     const username = this.config.getConfig().bot.username
     globalInstances[username] = this
 
-    this.initWeb()
+    this._initWeb()
+
+    this.on('SelfMove', data => {
+      const room = data.id;
+
+      this.logger.info(`机器人已移动至 > ${room}`)
+      this.api.moveTo(room, '')
+    })
   }
 
   /**
@@ -219,7 +230,7 @@ export class Bot extends EventEmitter {
     form._destroy()
   }
 
-  initWeb () {
+  _initWeb () {
     const route = Router()
 
     route.get('/menu', (req, res) => {

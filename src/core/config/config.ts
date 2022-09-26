@@ -68,4 +68,8 @@ export class Config {
   public getConfig() {
     return this.config
   }
+
+  public setConfig(config: TypeofConfig) {
+    this.config = config
+  }
 }

@@ -253,4 +253,18 @@ export class API {
     const data = this.encoder.admin.media.operation(op, time)
     this.socket.send(data)
   }
+
+  /**
+   * @description 移动到指定位置
+   */
+  moveTo (room: string, password: string) {
+    const config = this.config.getConfig()
+    config.bot.room = room
+    config.bot.room_password = password
+
+    this.config.setConfig(config)
+
+    this.socket.close()
+    setTimeout(() => this.socket.connect(), 500);
+  }
 }
