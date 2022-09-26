@@ -7,6 +7,7 @@ export class Plugin {
   public plugin_author: string = '';
   public plugin_description: string = '';
   public plugin_version: string = '';
+  public plugin_id: string = '';
   public config: any = {};
   public logger: Logger = new Logger(this.constructor.name);
 
