@@ -1,9 +1,26 @@
 import { Bot } from "./core/bot";
 import { Config, TypeofConfig } from "./core/config/config";
 import { PluginLoader, globalPlugins } from './core/loader';
-import { Plugin } from "./core/plugin";
+import { Plugin as PluginBase } from "./core/plugin";
 import { Logger } from "./core/logger";
 import { Decorators } from "./core/plugin/decorators";
+
+import { Music as typesMusic } from './core/packet/decoder/Music'
+import { Damaku as typesDamaku } from './core/packet/decoder/damaku'
+import { SelfMove as typesSelfMove} from './core/packet/decoder/SelfMove'
+import { UserList as typesUserList } from './core/packet/decoder/userlist'
+import { SystemMessage as typesJoinRoom } from './core/packet/decoder/JoinRoom'
+import { SwitchRoom as typesSwitchRoom } from './core/packet/decoder/SwitchRoom'
+import { SystemMessage as typesLeaveRoom } from './core/packet/decoder/LeaveRoom'
+import { BankCallback as typesBankCallback } from './core/packet/decoder/BankCallback'
+import { PublicMessage as typesPublicMessage } from './core/packet/decoder/PublicMessage'
+import { PrivateMessage as typesPrivateMessage } from './core/packet/decoder/PrivateMessage'
+import { paymentCallback as typesPaymentCallback } from './core/packet/decoder/paymentCallback'
+import { MediaListCallback as typesMediaListCallback } from './core/packet/decoder/MediaListCallback'
+import { GetUserListCallback as typesGetUserListCallback } from './core/packet/decoder/GetUserListCallback'
+import { UserProfileCallback as typesUserProfileCallback } from './core/packet/decoder/UserProfileCallback'
+import { RoomNotice as typesRoomNotice, Follower as typesFollower, Like as typesLike, Payment as typesPayment } from './core/packet/decoder/MailboxMessage'
+
 
 export class App {
   private config: Config;
@@ -132,3 +149,23 @@ export class App {
     })
   }
 }
+
+export interface MusicEvent extends typesMusic {}
+export interface DamakuEvent extends typesDamaku {}
+export interface SelfMoveEvent extends typesSelfMove {}
+export interface UserListEvent extends typesUserList {}
+export interface JoinRoomEvent extends typesJoinRoom {}
+export interface SwitchRoomEvent extends typesSwitchRoom {}
+export interface LeaveRoomEvent extends typesLeaveRoom {}
+export interface BankCallbackEvent extends typesBankCallback {}
+export interface PublicMessageEvent extends typesPublicMessage {}
+export interface PrivateMessageEvent extends typesPrivateMessage {}
+export interface PaymentCallbackEvent extends typesPaymentCallback {}
+export interface MediaListCallbackEvent extends typesMediaListCallback {}
+export interface GetUserListCallbackEvent extends typesGetUserListCallback {}
+export interface UserProfileCallbackEvent extends typesUserProfileCallback {}
+export interface RoomNoticeEvent extends typesRoomNotice {}
+export interface FollowerEvent extends typesFollower {}
+export interface LikeEvent extends typesLike {}
+export interface PaymentEvent extends typesPayment {}
+export class Plugin extends PluginBase {}
