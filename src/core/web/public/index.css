@@ -86,6 +86,7 @@ html,body {
   opacity: 0.8;
   z-index: 999;
   user-select: text;
+  overflow-y: auto;
 }
 
 .home {
