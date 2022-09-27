@@ -108,7 +108,7 @@ export class WebForm {
       type: 'custom',
       id: '',
       name: '',
-      custom: `<iframe src="${url}" style="width: 100%; height: 100%; border: none; border-radius: 4px;"></iframe>`
+      custom: `<iframe src="${url}" style="width: 100%; height: calc(100% - 8px); border: none; border-radius: 4px;"></iframe>`
     })
   }
 
