@@ -40,7 +40,7 @@ export class PluginLoader {
         if (!next) return
       }
 
-      if (event === 'PublicMessage' || event === 'PrivateMessage') {
+      if (event === 'PublicMessage' || event === 'PrivateMessage' && args.isRobot === false) {
         // 处理命令
         const commands = this.app.decorators.commands.filter(command => {
           if (event === 'PrivateMessage') return command.options.privateChat !== false
@@ -75,6 +75,7 @@ export class PluginLoader {
         const username = this.config.getConfig().bot.username
         const constructor = listener._this.constructor.name
         const plguinInstance = globalPlugins.get(username)?.get(constructor) as Plugin
+        if (listener.robot === false && args.isRobot) continue
 
         if(isAsync(listener.handle)) {
           await listener.handle.bind(plguinInstance)(args)

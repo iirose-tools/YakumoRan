@@ -31,6 +31,7 @@ interface EventListener {
   event: keyof IEmissions;
   handle: Function
   _this: ExtendsPlugin
+  robot?: boolean
 }
 
 export class Decorators {
@@ -77,7 +78,7 @@ export class Decorators {
    * @description 注册事件监听器
    * @param event 事件名
    */
-  EventListener(event: keyof IEmissions) {
+  EventListener(event: keyof IEmissions, robot: boolean = false) {
     return (target: ExtendsPlugin, propertyKey: keyof ExtendsPlugin, descriptor: PropertyDescriptor) => {
       if (!this.events.has(event)) this.events.set(event, [])
       const list = this.events.get(event) as EventListener[];
@@ -85,7 +86,8 @@ export class Decorators {
       list.push({
         event: event,
         handle: descriptor.value,
-        _this: target
+        _this: target,
+        robot: robot
       })
 
       this.events.set(event, list);

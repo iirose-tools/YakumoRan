@@ -8,6 +8,7 @@ export interface SystemMessage {
   uid: string,
   title: string,
   room: string
+  isRobot: boolean
 }
 
 export default (message: string): [string, SystemMessage][] | undefined => {
@@ -22,7 +23,8 @@ export default (message: string): [string, SystemMessage][] | undefined => {
           color: tmp[5],
           uid: tmp[8],
           title: tmp[9] === "'108" ? '花瓣' : tmp[9],
-          room: tmp[10]
+          room: tmp[10],
+          isRobot: tmp[9] === '4\''
         }
 
         return [['LeaveRoom', msg]]

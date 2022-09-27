@@ -16,6 +16,7 @@ export interface PublicMessage {
   title: string,
   messageId: number,
   replyMessage: replyMessage[] | null
+  isRobot: boolean
 }
 
 const replyMsg = (msg: string): replyMessage[] | null => {
@@ -73,7 +74,8 @@ export default (input: string): [string, PublicMessage][] | undefined => {
               uid: tmp[8],
               title: tmp[9] === "'108" ? '花瓣' : tmp[9],
               messageId: Number(tmp[10]),
-              replyMessage: reply
+              replyMessage: reply,
+              isRobot: tmp[9] === '4\''
             }
           ])
         } else if (tmp.length === 12) {
@@ -85,7 +87,8 @@ export default (input: string): [string, PublicMessage][] | undefined => {
               color: tmp[5],
               uid: tmp[8],
               title: tmp[9] === "'108" ? '花瓣' : tmp[9],
-              room: tmp[10]
+              room: tmp[10],
+              isRobot: tmp[9] === '4\''
             }
 
             messages.push(['JoinRoom', msg])
@@ -98,7 +101,8 @@ export default (input: string): [string, PublicMessage][] | undefined => {
               uid: tmp[8],
               title: tmp[9] === "'108" ? '花瓣' : tmp[9],
               room: tmp[10],
-              targetRoom: tmp[3].substr(2)
+              targetRoom: tmp[3].substr(2),
+              isRobot: tmp[9] === '4\''
             }
 
             messages.push(['SwitchRoom', msg])
@@ -110,7 +114,8 @@ export default (input: string): [string, PublicMessage][] | undefined => {
               color: tmp[5],
               uid: tmp[8],
               title: tmp[9] === "'108" ? '花瓣' : tmp[9],
-              room: tmp[10]
+              room: tmp[10],
+              isRobot: tmp[9] === '4\''
             }
 
             messages.push(['LeaveRoom', msg])
@@ -136,7 +141,8 @@ export default (input: string): [string, PublicMessage][] | undefined => {
           uid: tmp[8],
           title: tmp[9] === "'108" ? '花瓣' : tmp[9],
           messageId: Number(tmp[10]),
-          replyMessage: reply
+          replyMessage: reply,
+          isRobot: tmp[9] === '4\''
         }
 
         return [['PublicMessage', msg]]
