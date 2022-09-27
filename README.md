@@ -26,6 +26,7 @@
 - 运行 `npm install @yakumoran/core -g` 安装cli工具
 - 运行 `yakumoran-cli init` 初始化配置
 - 修改 config.json ，在plugins配置项中加载插件
+- 配置完成后运行 `yakumoran-cli run` 启动机器人
 
 config.json大致如下
 ```json
