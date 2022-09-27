@@ -1,5 +1,5 @@
 # YakumoRan V2
-这里是YakumoRan 2.0版本，目前还在开发中，不能用于生产环境
+这里是YakumoRan 2.0版本，目前正在进行正式版发布前的测试
 
 ## 目录结构
 ```
@@ -22,18 +22,36 @@
 |   |   |   |-- decoder # 解码器
 ```
 
-## 开发进度
-- [x] ~~插件加载器~~
-- [x] ~~网页控制面板~~
-- [x] ~~插件基类~~
-- [x] ~~机器人核心~~
-- [x] ~~网络模块~~
-- [x] ~~数据包编解码器~~
-- [x] ~~配置文件解析器~~
-- [x] ~~配置文件热更新(用于SelfMove事件)~~
-- [x] ~~日志模块~~
-- [x] ~~数据库~~
-- [x] ~~指令菜单~~
+## 快速开始
+- 运行 `npm install @yakumoran/core -g` 安装cli工具
+- 运行 `yakumoran-cli init` 初始化配置
+- 修改 config.json ，在plugins配置项中加载插件
+
+config.json大致如下
+```json
+{
+  "bot": {
+    "master_name": "",
+    "master_uid": "",
+    "color": "",
+    "username": "",
+    "password": "",
+    "room": "",
+    "room_password": "",
+    "port": 8800
+  },
+  "plugins": {
+    "插件名1": {"插件配置1": "xxx"},
+    "插件名2": {"插件配置2": "xxx"},
+  },
+  "database": {
+    "client": "better-sqlite3",
+    "connection": {
+      "filename": "./data/database.db"
+    }
+  }
+}
+```
 
 ## 插件开发
 - [开发文档](/docs)
