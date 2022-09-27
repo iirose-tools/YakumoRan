@@ -1,12 +1,12 @@
-import { Encoder, Decoder } from "../packet";
-import { Config } from "../config/config";
-import { WebSocket } from "../network";
-import { EventEmitter } from "events";
-import { Logger } from "../logger";
+import { Encoder, Decoder } from '../packet'
+import { Config } from '../config/config'
+import { WebSocket } from '../network'
+import { EventEmitter } from 'events'
+import { Logger } from '../logger'
 
 import { Music as typesMusic } from '../packet/decoder/Music'
 import { Damaku as typesDamaku } from '../packet/decoder/damaku'
-import { SelfMove as typesSelfMove} from '../packet/decoder/SelfMove'
+import { SelfMove as typesSelfMove } from '../packet/decoder/SelfMove'
 import { UserList as typesUserList } from '../packet/decoder/userlist'
 import { SystemMessage as typesJoinRoom } from '../packet/decoder/JoinRoom'
 import { SwitchRoom as typesSwitchRoom } from '../packet/decoder/SwitchRoom'
@@ -19,13 +19,13 @@ import { MediaListCallback as typesMediaListCallback } from '../packet/decoder/M
 import { GetUserListCallback as typesGetUserListCallback } from '../packet/decoder/GetUserListCallback'
 import { UserProfileCallback as typesUserProfileCallback } from '../packet/decoder/UserProfileCallback'
 import { RoomNotice as typesRoomNotice, Follower as typesFollower, Like as typesLike, Payment as typesPayment } from '../packet/decoder/MailboxMessage'
-import { globalInstances } from "../global";
-import { API } from "./api";
+import { globalInstances } from '../global'
+import { API } from './api'
 
-import { Knex, knex } from "knex";
-import { WebServer } from "../web";
-import { WebForm } from "../web/WebForm";
-import { Router } from "express";
+import { Knex, knex } from 'knex'
+import { WebServer } from '../web'
+import { WebForm } from '../web/WebForm'
+import { Router } from 'express'
 
 export interface IEmissions {
   /**
@@ -122,7 +122,7 @@ export class Bot extends EventEmitter {
   private _untypedEmit = this.emit
   public on = <K extends keyof IEmissions>(event: K, listener: IEmissions[K]): this => this._untypedOn(event, listener)
   public emit = <K extends keyof IEmissions>(event: K, ...args: Parameters<IEmissions[K]>): boolean => this._untypedEmit(event, ...args)
-  
+
   public api: API
   public db: Knex
   public web: WebServer
@@ -133,7 +133,7 @@ export class Bot extends EventEmitter {
     icon: string
   }[] = []
 
-  constructor(config: Config) {
+  constructor (config: Config) {
     super()
 
     this.config = config
@@ -144,7 +144,7 @@ export class Bot extends EventEmitter {
     this.web = new WebServer(this.config.getConfig().bot.port)
 
     // 开始处理事件
-    this.socket.on("message", (packet: string) => {
+    this.socket.on('message', (packet: string) => {
       const result = this.decoder.autoDecoder(packet)
       if (!result) {
         this.logger.warn(`收到了无法解析的数据包: ${packet.length > 50 ? packet.slice(0, 50) + '...' : packet}`)
@@ -199,7 +199,7 @@ export class Bot extends EventEmitter {
     this._initWeb()
 
     this.on('SelfMove', data => {
-      const room = data.id;
+      const room = data.id
 
       this.logger.info(`机器人已移动至 > ${room}`)
       this.api.moveTo(room, '')
@@ -211,7 +211,7 @@ export class Bot extends EventEmitter {
    * @param id ID
    * @param title 标题
    * @param icon 图标(填写fontawesome class)
-   * @returns 
+   * @returns
    */
   createForm (id: string, title: string, icon: string) {
     const form = new WebForm(this.web, id)

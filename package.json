@@ -8,7 +8,9 @@
   "author": "TheresaQWQ <yxiao2044@gmail.com>",
   "license": "APACHE-2.0",
   "scripts": {
-    "build": "tsc && node ./scripts/build.js"
+    "build": "tsc && node ./scripts/build.js",
+    "lint": "eslint --ext .ts src",
+    "lint:fix": "eslint --ext .ts src --fix"
   },
   "bin": {
     "yakumoran-cli": "./bin/cli.js"
@@ -18,13 +20,14 @@
     "@types/node": "^18.7.21",
     "@types/pako": "^2.0.0",
     "@types/ws": "^8.5.3",
-    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.38.1",
     "eslint": "^8.0.1",
     "eslint-config-standard-with-typescript": "^23.0.0",
     "eslint-plugin-import": "^2.25.2",
     "eslint-plugin-n": "^15.0.0",
     "eslint-plugin-promise": "^6.0.0",
-    "typescript": "*"
+    "typescript": "*",
+    "@typescript-eslint/parser": "^5.38.1"
   },
   "dependencies": {
     "express": "^4.18.1",

@@ -1,6 +1,6 @@
 import * as pako from 'pako'
 import { EventEmitter } from 'events'
-import { WebSocket as ws, ErrorEvent, MessageEvent } from 'ws'
+import { WebSocket as WebSockets, ErrorEvent, MessageEvent } from 'ws'
 import { Logger } from '../logger'
 
 interface IEmissions {
@@ -16,22 +16,22 @@ export class WebSocket extends EventEmitter {
   public on = <K extends keyof IEmissions>(event: K, listener: IEmissions[K]): this => this._untypedOn(event, listener)
   public emit = <K extends keyof IEmissions>(event: K, ...args: Parameters<IEmissions[K]>): boolean => this._untypedEmit(event, ...args)
 
-  private socket: ws
+  private socket: WebSockets
   private isOpen: boolean = false
   private allowClose: boolean = false
   private logger: Logger
   private failCount: number = 0
 
-  constructor() {
+  constructor () {
     super()
     this.logger = new Logger('WebSocket')
 
     this.logger.debug('正在初始化WebSocket...')
 
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
-    this.socket = new ws('wss://m2.iirose.com:8778')
+    this.socket = new WebSockets('wss://m2.iirose.com:8778')
     this.init()
-    
+
     this.logger.debug('WebSocket初始化完成')
 
     setInterval(() => {
@@ -47,7 +47,7 @@ export class WebSocket extends EventEmitter {
 
   // 手动连接
   public connect () {
-    this.socket = new ws('wss://m2.iirose.com:8778')
+    this.socket = new WebSockets('wss://m2.iirose.com:8778')
     this.init()
   }
 
@@ -61,7 +61,7 @@ export class WebSocket extends EventEmitter {
   }
 
   // 连接成功
-  private handleOpen() {
+  private handleOpen () {
     this.isOpen = true
     this.emit('open')
     this.logger.info('WebSocket连接成功')
@@ -69,19 +69,19 @@ export class WebSocket extends EventEmitter {
   }
 
   // 连接关闭
-  private handleClose() {
+  private handleClose () {
     this.isOpen = false
     this.emit('close')
     this.logger.warn('WebSocket连接已关闭')
 
     if (this.allowClose) return
     this.logger.warn('正在重连WebSocket...')
-    this.socket = new ws('wss://m2.iirose.com:8778')
+    this.socket = new WebSockets('wss://m2.iirose.com:8778')
     this.init()
   }
 
   // 消息处理
-  private handleMessage(event: MessageEvent) {
+  private handleMessage (event: MessageEvent) {
     const array = new Uint8Array(event.data as ArrayBuffer)
     const isCompressed = array[0] === 1
     const data = isCompressed ? pako.inflate(array.slice(1), { to: 'string' }) : Buffer.from(array).toString()
@@ -92,7 +92,7 @@ export class WebSocket extends EventEmitter {
   }
 
   // 错误处理
-  private handleError(error: ErrorEvent) {
+  private handleError (error: ErrorEvent) {
     this.emit('error', error)
     this.close()
 
@@ -116,7 +116,7 @@ export class WebSocket extends EventEmitter {
       const deflatedArray = new Uint8Array(deflatedData.length + 1)
       deflatedArray[0] = 1
       deflatedArray.set(deflatedData, 1)
-      
+
       return new Promise((resolve, reject) => {
         this.socket.send(deflatedArray, (err) => {
           if (err) return reject(err)

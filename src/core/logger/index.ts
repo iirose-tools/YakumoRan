@@ -30,7 +30,7 @@ export class Logger {
   public error: (message: string, ...args: any[]) => void
   public fatal: (message: string, ...args: any[]) => void
 
-  constructor(category: string) {
+  constructor (category: string) {
     const logger = log4js.getLogger(category)
     this.trace = logger.trace.bind(logger)
     this.debug = logger.debug.bind(logger)

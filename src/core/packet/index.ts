@@ -85,7 +85,7 @@ export class Encoder {
     userProfile: typeof encodeUserProfile
   }
 
-  constructor() {
+  constructor () {
     this.admin = {
       media: {
         clear: encodeAdminMediaClear,
@@ -128,7 +128,7 @@ export class Encoder {
 export class Decoder {
   private decoder: ((...args: any) => [string, any][] | undefined)[]
 
-  constructor() {
+  constructor () {
     this.decoder = [
       decodeDamaku,
       decodeJoinRoom,
@@ -148,7 +148,7 @@ export class Decoder {
     ]
   }
 
-  autoDecoder(packet: string) {
+  autoDecoder (packet: string) {
     for (const decoder of this.decoder) {
       const result = decoder(packet)
       if (result instanceof Array && result.length > 0) {

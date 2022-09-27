@@ -1,22 +1,22 @@
-import { Bot } from "../bot";
-import { Logger } from "../logger";
+import { Bot } from '../bot'
+import { Logger } from '../logger'
 
 export class Plugin {
-  public app: Bot;
-  public plugin_name: string = '';
-  public plugin_author: string = '';
-  public plugin_description: string = '';
-  public plugin_version: string = '';
-  public plugin_id: string = '';
-  public config: any = {};
-  public logger: Logger = new Logger(this.constructor.name);
+  public app: Bot
+  public plugin_name: string = ''
+  public plugin_author: string = ''
+  public plugin_description: string = ''
+  public plugin_version: string = ''
+  public plugin_id: string = ''
+  public config: any = {}
+  public logger: Logger = new Logger(this.constructor.name)
 
-  constructor(app: Bot) {
-    this.app = app;
+  constructor (app: Bot) {
+    this.app = app
   }
 
   /**
    * @description 插件初始化
    */
-  public async init() {}
+  public async init () {}
 }

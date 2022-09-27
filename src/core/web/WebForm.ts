@@ -1,5 +1,6 @@
-import { WebServer } from ".";
-import { Router } from "express";
+import { WebServer } from '.'
+import { Router } from 'express'
+import { isAsync } from '../utils/isAsync'
 
 interface InputConfig {
   type: 'text' | 'password' | 'number' | 'select' | 'checkbox' | 'textarea' | 'custom'
@@ -32,20 +33,29 @@ export class WebForm {
     this.router.get('/config', (req, res) => {
       res.json([
         ...this.config,
-        ...(this.submit ? [{
-          type: 'custom',
-          id: '',
-          name: '',
-          custom: `<button type="button" class="btn btn-primary" onclick="submit('${id}')">提交</button>`
-        }] : [])
+        ...(this.submit
+          ? [{
+              type: 'custom',
+              id: '',
+              name: '',
+              custom: `<button type="button" class="btn btn-primary" onclick="submit('${id}')">提交</button>`
+            }]
+          : [])
       ])
     })
 
-    this.router.post('/submit', (req, res) => {
+    this.router.post('/submit', async (req, res) => {
       if (!this.submit) {
         res.json({
           err: '未配置回调函数'
         })
+        return
+      }
+
+      if (isAsync(this.submit)) {
+        const err = await this.submit(req.body)
+        if (err) return res.json({ err })
+        res.json({ err: null })
         return
       }
 

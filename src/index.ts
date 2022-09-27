@@ -1,13 +1,13 @@
-import { Bot } from "./core/bot";
-import { Config, TypeofConfig } from "./core/config/config";
-import { PluginLoader, globalPlugins } from './core/loader';
-import { Plugin as PluginBase } from "./core/plugin";
-import { Logger } from "./core/logger";
-import { Decorators } from "./core/plugin/decorators";
+import { Bot } from './core/bot'
+import { Config, TypeofConfig } from './core/config/config'
+import { PluginLoader, globalPlugins } from './core/loader'
+import { Plugin as PluginBase } from './core/plugin'
+import { Logger } from './core/logger'
+import { Decorators } from './core/plugin/decorators'
 
 import { Music as typesMusic } from './core/packet/decoder/Music'
 import { Damaku as typesDamaku } from './core/packet/decoder/damaku'
-import { SelfMove as typesSelfMove} from './core/packet/decoder/SelfMove'
+import { SelfMove as typesSelfMove } from './core/packet/decoder/SelfMove'
 import { UserList as typesUserList } from './core/packet/decoder/userlist'
 import { SystemMessage as typesJoinRoom } from './core/packet/decoder/JoinRoom'
 import { SwitchRoom as typesSwitchRoom } from './core/packet/decoder/SwitchRoom'
@@ -21,22 +21,21 @@ import { GetUserListCallback as typesGetUserListCallback } from './core/packet/d
 import { UserProfileCallback as typesUserProfileCallback } from './core/packet/decoder/UserProfileCallback'
 import { RoomNotice as typesRoomNotice, Follower as typesFollower, Like as typesLike, Payment as typesPayment } from './core/packet/decoder/MailboxMessage'
 
-
 export class App {
-  private config: Config;
+  private config: Config
   private pluginLoader: PluginLoader
   private logger: Logger = new Logger('App')
   public bot: Bot
   public decorators: Decorators = new Decorators()
 
   constructor (config?: TypeofConfig) {
-    this.config = new Config(config);
+    this.config = new Config(config)
     this.bot = new Bot(this.config)
     this.pluginLoader = new PluginLoader(this.bot, this, this.config)
     this.InitHelpCommand()
   }
 
-  public loadPlugin(name: string, plugin?: (app: App) => typeof Plugin) {
+  public loadPlugin (name: string, plugin?: (app: App) => typeof Plugin) {
     try {
       this.logger.info(`正在加载插件 ${name}`)
       this.pluginLoader.load(name, plugin)
@@ -92,7 +91,7 @@ export class App {
           const pluginPerPage = 3
           const maxPage = Math.ceil(pluginCount / pluginPerPage)
 
-          if (page > maxPage) return this.bot.api.sendPublicMessage(`已经是最后一页了`)
+          if (page > maxPage) return this.bot.api.sendPublicMessage('已经是最后一页了')
 
           const start = (page - 1) * pluginPerPage
           const end = start + pluginPerPage

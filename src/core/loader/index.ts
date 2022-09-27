@@ -1,12 +1,12 @@
-import { App } from "../..";
-import { Bot } from "../bot";
-import { Config } from "../config/config";
-import { PrivateMessage } from "../packet/decoder/PrivateMessage";
-import { PublicMessage } from "../packet/decoder/PublicMessage";
-import { Plugin } from "../plugin";
-import { isAsync } from "../utils/isAsync";
+import { App } from '../..'
+import { Bot } from '../bot'
+import { Config } from '../config/config'
+import { PrivateMessage } from '../packet/decoder/PrivateMessage'
+import { PublicMessage } from '../packet/decoder/PublicMessage'
+import { Plugin } from '../plugin'
+import { isAsync } from '../utils/isAsync'
 
-export const globalPlugins = new Map<string, Map<string, Plugin>>();
+export const globalPlugins = new Map<string, Map<string, Plugin>>()
 
 export class PluginLoader {
   private readonly plugins: Plugin[] = []
@@ -20,7 +20,7 @@ export class PluginLoader {
     this.config = config
 
     // 处理插件上的装饰器
-    this.bot.on("__ALL__", async (event, args) => {
+    this.bot.on('__ALL__', async (event, args) => {
       // 中间件
       const middlewares = this.app.decorators.middlewares.get(event) || []
       for (const middleware of middlewares) {
@@ -31,7 +31,7 @@ export class PluginLoader {
         const constructor = middleware._this.constructor.name
         const plguinInstance = globalPlugins.get(username)?.get(constructor) as Plugin
 
-        if(isAsync(middleware.handle)) {
+        if (isAsync(middleware.handle)) {
           [next, args] = await middleware.handle.bind(plguinInstance)(args)
         } else {
           [next, args] = middleware.handle.bind(plguinInstance)(args)
@@ -40,7 +40,7 @@ export class PluginLoader {
         if (!next) return
       }
 
-      if (event === 'PublicMessage' || event === 'PrivateMessage' && args.isRobot === false) {
+      if ((event === 'PublicMessage' || event === 'PrivateMessage') && args.isRobot === false) {
         // 处理命令
         const commands = this.app.decorators.commands.filter(command => {
           if (event === 'PrivateMessage') return command.options.privateChat !== false
@@ -77,7 +77,7 @@ export class PluginLoader {
         const plguinInstance = globalPlugins.get(username)?.get(constructor) as Plugin
         if (listener.robot === false && args.isRobot) continue
 
-        if(isAsync(listener.handle)) {
+        if (isAsync(listener.handle)) {
           await listener.handle.bind(plguinInstance)(args)
         } else {
           listener.handle.bind(plguinInstance)(args)
@@ -91,7 +91,7 @@ export class PluginLoader {
         const plguinInstance = globalPlugins.get(username)?.get(constructor) as Plugin
 
         if (!middleware.inBottom) continue
-        if(isAsync(middleware.handle)) {
+        if (isAsync(middleware.handle)) {
           args = await middleware.handle.bind(plguinInstance)(args)
         } else {
           args = middleware.handle.bind(plguinInstance)(args)
@@ -100,18 +100,18 @@ export class PluginLoader {
     })
   }
 
-  public load(name: string, plugin?: (app: App) => any) {
-    if (!plugin) plugin = require(name).default;
+  public load (name: string, plugin?: (app: App) => any) {
+    if (!plugin) plugin = require(name).default
     if (!plugin) return
-    const Plugin = plugin(this.app);
-    const p = new Plugin(this.bot);
+    const Plugin = plugin(this.app)
+    const p = new Plugin(this.bot)
 
-    this.plugins.push(p);
+    this.plugins.push(p)
 
     p.app = this.bot
-    p.config = this.config;
+    p.config = this.config
 
-    p.init();
+    p.init()
 
     const username = this.config.getConfig().bot.username
     const constructor = p.constructor.name
@@ -119,9 +119,9 @@ export class PluginLoader {
     if (!globalPlugins.has(username)) {
       globalPlugins.set(username, new Map())
     }
-    
+
     const plugins = globalPlugins.get(username) as Map<string, Plugin>
-    
+
     if (plugins.has(constructor)) {
       throw new Error(`插件 ${constructor} 已经存在`)
     }
@@ -129,7 +129,7 @@ export class PluginLoader {
     plugins.set(constructor, p)
   }
 
-  public getPlugins() {
-    return this.plugins;
+  public getPlugins () {
+    return this.plugins
   }
 }

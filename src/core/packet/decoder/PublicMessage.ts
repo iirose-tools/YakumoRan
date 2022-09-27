@@ -65,7 +65,7 @@ export default (input: string): [string, PublicMessage][] | undefined => {
           const reply = replyMsg(tmp[3])
           messages.push([
             'PublicMessage',
-              {
+            {
               timestamp: Number(tmp[0]),
               avatar: tmp[1],
               username: decode(tmp[2]),

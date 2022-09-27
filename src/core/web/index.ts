@@ -1,5 +1,6 @@
 // @ts-ignore
 import express from 'express'
+import { join } from 'path'
 import { Logger } from '../logger'
 
 export class WebServer {
@@ -13,7 +14,7 @@ export class WebServer {
 
     this.app.use(express.json())
     this.app.use(express.urlencoded({ extended: true }))
-    this.app.use(express.static(`${__dirname}/public`))
+    this.app.use(express.static(join(__dirname, 'public')))
 
     this.start()
   }

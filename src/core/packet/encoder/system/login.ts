@@ -1,4 +1,4 @@
-import md5 from "../../../utils/md5"
+import md5 from '../../../utils/md5'
 
 export default (username: string, password: string, room: string, roomPassword?: string) => {
   const data = {

@@ -1,3 +1,3 @@
-import { Bot } from "../bot";
+import { Bot } from '../bot'
 
-export const globalInstances: { [key: string]: Bot } = {};
+export const globalInstances: { [key: string]: Bot } = {}

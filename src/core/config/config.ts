@@ -27,21 +27,21 @@ export class Config {
   private logger: Logger
 
   private defaultConfig: any = {
-    "bot": {
-      "username": "用户名",
-      "password": "密码MD5",
-      "master_uid": "主人UID",
-      "master_name": "主人昵称",
-      "color": "消息气泡颜色",
-      "room": "房间id",
-      "room_password": "房间密码（无密码请留空）",
+    bot: {
+      username: '用户名',
+      password: '密码MD5',
+      master_uid: '主人UID',
+      master_name: '主人昵称',
+      color: '消息气泡颜色',
+      room: '房间id',
+      room_password: '房间密码（无密码请留空）'
     },
-    "plugins": {}
+    plugins: {}
   }
 
   private config: TypeofConfig
 
-  constructor(conf?: TypeofConfig) {
+  constructor (conf?: TypeofConfig) {
     this.logger = new Logger('Config Loader')
 
     if (conf) {
@@ -65,11 +65,11 @@ export class Config {
     this.config = config
   }
 
-  public getConfig() {
+  public getConfig () {
     return this.config
   }
 
-  public setConfig(config: TypeofConfig) {
+  public setConfig (config: TypeofConfig) {
     this.config = config
   }
 }

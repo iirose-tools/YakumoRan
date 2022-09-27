@@ -2,14 +2,14 @@ export const waitUntil = (condition: () => boolean, timeout: number = 1000, inte
   return new Promise((resolve, reject) => {
     const timer = setInterval(() => {
       if (condition()) {
-        clearInterval(timer);
+        clearInterval(timer)
         resolve(true)
       }
-    }, interval);
+    }, interval)
 
     setTimeout(() => {
-      clearInterval(timer);
-      reject();
-    }, timeout);
-  });
+      clearInterval(timer)
+      reject(new Error('waitUntil timeout'))
+    }, timeout)
+  })
 }
