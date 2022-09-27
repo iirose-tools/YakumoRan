@@ -24,7 +24,7 @@ const renderElement = (fid, options) => {
     return `
     <div class="mb-3">
       <label for="${fid}-${id}" class="form-label">${name}</label>
-      <input type="${type}" class="form-control" id="${fid}-${id}" placeholder="${opts.placeholder || ''}">
+      <input type="${type}" class="form-control" id="${fid}-${id}" placeholder="${opts.placeholder || ''}" value="${opts.value}">
     </div>
     `
   } else if (type === 'select') {

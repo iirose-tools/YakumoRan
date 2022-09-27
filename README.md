@@ -1,6 +1,9 @@
 # YakumoRan V2
 这里是YakumoRan 2.0版本，目前正在进行正式版发布前的测试
 
+[![CodeFactor](https://www.codefactor.io/repository/github/iirose-tools/yakumoran/badge)](https://www.codefactor.io/repository/github/iirose-tools/yakumoran)
+
+
 ## 目录结构
 ```
 |-- config.json # 配置文件
