@@ -22,6 +22,34 @@ app.loadPlugin('xxx')
 // 直接传入插件实例，无论是传入文件名还是实例，都需要填写插件名
 app.loadPlugin('xxx', MyPlugin)
 ```
+配置文件格式大致如下
+```json
+{
+  "bot": {
+    "master_name": "",
+    "master_uid": "",
+    "color": "",
+    "username": "",
+    "password": "",
+    "room": "",
+    "room_password": "",
+    "port": 8800
+  },
+  "plugins": {
+    "./index.ts": {}
+  },
+  "database": {
+    "client": "better-sqlite3",
+    "connection": {
+      "filename": "./data/database.db"
+    }
+  }
+}
+```
+
+一些额外说明:
+- 数据库参数中的client需要手动安装
+- 本例中是 better-sqlite3，支持的数据库可以前往 knex 官网查看
 
 ## 开始开发
 ```typescript
