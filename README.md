@@ -1,5 +1,5 @@
 # YakumoRan V2
-这里是YakumoRan 2.0版本，目前正在进行正式版发布前的测试
+这里是YakumoRan 2.0版本，若需要 1.x 版本请手动切换至 main 分支
 
 [![CodeFactor](https://www.codefactor.io/repository/github/iirose-tools/yakumoran/badge)](https://www.codefactor.io/repository/github/iirose-tools/yakumoran)
 
