@@ -23,7 +23,7 @@ export class WebForm {
   private web: WebServer
   private router: Router = Router()
   private config: InputConfig[] = []
-  private submit?: (data: any) => string | undefined
+  private submit?: (data: any) => Promise<string | undefined> | string | undefined
   public id: string
 
   constructor (web: WebServer, id: string) {
@@ -52,14 +52,22 @@ export class WebForm {
         return
       }
 
+      const data: any = {}
+
+      for (const key in req.body) {
+        if (key.startsWith(`${id}-`)) {
+          data[key.slice(id.length + 1)] = req.body[key]
+        }
+      }
+
       if (isAsync(this.submit)) {
-        const err = await this.submit(req.body)
+        const err = await this.submit(data)
         if (err) return res.json({ err })
         res.json({ err: null })
         return
       }
 
-      const err = this.submit(req.body)
+      const err = this.submit(data)
       if (err) return res.json({ err })
       res.json({ err: null })
     })
@@ -126,7 +134,7 @@ export class WebForm {
    * @description 表单提交后的回调函数
    * @param callback 回调函数，返回值为错误信息，若返回值为 undefined 则表示没有错误
    */
-  public onSubmitted (callback: (data: any) => string | undefined) {
+  public onSubmitted (callback: (data: any) => Promise<string | undefined> | string | undefined) {
     if (this.submit) {
       throw new Error('onSubmitted can only be called once')
     }

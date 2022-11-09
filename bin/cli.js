@@ -1,18 +1,19 @@
 #! /usr/bin/env node
 const { promises: fs } = require('fs')
 const { join } = require('path')
-const { promises: readline } = require('readline')
 const { exec } = require('child_process')
 const crypto = require('crypto')
+const inquirer = require('inquirer')
 
 const question = async (query) => {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  })
+  const { answer } = await inquirer.prompt([
+    {
+      type: 'input',
+      name: 'answer',
+      message: query
+    }
+  ])
 
-  const answer = await rl.question(query)
-  rl.close()
   return answer
 }
 
