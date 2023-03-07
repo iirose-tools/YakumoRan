@@ -1,172 +1,241 @@
-import Word from './api/main'
-import * as api from '../../lib/api'
+
+import * as word from './api/index'
 import config from '../../config'
-import per from '../permission/permission'
-import fs from 'fs'
-import path from 'path'
-import axios from 'axios'
+import * as api from '../../lib/api'
 
-try {
-  fs.mkdirSync(path.join(api.Data, 'word/wordData'))
-} catch (err) {}
+if (!word.permissions.have('word.*', config.app.master_uid)) { word.permissions.add('word.*', config.app.master_uid) }
 
-try {
-  fs.mkdirSync(path.join(api.Data, 'word/userData'))
-} catch (err) {}
-
-try {
-  fs.mkdirSync(path.join(api.Data, 'word/wordconfig'))
-} catch (err) {}
-
-// 指定词库数据库根目录
-const word = new Word(api.Data, config.app.master_uid, config.app.nickname)
-
-// 主词库(公屏触发)
+// 主词库(私聊触发)
 api.Event.on('PrivateMessage', msg => {
-  if (per.users.hasPermission(msg.uid, 'word.kick')) return // 不响应已经被踢出的人
   if (msg.username === config.account.username) return // 不响应自己发送的消息
-  const wd: string = msg.message.trim()
-  const reply = api.method.sendPrivateMessage // 定义发送文本的函数
-  const out = word.start(wd, msg)
-  if (out) {
-    reply(msg.uid, out)
-  }
-}
-)
+  const message: string = msg.message.trim()
+  const name:string = msg.username
+  const id:string = msg.uid
+
+  const out = word.driver.mainStart(message, {
+    mname: name,
+    mid: id
+  })
+
+  if (!out) return
+  api.method.sendPrivateMessage(id, out)
+})
 
 // 主词库(公屏触发)
 api.Event.on('PublicMessage', msg => {
-  if (per.users.hasPermission(msg.uid, 'word.kick')) return // 不响应已经被踢出的人
   if (msg.username === config.account.username) return // 不响应自己发送的消息
-  const wd: string = msg.message.trim()
-  const reply = api.method.sendPublicMessage // 定义发送文本的函数
-  const out = word.start(wd, msg)
-  if (out) {
-    reply(out)
-  }
-}
-)
+  const message: string = msg.message.trim()
+  const name:string = msg.username
+  const id:string = msg.uid
 
-// 添加问答√
-api.command(/^\.问(.*?)答(.*)$/, 'word.add', async (m, e, reply) => {
-  if (!per.users.hasPermission(e.uid, 'word.edit.add') && !per.users.hasPermission(e.uid, 'permission.word')) return // 不响应没有权限的人，@后期改为能设置config文件内决定是否开启这一条
-  if (per.users.hasPermission(e.uid, 'word.kick')) return // 不响应已经被踢出的人
-  reply(word.add(m[1], m[2], e))
-}
-)
+  const out = word.driver.mainStart(message, {
+    mname: name,
+    mid: id
+  })
 
-// 删除问答√
-api.command(/^\.删(.*?)序号(.*)$/, 'word.del', async (m, e, reply) => {
-  if (!per.users.hasPermission(e.uid, 'word.edit.del') && !per.users.hasPermission(e.uid, 'permission.word')) return // 不响应没有权限的人，@后期改为能设置config文件内决定是否开启这一条
-  if (per.users.hasPermission(e.uid, 'word.kick')) return // 不响应已经被踢出的人
-  reply(word.del(m[1], m[2], e))
-}
-)
+  if (!out) return
+  api.method.sendPublicMessage(out)
+})
 
-// 查看问（包含指定文字的问，需要显示是哪个库的√
-api.command(/^\.问表(.*?)$/, 'word.qwhere', async (m, e, reply) => {
-  if (per.users.hasPermission(e.uid, 'word.kick')) return // 不响应已经被踢出的人
-  api.method.sendPrivateMessage(e.uid, word.getas(m[1]))
-}
-)
+// 添加问答
+api.command(/^\.问([\s\S]+?)答([\s\S]+)$/, 'word.editor.add', async (m, e, reply) => {
+  if (!word.permissions.have('word.edit.add', e.uid)) return reply(' [词库核心] word.edit.add 权限不足')
+  // 发送消息
+  reply(word.editor.add(m[1], m[2], e.uid))
+})
 
-// 查看答 （包含指定文字的答，需要显示是哪个库的√
-api.command(/^\.答表(.*?)$/, 'word.awhere', async (m, e, reply) => {
-  if (per.users.hasPermission(e.uid, 'word.kick')) return // 不响应已经被踢出的人
-  api.method.sendPrivateMessage(e.uid, word.getqs(m[1]))
-}
-)
+// 删除问答
+api.command(/^\.删([\s\S]+?)序号([\s\S]+?)$/, 'word.editor.del', async (m, e, reply) => {
+  if (!word.permissions.have('word.edit.del', e.uid)) return reply(' [词库核心] word.edit.del 权限不足')
 
-// 设置为第几个词库
-api.command(/^\.入库(.*?)$/, 'word.in', async (m, e, reply) => {
-  if (!per.users.hasPermission(e.uid, 'word.edit.in') && !per.users.hasPermission(e.uid, 'permission.word')) return // 不响应没有权限的人，@后期改为能设置config文件内决定是否开启这一条
-  if (per.users.hasPermission(e.uid, 'word.kick')) return // 不响应已经被踢出的人
+  // 发送消息
+  reply(word.editor.del(m[1], m[2], e.uid))
+})
 
-  reply(word.in(m[1], e))
-}
-)
+// 寻找触发词
+api.command(/^\.问表([\s\S]+?)$/, 'word.editor.findQuestion', async (m, e, reply) => {
+  // 回复结果
+  reply(word.editor.findQuestion(m[1]))
+})
 
-api.command(/^\.出库$/, 'word.out', async (m, e, reply) => {
-  if (!per.users.hasPermission(e.uid, 'word.edit.out') && !per.users.hasPermission(e.uid, 'permission.word')) return // 不响应没有权限的人，@后期改为能设置config文件内决定是否开启这一条
-  if (per.users.hasPermission(e.uid, 'word.kick')) return // 不响应已经被踢出的人
-  reply(word.out(e))
-}
-)
-
-api.command(/^\.表(.*)$/, 'word.list.a', async (m, e, reply) => {
-  if (!per.users.hasPermission(e.uid, 'word.edit.find') && !per.users.hasPermission(e.uid, 'permission.word')) return // 不响应没有权限的人，@后期改为能设置config文件内决定是否开启这一条
-  if (per.users.hasPermission(e.uid, 'word.kick')) return // 不响应已经被踢出的人
-  api.method.sendPrivateMessage(e.uid, word.alist(m[1], e))
-}
-)
-
-api.command(/^\.库表$/, 'word.list', async (m, e, reply) => {
-  if (!per.users.hasPermission(e.uid, 'word.edit.find') && !per.users.hasPermission(e.uid, 'permission.word')) return // 不响应没有权限的人，@后期改为能设置config文件内决定是否开启这一条
-  if (per.users.hasPermission(e.uid, 'word.kick')) return // 不响应已经被踢出的人
-  api.method.sendPrivateMessage(e.uid, word.list())
-}
-)
-
-api.command(/^\.栈(.*)$/, 'word.list.q', async (m, e, reply) => {
-  if (!per.users.hasPermission(e.uid, 'word.edit.find') && !per.users.hasPermission(e.uid, 'permission.word')) return // 不响应没有权限的人，@后期改为能设置config文件内决定是否开启这一条
-  if (per.users.hasPermission(e.uid, 'word.kick')) return // 不响应已经被踢出的人
-  api.method.sendPrivateMessage(e.uid, word.qlist(m[1]))
-}
-)
-
-api.command(/^\.wop(.*)$/, 'word.admin.add', async (m, e, reply) => {
-  if (!per.users.hasPermission(e.uid, 'word.admin.add') && !per.users.hasPermission(e.uid, 'permission.word')) return // 不响应没有权限的人，@后期改为能设置config文件内决定是否开启这一条
-  if (per.users.hasPermission(e.uid, 'word.kick')) return // 不响应已经被踢出的人
-  reply(word.op(m[1]))
-}
-)
-
-api.command(/^\.wdeop(.*)$/, 'word.admin.del', async (m, e, reply) => {
-  if (!per.users.hasPermission(e.uid, 'word.admin.del') && !per.users.hasPermission(e.uid, 'permission.word')) return // 不响应没有权限的人，@后期改为能设置config文件内决定是否开启这一条
-  if (per.users.hasPermission(e.uid, 'word.kick')) return // 不响应已经被踢出的人
-  reply(word.deop(m[1]))
-}
-)
-
-api.command(/^\.(.*)天梯$/, 'word.list.data', async (m, e, reply) => {
-  if (per.users.hasPermission(e.uid, 'word.kick')) return // 不响应已经被踢出的人
-  reply(word.leaderboard(m[1]))
-}
-)
-
-api.command(/^.上传(.*)$/, 'word.upload', async (m, e, reply) => {
-  if (!per.users.hasPermission(e.uid, 'word.edit.upload') && !per.users.hasPermission(e.uid, 'permission.word')) return // 不响应没有权限的人，@后期改为能设置config文件内决定是否开启这一条
-  if (per.users.hasPermission(e.uid, 'word.kick')) return // 不响应已经被踢出的人
-  const up = word.getjson('wordData', m[1])
-  if (JSON.stringify(up) !== '{}') {
-    try {
-      const response = await axios.post('https://word.bstluo.top/new.php', up)
-      reply(` [词库核心] ${response.data}`)
-    } catch (error) {
-      reply('投稿失败，请联系管理员手动进行投稿')
-    }
+// 入库
+api.command(/^\.入库([\s\S]+?)$/, 'word.editor.changePointer', async (m, e, reply) => {
+  // 回复结果
+  const adminlist = word.editor.isWriter(e.uid)
+  if (adminlist) {
+    reply(word.editor.changePointer(m[1], e.uid))
+  } else {
+    reply(' [词库核心] 您可能不是此词库的作者，无法入库')
   }
 })
 
-api.command(/^.下载(.*):(.*)$/, 'word.download', async (m, e, reply) => {
-  if (!per.users.hasPermission(e.uid, 'word.edit.download') && !per.users.hasPermission(e.uid, 'permission.word')) return // 不响应没有权限的人，@后期改为能设置config文件内决定是否开启这一条
-  if (per.users.hasPermission(e.uid, 'word.kick')) return // 不响应已经被踢出的人
-  try {
-    const response = await axios.post('https://word.bstluo.top/read.php', {
-      id: m[1]
-    })
-    word.update('wordData', m[2], response.data)
-    reply(' [词库核心] 下载成功')
-  } catch (error) {
-    console.log(error)
-    reply('下载失败，请联系管理员手动进行投稿')
+// 出库
+api.command(/^\.问表([\s\S]+?)$/, 'word.editor.resetPointer', async (m, e, reply) => {
+  // 回复结果
+  reply(word.editor.resetPointer(e.uid))
+})
+
+// 查看某关键词的回答
+api.command(/^\.表([\s\S]+?)$/, 'word.editor.list', async (m, e, reply) => {
+  // 回复结果
+  reply(word.editor.list(m[1], e.uid))
+})
+
+// 查看拥有的词库
+api.command(/^\.库表([\s\S]+?)$/, 'word.editor.findList', async (m, e, reply) => {
+  // 回复结果
+  reply(word.editor.findList(m[1]))
+})
+
+// 查看某词库拥有的所有触发词
+api.command(/^\.栈([\s\S]+?)$/, 'word.editor.passiveList', async (m, e, reply) => {
+  // 回复结果
+  reply(word.editor.passiveList(m[1]))
+})
+
+// 给一位用户权限
+// .赋权<uid> <权限名>
+api.command(/^\.赋权\s+\[@([\s\S]+?)@\]\s+([\s\S]+?)$/, 'word.permissions.add', async (m, e, reply) => {
+  // 回复结果
+  if (!word.permissions.have('word.permissions.add', e.uid)) return reply(' [词库核心] word.permissions.add 权限不足')
+
+  reply(word.permissions.add(m[2], m[1].toLowerCase()))
+})
+
+// 给一位用户权限
+// .除权<uid> <权限名>
+api.command(/^\.除权\s+\[@([\s\S]+?)@\]\s+([\s\S]+?)$/, 'word.permissions.del', async (m, e, reply) => {
+  // 回复结果
+  if (!word.permissions.have('word.permissions.del', e.uid)) return reply(' [词库核心] word.permissions.del 权限不足')
+
+  reply(word.permissions.del(m[2], m[1].toLowerCase()))
+})
+
+// 查看某物品的数量
+// .<物品名称>:<库名>天梯
+api.command(/^\.([\s\S]+?):([\s\S]+?)天梯$/, 'word.driver.itemList', async (m, e, reply) => {
+  const a = '\\\\\\*\n' + word.driver.itemList(m[1], m[2], { header: ' [@', body: '@] ' }, true)
+  reply(a)
+})
+
+// 将一个库移动到回收站
+// .删库<库名>
+api.command(/^\.删库([\s\S]+?)$/, 'word.editor.killList', async (m, e, reply) => {
+  if (!word.permissions.have('word.editor.killList', e.uid)) return reply(' [词库核心] word.editor.killList 权限不足')
+
+  reply(word.editor.killList(m[1]))
+})
+
+// 将回收站清空
+// .清空回收站
+api.command(/^\.清空回收站$/, 'word.editor.clearBackup', async (m, e, reply) => {
+  if (!word.permissions.have('word.editor.clearBackup', e.uid)) return reply(' [词库核心] word.editor.clearBackup 权限不足')
+
+  reply(word.editor.clearBackup())
+})
+
+// 将回收站内某词库还原
+// .还原回收站<词库名>
+api.command(/^\.还原回收站([\s\S]+?)$/, 'word.editor.recoveryList', async (m, e, reply) => {
+  if (!word.permissions.have('word.editor.recoveryList', e.uid)) return reply(' [词库核心] word.editor.recoveryList 权限不足')
+
+  reply(word.editor.recoveryList(m[1]))
+})
+
+// 查看回收站内的词库
+// .查看回收
+api.command(/^\.查看回收$/, 'word.editor.backupList', async (m, e, reply) => {
+  if (!word.permissions.have('word.editor.backupList', e.uid)) return reply(' [词库核心] word.editor.backupList 权限不足')
+
+  reply(word.editor.backupList())
+})
+
+// 不放入回收站直接删除词库
+// .强删<词库名>
+api.command(/^\.强删([\s\S]+?)$/, 'word.editor.mandatoryDelete', async (m, e, reply) => {
+  if (!word.permissions.have('word.editor.mandatoryDelete', e.uid)) return reply(' [词库核心] word.editor.mandatoryDelete 权限不足')
+
+  reply(word.editor.mandatoryDelete(m[1]))
+})
+
+// 在当前词库添加此id为开发者
+// .添加开发者<对方id>
+api.command(/^\.添加开发者\s\[@([\s\S]+?)@\]\s$/, 'word.editor.addWriter', async (m, e, reply) => {
+  if (!word.permissions.have('word.editor.addWriter', e.uid)) return reply(' [词库核心] word.editor.addWriter 权限不足')
+
+  reply(word.editor.addWriter(m[1], e.uid))
+})
+
+// 在当前词库删除此id的开发者身份
+// .删除开发者<对方id>
+api.command(/^\.删除开发者\s\[@([\s\S]+?)@\]\s$/, 'word.editor.rmWriter', async (m, e, reply) => {
+  if (!word.permissions.have('word.editor.rmWriter', e.uid)) return reply(' [词库核心] word.editor.rmWriter 权限不足')
+
+  reply(word.editor.rmWriter(m[1], e.uid))
+})
+
+// 查看某词库的开发者
+// .查看开发者<词库名>
+api.command(/^\.查看开发者([\s\S]+?)$/, 'word.editor.viewWriter', async (m, e, reply) => {
+  reply(word.editor.viewWriter(m[1]))
+})
+
+// 添加某物品到当前词库的物品清单
+// .增包<物品名称>
+api.command(/^\.增包([\s\S]+?)$/, 'word.editor.setPack', async (m, e, reply) => {
+  if (word.editor.isWriter(e.uid)) {
+    reply(word.editor.setPack(e.uid, m[1]))
+  } else {
+    reply(' [词库核心] 您不是当前词库的开发者，请检查当前所入的库')
   }
 })
-/**
- * 导出，导入词库功能
- * 以node POST给服务器然后导出为直链
- * 导入为下载直链
- * 每隔一天清空一次缓存
- *
- * 删除一句、全部删除
-*/
+
+// 删除某物品从当前词库的物品清单
+// .删包<物品名称>
+api.command(/^\.删包([\s\S]+?)$/, 'word.editor.delPack', async (m, e, reply) => {
+  if (word.editor.isWriter(e.uid)) {
+    reply(word.editor.delPack(e.uid, m[1]))
+  } else {
+    reply(' [词库核心] 您不是当前词库的开发者，请检查当前所入的库')
+  }
+})
+
+// 查看当前词库的物品清单
+// .查包
+api.command(/^\.查包$/, 'word.editor.listPack', async (m, e, reply) => {
+  if (word.editor.isWriter(e.uid)) {
+    reply(word.editor.listPack(e.uid))
+  } else {
+    reply(' [词库核心] 您不是当前词库的开发者，请检查当前所入的库')
+  }
+})
+
+// 将当前词库的物品存储于背包某格
+// .修改存储格<背包存储格>
+api.command(/^\.修改存储格([\s\S]+?)$/, 'word.editor.changCache', async (m, e, reply) => {
+  if (word.editor.isWriter(e.uid)) {
+    reply(word.editor.changCache(m[1], e.uid))
+  } else {
+    reply(' [词库核心] 您不是当前词库的开发者，请检查当前所入的库')
+  }
+})
+
+// 添加主动问答
+// .有<主动式>时<回答句>
+api.command(/^\.修改存储格([\s\S]+?)$/, 'word.editor.whenOn', async (m, e, reply) => {
+  if (!word.permissions.have('word.editor.whenOn', e.uid)) return reply(' [词库核心] word.editor.whenOn 权限不足')
+  // 发送消息
+  reply(word.editor.whenOn(m[1], m[2], e.uid))
+})
+
+// 删除主动问答
+// .无<触发词>序号<序号>
+api.command(/^\.删([\s\S]+?)序号([\s\S]+?)$/, 'word.editor.whenOff', async (m, e, reply) => {
+  if (!word.permissions.have('word.editor.whenOff', e.uid)) return reply(' [词库核心] word.editor.whenOff 权限不足')
+
+  // 回复结果
+  reply(word.editor.whenOff(m[1], m[2], e.uid))
+})
+
+// 上传
+// 下载

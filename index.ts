@@ -5,14 +5,18 @@ import pack from './package.json'
 const update = async () => {
   logger('Updater').info('正在检查更新...')
 
-  const resp = await axios.get('https://api.peer.ink/api/github/YakumoRan')
+  try {
+    const resp = await axios.get('https://github.com/iirose-tools/YakumoRan/raw/main/package.json')
 
-  const data = resp.data
+    const data = resp.data
 
-  if (data.version !== pack.version) {
-    logger('Updater').info(`发现了新的版本，版本号为 ${data.version}，请及时更新，链接: https://github.com/iirose-tools/YakumoRan`)
-  } else {
-    logger('Updater').info('未发现新版本')
+    if (data.version !== pack.version) {
+      logger('Updater').info(`发现了新的版本，版本号为 ${data.version}，请及时更新，链接: https://github.com/iirose-tools/YakumoRan`)
+    } else {
+      logger('Updater').info('未发现新版本')
+    }
+  } catch (err) {
+    logger('Updater').info('检查更新失败')
   }
 }
 
