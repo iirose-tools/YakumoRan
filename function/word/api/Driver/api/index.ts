@@ -144,6 +144,7 @@ export const interpreter = (inData: string, playData: { [key: string]: string })
     }
     return outArr
   } catch (err: any) {
+    console.log(err)
     return `[Word-Driver] ${err.message}`
   }
 }
@@ -160,8 +161,6 @@ const ArrayInterpreter = (needInterpreterArr: any[], playData: { [key: string]: 
 
   if (Object.keys(funcPack).indexOf(inArr[0]) > -1) {
     if (!funcPack[inArr[0]]) { return }
-    inArr[0] = playData.messageId
-    delete playData.messageId
 
     let o = funcPack[inArr[0]](inArr, playData)
     if (!o) { o = '' }

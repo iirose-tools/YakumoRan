@@ -1,4 +1,3 @@
-
 import * as word from './api/index'
 import config from '../../config'
 import * as api from '../../lib/api'

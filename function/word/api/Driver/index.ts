@@ -3,6 +3,7 @@ import * as path from 'path'
 import * as api from '../Tools/index'
 import { messageReg } from '../Function/Config/regList/index'
 import { interpreter } from './api/index'
+import md5 from 'md5'
 
 /**
 * 返回一个文件的json对象
@@ -168,8 +169,11 @@ export default class {
    * @returns
    */
   start (a: string, playData: { [key: string]: any }) {
-    // 修改消息id
+    // 修改消息唯一标识
+    playData.messageId = md5(a)
+
     let out = interpreter(a, playData)
+    console.log(out)
     if (Array.isArray(out)) { out = out.join('') }
 
     // 完成后从这边应用整个playData.data的数据

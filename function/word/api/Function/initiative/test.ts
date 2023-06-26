@@ -1,3 +1,5 @@
 import { initiative } from '../../index'
 
-console.log(initiative('每隔2秒', {}))
+setInterval(() => {
+  initiative('每隔2秒', {})
+})
