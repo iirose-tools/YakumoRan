@@ -1,4 +1,4 @@
-export default (type: 'music' | 'video', title: string, signer: string, cover: string, link: string, url: string, duration: number) => {
+export default (type: 'music' | 'video', title: string, signer: string, cover: string, link: string, url: string, duration: number, lyrics: string = '') => {
   const typeMap = {
     music: 0,
     video: 1
@@ -11,7 +11,8 @@ export default (type: 'music' | 'video', title: string, signer: string, cover: s
     n: title,
     o: link.substr(4),
     r: signer,
-    s: url.substr(4)
+    s: url.substr(4),
+    l: lyrics
   })
 
   return `&1${data}`

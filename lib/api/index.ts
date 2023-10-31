@@ -227,6 +227,7 @@ export const method = {
    * @param duration 时长（秒）
    * @param BitRate 比特率
    * @param color 颜色
+   * @param lyrics 歌词
    * @returns {[Promise, Promise]}
    */
   sendMedia: (
@@ -238,10 +239,11 @@ export const method = {
     url: string,
     duration: number,
     BitRate: number,
-    color: string
+    color: string,
+    lyrics: string = ''
   ) => {
     const cardData = mediaCard(type, title, signer, cover, BitRate, color)
-    const mData = mediaData(type, title, signer, cover, link, url, duration)
+    const mData = mediaData(type, title, signer, cover, link, url, duration, lyrics)
 
     return [send(cardData), send(mData)]
   },
