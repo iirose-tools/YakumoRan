@@ -111,14 +111,14 @@ export default class {
       const key = Object.keys(inArr)[index]// 选择哪个词库
       const a = inArr[key]
 
-      if (a.length <= 0) { break }
+      if (a.length < 0) { break }
 
       playData.cache = key
 
       const now = a.splice(random(0, a.length - 1), 1)
       const value = this.start(now[0], playData)
 
-      if (value !== '[Word-Driver] next') {
+      if (/\[Word-Driver\]\s(next|error)/.test(value)) {
         return value
       }
     }
@@ -173,7 +173,7 @@ export default class {
     playData.messageId = md5(a)
 
     let out = interpreter(a, playData)
-    console.log(out)
+
     if (Array.isArray(out)) { out = out.join('') }
 
     // 完成后从这边应用整个playData.data的数据

@@ -175,3 +175,7 @@ const ArrayInterpreter = (needInterpreterArr: any[], playData: { [key: string]: 
 export const next = () => {
   return new Error('[Word-Driver] next')
 }
+
+export const error = (text: string) => {
+  return new Error(`[Word-Driver] error ${text}`)
+}

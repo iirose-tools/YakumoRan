@@ -2,7 +2,7 @@ import * as api from '../../Tools/index'
 import { config } from '../../Function/Config/conventional'
 import * as word from '../../index'
 // next() 代表此条词库执行失败，申请换一条
-import { next } from '../../Driver/api/index'
+import { next, error } from '../../Driver/api/index'
 
 const dir = config.dir
 
@@ -11,6 +11,12 @@ const random = (n: number, m: number) => { return Math.floor(Math.random() * (m 
 
 // 函数包
 export const funcPack:any = {
+  测试: (inData: any, playData: any) => {
+    console.log(inData)
+    console.log(playData)
+    // 当发现有测试语句的时候会触发这个
+    return inData[1]
+  },
   添加: (inData: any, playData: any) => {
     const cache = playData.cache
     const reg = /([\s\S]+?)~([\s\S]+?)/
@@ -41,6 +47,7 @@ export const funcPack:any = {
 
     return num
   },
+  // $减少 物品名称 数量(可以为xx~xx，或者是all) 为谁减少$
   减少: (inData: any, playData: any) => {
     const cache = playData.cache
     const reg = /([\s\S]+?)~([\s\S]+?)/
@@ -51,7 +58,13 @@ export const funcPack:any = {
     // 在缓存的玩家数据如果不存在的话，读取，并初始化它
     /*
     {
-      存储格名: {}
+      存储格子a: {
+        小鱼干: 10,
+        大鱼干: 20
+      },
+      存储格子b: {
+        丹药: 114514
+      }
     }
     */
     if (!playData.data[who]) { playData.data[who] = api.command.getjson(dir, 'userData', who) }
@@ -69,7 +82,7 @@ export const funcPack:any = {
 
     mData[main] = mData[main] - Number(num)
     if (mData[main] > 0) { return num }
-    return next()
+    return error(`你的物品${main}不足`)
   },
   数值: (inData: any, playData: any) => {
     const cache = playData.cache
