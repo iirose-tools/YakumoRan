@@ -1,0 +1,53 @@
+{
+  "name": "chess",
+  "id": "chess",
+  "main": "index",
+  "author": {
+    "name": "春风~",
+    "github": "BSTluo",
+    "iirose": "春风萧落"
+  },
+  "intro": [
+    "棋",
+    "权限节点",
+    "chess.op  : 拥有这个权限的用户能够修改词库",
+    "chess.watch ： 拥有这个权限可以观战"
+    ],
+  "commands": [{
+    "cmd": "chess restart",
+    "helper": "初始化棋盘"
+  }, {
+    "cmd": "chess get",
+    "helper": "获得身份"
+  },{
+    "cmd": "attack<艾特>",
+    "helper": "攻击一个人"
+  },{
+    "cmd": "请<白|黑>方攻击",
+    "helper": "宣告某一方攻击"
+  },{
+    "cmd": "chess open",
+    "helper": "发起游戏（并且成为主持人）"
+  },{
+    "cmd": "chess list player",
+    "helper": "查看自己的阵营的列表"
+  },{
+    "cmd": "chess all player",
+    "helper": "查看场上所有角色"
+  },{
+    "cmd": "chess list check",
+    "helper": "查看己方阵营棋子"
+  },{
+    "cmd": "chess all check",
+    "helper": "（需要主持人权限）查看场上的棋子"
+  },{
+    "cmd": "chess help",
+    "helper": "查看基本规则"
+  },{
+    "cmd": "chess watch on",
+    "helper": "开始观战"
+  },{
+    "cmd": "chess watch off",
+    "helper": "停止观战"
+  }]
+}

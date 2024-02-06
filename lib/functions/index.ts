@@ -29,7 +29,7 @@ fs.readdirSync(functionPath).forEach(e => {
   logger('Plugin').info(`${e} 加载完成`)
 })
 
-Event.on('PrivateMessage', (msg) => {
+Event.on('PublicMessage', (msg) => {
   const helper = (id: string): string => {
     if (func[id]) {
       const helper = func[id].helper
@@ -100,7 +100,7 @@ Event.on('PrivateMessage', (msg) => {
       tmp.push(helper(id))
     }
 
-    method.sendPrivateMessage(msg.uid, '\\\\\\~' + tmp.slice((page - 1) * 3, page * 3).join('\n================================\n'), config.app.color)
+    method.sendPublicMessage('\\\\\\~' + tmp.slice((page - 1) * 3, page * 3).join('\n================================\n'), config.app.color)
   }
 
   if (msg.message.trim() === '.help') {
@@ -112,6 +112,6 @@ Event.on('PrivateMessage', (msg) => {
     // eslint-disable-next-line eqeqeq
     if (Number(id) == id) return helpPage(Number(id))
 
-    method.sendPrivateMessage(msg.uid, '\\\\\\~' + helper(id), config.app.color)
+    method.sendPublicMessage('\\\\\\~' + helper(id), config.app.color)
   }
 })
