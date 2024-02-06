@@ -14,7 +14,7 @@ export class autopay {
       employer: string,
       salaryperhour: number
     }
-  } = {};
+  } = {}
 
   /**
   * @description 写入数据

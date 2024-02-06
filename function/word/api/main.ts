@@ -561,7 +561,7 @@ export default class word {
             const outnum = Number((mData[1].search('~') >= 0) ? (this.random(Number(mData[1].split('~')[0]), Number(mData[1].split('~')[1]))) : Number(mData[1]))
             if (outnum > user[mData[0].substring(0, 2)].value) {
               user[mData[0].substring(0, 2)] = {
-                name: name,
+                name,
                 value: outnum
               }
               this.update('userData', mubiao, user)

@@ -9,13 +9,13 @@ import { Actions } from './Action'
  * @class
  */
 export class Member {
-  static path = path.join(Ran.Data, '/member/members.json');
+  static path = path.join(Ran.Data, '/member/members.json')
   static users: {
     [index: string]: {
       online: boolean,
       Minutes: number
     }
-  } = {};
+  } = {}
 
   /**
    * @description 写入数据
