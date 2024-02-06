@@ -1,0 +1,26 @@
+{
+  "name": "vote",
+  "id": "vote",
+  "main": "index",
+  "author": {
+    "name": "风间苏苏",
+    "github": "TheresaQWQ",
+    "iirose": "风间苏苏"
+  },
+  "intro": [
+    "投票插件",
+    "",
+    "权限节点：",
+    "新建投票 vote.create"
+  ],
+  "commands": [{
+    "cmd": "新建投票",
+    "helper": "新建一个投票（根据机器人私聊中的提示操作即可）"
+  }, {
+    "cmd": "投票列表",
+    "helper": "查看投票列表"
+  }, {
+    "cmd": "投票<id><选项>",
+    "helper": "参与一个投票"
+  }]
+}

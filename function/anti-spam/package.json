@@ -1,0 +1,14 @@
+{
+  "name": "anti-spam",
+  "id": "anti-spam",
+  "main": "index",
+  "author": {
+    "name": "风间苏苏",
+    "github": "TheresaQWQ",
+    "iirose": "风间苏苏"
+  },
+  "intro": [
+    "自动封禁刷屏以及发送垃圾信息的用户"
+  ],
+  "commands": []
+}

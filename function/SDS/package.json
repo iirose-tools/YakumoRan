@@ -1,0 +1,14 @@
+{
+  "name": "SDS",
+  "id": "sds",
+  "main": "index",
+  "author": {
+    "name": "风间苏苏",
+    "github": "TheresaQWQ",
+    "iirose": "风间苏苏"
+  },
+  "intro": [
+    "私聊发送 SDS 开始测试"
+  ],
+  "commands": []
+}

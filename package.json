@@ -38,7 +38,6 @@
     "@types/pako": "^1.0.1",
     "@types/ws": "^7.4.0",
     "axios": "^0.26.1",
-    "chatgpt-lib": "^0.3.0",
     "cross-env": "^7.0.3",
     "html-entities": "^2.3.2",
     "log4js": "^6.3.0",
