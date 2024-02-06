@@ -239,7 +239,7 @@ const itemsToReduce = () => {
       wd = wd.replace(load[0], '')
     }
   }
- 
+
   while (wd.match(/-(.*?)-/)) {
     const third = wd.match(/-(.*?)-/)
     if (third) {
@@ -295,7 +295,7 @@ const itemsToReduce = () => {
             outNumber = random(Number(num[0]), user[mData[0]])
           } else if (num[1] === '0.5all') {
             outNumber = random(Number(num[0]), user[mData[0]] / 2)
-          } else if (num[1] === '0.2all')  {
+          } else if (num[1] === '0.2all') {
             outNumber = random(Number(num[0]), user[mData[0]] / 5)
           } else {
             outNumber = random(Number(num[0]), Number(num[1]))
@@ -337,7 +337,7 @@ const itemsToAdd = () => {
         const outnum = Number((mData[1].search('~') >= 0) ? (random(Number(mData[1].split('~')[0]), Number(mData[1].split('~')[1]))) : Number(mData[1]))
         if (outnum > user[mData[0].substring(0, 2)].value) {
           user[mData[0].substring(0, 2)] = {
-            name: name,
+            name,
             value: outnum
           }
           update('userData', mubiao, user, dir)

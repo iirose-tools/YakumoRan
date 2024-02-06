@@ -164,7 +164,7 @@ export const edit = {
     * @return 返回结果
   */
   over (name:string, dir:any) {
-    try{
+    try {
       fs.unlinkSync(path.join(dir, `./word/wordData/${name}.json`))
       return ' [词库核心] 删除词库成功 '
     } catch (err) {

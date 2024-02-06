@@ -211,7 +211,7 @@ const outputResolution = async (wd:string, userData:any) => {
       wd = wd.replace(load[0], '')
     }
   }
-  
+
   return [publicValue, privateValue, wd]
 }
 
