@@ -29,8 +29,4 @@ process.on('uncaughtException', (err: any, origin: any) => {
   process.exit(127)
 })
 
-<<<<<<< HEAD
 init()
-=======
-init()
->>>>>>> parent of 4743efd (	deleted:    function/JustForFun/index.ts)
